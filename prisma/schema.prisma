@@ -124,13 +124,14 @@ model Userprofile {
 }
 
 model Milestone {
-  id           String          @id @default(cuid())
-  title        String
-  subtitle     String?
-  description  String?
-  status       Milestonestatus
-  badge        String?
-  freelancerid String
+  id            String          @id @default(cuid())
+  title         String
+  subtitle      String?
+  milestonecost Int
+  description   String?
+  status        Milestonestatus
+  badge         String?
+  freelancerid  String
 
   Freelancer Freelancer @relation(fields: [freelancerid], references: [id])
 }
