@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String       @id
+  name          String
+  email         String
+  emailVerified Boolean      @default(false)
+  image         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  Freelancer    Freelancer?
+  userprofiles  Userprofile?
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Freelancer {
+  id       String    @id @default(cuid())
+  userId   String    @unique
+  category Categorys
+
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  milestones Milestone[]
+  clients    FreelancerClient[]
+}
+
+model FreelancerClient {
+  id String @id @default(cuid())
+
+  freelancerId String?
+  clientid     String?
+
+  freelancer  Freelancer?  @relation(fields: [freelancerId], references: [id])
+  userprofile Userprofile? @relation(fields: [clientid], references: [id])
+  createdAt   DateTime     @default(now())
+}
+
+model Userprofile {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Freelancers FreelancerClient[]
+}
+
+model Milestone {
+  id           String          @id @default(cuid())
+  title        String
+  subtitle     String?
+  description  String?
+  status       Milestonestatus
+  badge        String?
+  freelancerid String
+
+  Freelancer Freelancer @relation(fields: [freelancerid], references: [id])
+}
+
+enum Categorys {
+  WEB_DEV
+  VIDEO_EDITOR
+  GRAPHIC_DESIGNER
+  WEB_DESIGNER
+  SEO
+}
+
+enum Milestonestatus {
+  approved
+  pending_payment
+  not_started
+  stopped
+}
