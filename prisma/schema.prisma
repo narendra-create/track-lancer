@@ -72,33 +72,55 @@ model Verification {
   @@map("verification")
 }
 
+model Payment {
+  id              String                    @id @default(cuid())
+  total_cost      Int
+  paid_amount     Int
+  payment_status  Paymentstatus
+  due_date        DateTime
+  paymentrelation FreelancerPaymentClient[]
+}
+
 model Freelancer {
   id       String    @id @default(cuid())
   userId   String    @unique
   category Categorys
 
-  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  milestones Milestone[]
-  clients    FreelancerClient[]
+  user                     User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  milestones               Milestone[]
+  clients                  FreelancerClient[]
+  freelancerPaymentClients FreelancerPaymentClient[]
 }
 
 model FreelancerClient {
-  id String @id @default(cuid())
-
+  id           String  @id @default(cuid())
   freelancerId String?
   clientid     String?
 
   freelancer  Freelancer?  @relation(fields: [freelancerId], references: [id])
   userprofile Userprofile? @relation(fields: [clientid], references: [id])
-  createdAt   DateTime     @default(now())
+
+  createdAt DateTime @default(now())
+}
+
+model FreelancerPaymentClient {
+  id           String  @id @default(cuid())
+  freelancerId String?
+  clientid     String?
+  paymentId    String
+
+  freelancer   Freelancer?  @relation(fields: [freelancerId], references: [id])
+  userprofile  Userprofile? @relation(fields: [clientid], references: [id])
+  paymentmodel Payment      @relation(fields: [paymentId], references: [id])
 }
 
 model Userprofile {
   id     String @id @default(cuid())
   userId String @unique
 
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Freelancers FreelancerClient[]
+  user                     User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Freelancers              FreelancerClient[]
+  freelancerPaymentClients FreelancerPaymentClient[]
 }
 
 model Milestone {
@@ -126,4 +148,10 @@ enum Milestonestatus {
   pending_payment
   not_started
   stopped
+}
+
+enum Paymentstatus {
+  DUE
+  PENDING_VERIFICATION
+  PAID
 }
