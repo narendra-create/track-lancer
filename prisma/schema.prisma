@@ -119,7 +119,7 @@ model Userprofile {
   userId String @unique
 
   user                     User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Freelancers              FreelancerClient[]
+  hiredFreelancers         FreelancerClient[]
   freelancerPaymentClients FreelancerPaymentClient[]
 }
 
