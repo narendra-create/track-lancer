@@ -73,12 +73,13 @@ model Verification {
 }
 
 model Payment {
-  id              String                    @id @default(cuid())
-  total_cost      Int
-  paid_amount     Int
-  payment_status  Paymentstatus
-  due_date        DateTime
-  paymentrelation FreelancerPaymentClient[]
+  id             String        @id @default(cuid())
+  total_cost     Int
+  paid_amount    Int
+  payment_status Paymentstatus
+  due_date       DateTime
+  projectId      String?
+  project        Project?      @relation(fields: [projectId], references: [id])
 }
 
 model Freelancer {
@@ -86,41 +87,16 @@ model Freelancer {
   userId   String    @unique
   category Categorys
 
-  user                     User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  milestones               Milestone[]
-  clients                  FreelancerClient[]
-  freelancerPaymentClients FreelancerPaymentClient[]
-}
-
-model FreelancerClient {
-  id           String  @id @default(cuid())
-  freelancerId String?
-  clientid     String?
-
-  freelancer  Freelancer?  @relation(fields: [freelancerId], references: [id])
-  userprofile Userprofile? @relation(fields: [clientid], references: [id])
-
-  createdAt DateTime @default(now())
-}
-
-model FreelancerPaymentClient {
-  id           String  @id @default(cuid())
-  freelancerId String?
-  clientid     String?
-  paymentId    String
-
-  freelancer   Freelancer?  @relation(fields: [freelancerId], references: [id])
-  userprofile  Userprofile? @relation(fields: [clientid], references: [id])
-  paymentmodel Payment      @relation(fields: [paymentId], references: [id])
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects Project[]
 }
 
 model Userprofile {
   id     String @id @default(cuid())
   userId String @unique
 
-  user                     User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  hiredFreelancers         FreelancerClient[]
-  freelancerPaymentClients FreelancerPaymentClient[]
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects Project[]
 }
 
 model Milestone {
@@ -131,9 +107,25 @@ model Milestone {
   description   String?
   status        Milestonestatus
   badge         String?
-  freelancerid  String
 
-  Freelancer Freelancer @relation(fields: [freelancerid], references: [id])
+  project   Project? @relation(fields: [projectId], references: [id])
+  projectId String?
+}
+
+model Project {
+  id           String  @id @default(cuid())
+  title        String
+  clientId     String
+  freelancerId String?
+
+  client     Userprofile @relation(fields: [clientId], references: [id])
+  freelancer Freelancer? @relation(fields: [freelancerId], references: [id])
+
+  milestones Milestone[]
+  payments   Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Categorys {
