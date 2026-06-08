@@ -1,15 +1,86 @@
 @import "tailwindcss";
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
-
 @theme inline {
+  /* DEFAULT NEXT COLORS */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* BRAND COLORS */
+  --color-brand-bg: #0f0f0f;
+  --color-brand-surface: #161616;
+  --color-brand-surface2: #1d1d1d;
+
+  /* BORDER */
+  --color-border: #2a2a2a;
+  --color-border-hover: #3d3d3d;
+
+  /* ACCENT */
+  --color-accent: #c8a96e;
+  --color-accent-dim: #9c7d45;
+
+  /* TEXT */
+  --color-ink: #e8e3d8;
+  --color-ink-muted: #7a7570;
+  --color-ink-dim: #3a3733;
+
+  /* STATUS COLORS */
+  --color-status-paid: #2e7d52;
+  --color-status-paid-bg: rgba(46, 125, 82, 0.07);
+  --color-status-paid-border: rgba(46, 125, 82, 0.3);
+  --color-status-paid-text: #4a9e75;
+
+  --color-status-pending: #c8a96e;
+  --color-status-pending-bg: rgba(200, 169, 110, 0.07);
+  --color-status-pending-border: rgba(200, 169, 110, 0.3);
+
+  --color-status-upcoming: #3a3733;
+  --color-status-upcoming-bg: #161616;
+  --color-status-upcoming-border: #2a2a2a;
+  --color-status-upcoming-text: #7a7570;
+
+  --color-status-stopped: #c87840;
+  --color-status-stopped-bg: rgba(200, 120, 64, 0.06);
+  --color-status-stopped-border: rgba(200, 120, 64, 0.25);
+  --color-status-stopped-text: #c87840;
+
+  --color-status-danger: #c0392b;
+  --color-status-danger-bg: rgba(192, 96, 96, 0.08);
+  --color-status-danger-border: #5a2020;
+  --color-status-danger-text: #c06060;
+
+  /* FONTS */
+  --font-serif: var(--font-serif), Georgia, serif;
+
+  --font-sans: var(--font-sans), Arial, sans-serif;
+
+  --font-mono: var(--font-mono), monospace;
+
+  /* FONT SIZES */
+  --text-2xs: 8px;
+  --text-xs: 9px;
+  --text-sm: 11px;
+  --text-base: 13px;
+  --text-md: 15px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 30px;
+  --text-4xl: 48px;
+
+  /* LETTER SPACING */
+  --tracking-badge: 1.5px;
+  --tracking-label: 2px;
+  --tracking-wide: 0.5px;
+  --tracking-tight: -0.5px;
+  --tracking-hero: -0.8px;
+
+  /* RADIUS */
+  --radius-none: 0px;
+  --radius-sm: 0px;
+  --radius-default: 0px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,9 +93,10 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
 
+/* TICKER ANIMATION */
 @keyframes ticker {
   from {
     transform: translateX(0);
@@ -34,7 +106,25 @@ body {
     transform: translateX(-50%);
   }
 }
-
 .animate-ticker {
   animation: ticker 22s linear infinite;
+}
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-tag::before {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--color-accent);
 }
