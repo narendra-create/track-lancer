@@ -44,8 +44,8 @@ const Navbar = () => {
               className="
                 font-mono text-[14px]
                 uppercase tracking-[1.5px]
-                text-[#7a7570]
-                hover:text-[#e8e3d8]
+                text-[#e3dfda]
+                hover:text-[#81817f]
                 duration-150
               "
             >
@@ -120,7 +120,7 @@ const Navbar = () => {
           <button
             key={item}
             onClick={() => setopen(false)}
-            className="text-left py-4 border-b border-[#2a2a2a] font-mono text-[10px] uppercase tracking-[1.5px] text-[#7a7570] hover:text-[#e8e3d8]"
+            className="text-left py-4 border-b border-[#2a2a2a] font-mono text-[10px] uppercase tracking-[1.5px] text-[#dbd6d1] hover:text-[#71706e]"
           >
             {item}
           </button>
