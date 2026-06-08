@@ -17,6 +17,7 @@ model User {
   updatedAt     DateTime     @updatedAt
   sessions      Session[]
   accounts      Account[]
+  role          userrole
   Freelancer    Freelancer?
   userprofiles  Userprofile?
 
@@ -150,4 +151,9 @@ enum Paymentstatus {
   DUE
   PENDING_VERIFICATION
   PAID
+}
+
+enum userrole {
+  FREELANCER
+  CLIENT
 }
