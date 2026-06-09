@@ -91,7 +91,7 @@
 }
 
 body {
-  background: var(--background);
+  background: #0f0f0f;
   color: var(--foreground);
   font-family: var(--font-sans);
 }
@@ -131,4 +131,13 @@ body {
   width: 24px;
   height: 1px;
   background: var(--color-accent);
+}
+
+.step-n {
+  font-family: var(--font-mono);
+  color: var(--color-ink);
+  opacity: 0.06;
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
 }
