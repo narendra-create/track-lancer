@@ -24,7 +24,7 @@
   /* TEXT */
   --color-ink: #e8e3d8;
   --color-ink-muted: #7a7570;
-  --color-ink-dim: #3a3733;
+  --color-ink-dim: #c4bcb1;
 
   /* STATUS COLORS */
   --color-status-paid: #2e7d52;
@@ -107,8 +107,12 @@ body {
   }
 }
 .animate-ticker {
-  animation: ticker 22s linear infinite;
+  animation: ticker 62s linear infinite;
 }
+.animate-ticker:hover {
+  animation-play-state: paused;
+}
+
 .hero-tag {
   font-family: var(--font-mono);
   font-size: 8px;
