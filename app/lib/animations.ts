@@ -1,18 +1,22 @@
 import { Variants } from "motion/react";
 
 export const fadeUp: Variants = {
-    hidden: {
-        opacity: 0,
-        y: 35,
+  hidden: {
+    opacity: 0,
+    y: 30,
+    x: -10,
+  },
+
+  show: {
+    opacity: 1,
+    y: 0,
+    x: 0,
+
+    transition: {
+      duration: 0.7,
+      ease: [0.16,1,0.3,1],
     },
-    show: {
-        opacity: 1,
-        y: 0,
-        transition: {
-            duration: 0.7,
-            ease: [0.16, 1, 0.3, 1],
-        },
-    },
+  },
 };
 
 
@@ -32,18 +36,18 @@ export const fadeLeft: Variants = {
 };
 
 export const fadeRight: Variants = {
-    hidden: {
-        opacity: 0,
-        y: 40,
+  hidden:{
+    opacity:0,
+    x:-40,
+  },
+  show:{
+    opacity:1,
+    x:0,
+    transition:{
+      duration:0.7,
+      ease:[0.16,1,0.3,1],
     },
-    show: {
-        opacity: 1,
-        y: 0,
-        transition: {
-            duration: 0.7,
-            ease: [0.16, 1, 0.3, 1],
-        },
-    },
+  },
 };
 
 
