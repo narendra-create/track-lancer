@@ -58,7 +58,7 @@ const Navbar = () => {
         <button
           className="
           hidden md:block
-          font-mono text-[16px]
+          font-mono text-[13px]
           uppercase tracking-wider
           px-4 py-1.5
           border border-[#3d3d3d]
