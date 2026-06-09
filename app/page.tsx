@@ -5,6 +5,8 @@ import { YellowButton } from "./components/Buttons/Yellowbutton";
 import { Secondbutton } from "./components/Buttons/Secondbutton";
 import { motion } from "motion/react";
 import { Ticker } from "./components/tickeranimation";
+import { Featurecard } from "./components/Featurecard";
+import type { cardprop } from "./components/Featurecard";
 import {
   fadeUp,
   fadeLeft,
@@ -14,6 +16,38 @@ import {
 } from "./lib/animations";
 
 export default function Home() {
+  const features1: cardprop[] = [
+    {
+      title: "Create a project",
+      body: "Set the title, total amount, and deadline, A unique 8-digit code is generated instantly.",
+      isghost: true,
+      ghostnumber: 1,
+    },
+    {
+      title: "Share the code",
+      body: "Send the code to your freelancer, They enter it to access your project milestone dashboard - no account setup required.",
+      isghost: true,
+      ghostnumber: 2,
+    },
+    {
+      title: "See milestones",
+      body: "Each milestone has a title, amount, and due date on the timeline.",
+      isghost: true,
+      ghostnumber: 3,
+    },
+    {
+      title: "Pay & settle",
+      body: "Pay via UPI, submit the transaction ID, Freelancer verifies and marks it approved.",
+      isghost: true,
+      ghostnumber: 4,
+    },
+  ];
+
+  const viewPort = {
+    once: true,
+    amount: 0.2,
+  };
+
   return (
     <main>
       <motion.section
@@ -46,7 +80,10 @@ export default function Home() {
             A tool for freelancers and their clients. Every milestone logged,
             every payment verified, zero confusion about what's owed.
           </motion.p>
-          <motion.div className="mt-4 mb-4 flex flex-col lg:flex-row gap-1 lg:gap-3">
+          <motion.div
+            variants={scaleIn}
+            className="mt-4 mb-4 flex flex-col lg:flex-row gap-1 lg:gap-3"
+          >
             <YellowButton>START FREE →</YellowButton>
             <Secondbutton>SEE HOW IT WORKS</Secondbutton>
           </motion.div>
@@ -62,6 +99,48 @@ export default function Home() {
         className="mt-7 lg:mt-14"
       >
         <Ticker />
+      </motion.section>
+      <motion.section
+        variants={staggerContainer}
+        animate="show"
+        initial="hidden"
+      >
+        <motion.div
+          variants={fadeUp}
+          whileInView="show"
+          viewport={viewPort}
+          initial="hidden"
+          className="mt-6 border-b border-ink-muted/70 mb-12 pb-12"
+        >
+          <div className="px-4 lg:px-16 py-5 lg:py-9">
+            <h3 className="font-serif italic text-sm font-medium text-accent/94 text-shadow-accent">
+              01 — How it works
+            </h3>
+            <div className="font-serif text-xl lg:text-2xl lg:flex lg:flex-col lg:gap-2 my-2">
+              <h2>Simple for you.</h2>
+              <h2>Clear for your client.</h2>
+            </div>
+            <p className="text-ink-muted text-[12px] lg:text-[18px] font-sans max-w-82 lg:max-w-176">
+              No more chasing payments or explaining what's done. Everything is
+              on record, visible to both sides.
+            </p>
+          </div>
+          <motion.div
+            variants={staggerContainer}
+            whileInView="show"
+            initial="hidden"
+            viewport={viewPort}
+            className="px-4 lg:px-16 flex flex-col lg:flex-row"
+          >
+            {features1.map((item, i) => {
+              return (
+                <motion.div variants={fadeUp} key={i}>
+                  <Featurecard item={item} />
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </motion.div>
       </motion.section>
     </main>
   );
