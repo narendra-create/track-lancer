@@ -16,7 +16,7 @@ export function Comparecard({
   viewPort: object;
 }) {
   return (
-    <div className="p-5 flex flex-col">
+    <div className="p-5 flex flex-col lg:w-180 bg-brand-bg">
       <h3 className="text-accent font-mono text-[9px] tracking-widest py-3">
         {item?.Yellowtitle}
       </h3>
