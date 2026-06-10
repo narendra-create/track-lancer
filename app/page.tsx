@@ -3,7 +3,7 @@ import Image from "next/image";
 import { HeroMockup } from "./components/Heromockup";
 import { YellowButton } from "./components/Buttons/Yellowbutton";
 import { Secondbutton } from "./components/Buttons/Secondbutton";
-import { motion } from "motion/react";
+import { motion, stagger } from "motion/react";
 import { Ticker } from "./components/tickeranimation";
 import { Featurecard } from "./components/Featurecard";
 import type { cardprop } from "./components/Featurecard";
@@ -14,6 +14,8 @@ import {
   scaleIn,
   staggerContainer,
 } from "./lib/animations";
+import { Comparecard } from "./components/ComparisonCard";
+import type { comparecard } from "./components/ComparisonCard";
 
 export default function Home() {
   const features1: cardprop[] = [
@@ -75,6 +77,31 @@ export default function Home() {
       isghost: false,
     },
   ];
+
+  const freelancercompare: comparecard = {
+    Yellowtitle: "FOR FREELANCERS",
+    Maintitle1: "Stop chasing.",
+    Maintitle2: "Start closing.",
+    Features: [
+      "Track every milestone and payment in one place",
+      "Share a project code instead of long email threads",
+      "Flag delays before clients get frustrated",
+      "See all your clients and projects at a glance",
+      "Archive completed work with total earned",
+    ],
+  };
+  const clientcompare: comparecard = {
+    Yellowtitle: "FOR CLIENTS",
+    Maintitle1: "Always know",
+    Maintitle2: "where things stand.",
+    Features: [
+      "See exactly what's been built and what's coming",
+      "Pay only for what's done via UPI - no surprises",
+      "Stop the project at any point if budget changes",
+      "Get notified about delays before they happen",
+      "Access your project history and payment records",
+    ],
+  };
 
   const viewPort = {
     once: true,
@@ -185,7 +212,7 @@ export default function Home() {
           whileInView="show"
           viewport={viewPort}
           initial="hidden"
-          className="mt-6 border-b border-ink-muted/70 mb-12 pb-12"
+          className="mt-6 border-b border-ink-muted/70 pb-12"
         >
           <div className="px-4 lg:px-16 py-5 lg:py-9">
             <h3 className="font-serif italic text-sm lg:text-md font-medium text-accent/94 text-shadow-accent">
@@ -215,6 +242,30 @@ export default function Home() {
               );
             })}
           </motion.div>
+        </motion.div>
+      </motion.section>
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewPort}
+      >
+        <motion.div
+          variants={scaleIn}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewPort}
+          className="border-b border-ink-muted/90"
+        >
+          <Comparecard item={freelancercompare} viewPort={viewPort} />
+        </motion.div>
+        <motion.div
+          variants={scaleIn}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewPort}
+        >
+          <Comparecard item={clientcompare} viewPort={viewPort} />
         </motion.div>
       </motion.section>
     </main>
