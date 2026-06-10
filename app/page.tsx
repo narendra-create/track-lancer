@@ -249,13 +249,14 @@ export default function Home() {
         initial="hidden"
         whileInView="show"
         viewport={viewPort}
+        className="flex lg:gap-1 flex-col lg:flex-row lg:px-5 lg:py-10 lg:items-center lg:justify-center  lg:bg-brand-surface2"
       >
         <motion.div
           variants={scaleIn}
           initial="hidden"
           whileInView="show"
           viewport={viewPort}
-          className="border-b border-ink-muted/90"
+          className="border-b border-ink-muted/90 lg:border-none"
         >
           <Comparecard item={freelancercompare} viewPort={viewPort} />
         </motion.div>
