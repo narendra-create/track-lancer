@@ -43,13 +43,46 @@ export default function Home() {
     },
   ];
 
+  const features2: cardprop[] = [
+    {
+      title: "Milestone thread",
+      body: "Visual vertical timeline with color-coded dots. Green = paid, amber = pending, hollow = upcoming. Both sides see the same view.",
+      isghost: false,
+    },
+    {
+      title: "UPI Payment flow",
+      body: "Client scans a QR, pays. submits the UPI transaction ID. Freelancer reviews and approves = no payment gateway fees.",
+      isghost: false,
+    },
+    {
+      title: "Stop & settle",
+      body: "Client can stop the project at any milestone if budget runs out. The system auto-calculates the amount owed for work done so far.",
+      isghost: false,
+    },
+    {
+      title: "Delay flagging",
+      body: "Freelancer can flag a delay with a reason. It appears on the client's dashboard so there are no surprises - just transparency.",
+      isghost: false,
+    },
+    {
+      title: "Role-separated views",
+      body: "Freelancer sees admin controls. Client sees only their project status, timeline, and payment options.One codebase, two clean experiences",
+      isghost: false,
+    },
+    {
+      title: "Project history",
+      body: "All completed and settled projects are archived with totals and dates. A clean record for both parties.",
+      isghost: false,
+    },
+  ];
+
   const viewPort = {
     once: true,
     amount: 0.2,
   };
 
   return (
-    <main>
+    <main className="overflow-hidden">
       <motion.section
         variants={staggerContainer}
         initial="hidden"
@@ -113,7 +146,7 @@ export default function Home() {
           className="mt-6 border-b border-ink-muted/70 mb-12 pb-12"
         >
           <div className="px-4 lg:px-16 py-5 lg:py-9">
-            <h3 className="font-serif italic text-sm font-medium text-accent/94 text-shadow-accent">
+            <h3 className="font-serif italic text-sm lg:text-md font-medium text-accent/94 text-shadow-accent">
               01 — How it works
             </h3>
             <div className="font-serif text-xl lg:text-2xl lg:flex lg:flex-col lg:gap-2 my-2">
@@ -135,6 +168,48 @@ export default function Home() {
             {features1.map((item, i) => {
               return (
                 <motion.div variants={fadeUp} key={i}>
+                  <Featurecard item={item} />
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </motion.div>
+      </motion.section>
+      <motion.section
+        variants={staggerContainer}
+        animate="show"
+        initial="hidden"
+      >
+        <motion.div
+          variants={fadeUp}
+          whileInView="show"
+          viewport={viewPort}
+          initial="hidden"
+          className="mt-6 border-b border-ink-muted/70 mb-12 pb-12"
+        >
+          <div className="px-4 lg:px-16 py-5 lg:py-9">
+            <h3 className="font-serif italic text-sm lg:text-md font-medium text-accent/94 text-shadow-accent">
+              02 — Features
+            </h3>
+            <div className="font-serif text-xl lg:text-2xl lg:flex lg:flex-col lg:gap-2 my-2">
+              <h2>Built for how freelancing</h2>
+              <h2>actually works.</h2>
+            </div>
+            <p className="text-ink-muted text-[12px] lg:text-[18px] font-sans max-w-82 lg:max-w-176">
+              Not a generic project manager.A tool designed around the
+              freelancer-client relationship in india.
+            </p>
+          </div>
+          <motion.div
+            variants={staggerContainer}
+            whileInView="show"
+            initial="hidden"
+            viewport={viewPort}
+            className="px-4 lg:px-16 flex flex-col lg:grid-cols-2 lg:grid"
+          >
+            {features2.map((item, i) => {
+              return (
+                <motion.div variants={scaleIn} key={i}>
                   <Featurecard item={item} />
                 </motion.div>
               );
