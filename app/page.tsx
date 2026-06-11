@@ -269,6 +269,50 @@ export default function Home() {
           <Comparecard item={clientcompare} viewPort={viewPort} />
         </motion.div>
       </motion.section>
+      <motion.section
+        variants={staggerContainer}
+        whileInView="show"
+        viewport={viewPort}
+        initial="hidden"
+      >
+        <motion.div
+          variants={fadeUp}
+          whileInView="show"
+          viewport={viewPort}
+          initial="hidden"
+          className="mt-6 border-b border-ink-muted/70 mb-12 pb-12"
+        >
+          <div className="px-4 lg:px-16 py-5 lg:py-9">
+            <h3 className="font-serif italic text-sm lg:text-md font-medium text-accent/94 text-shadow-accent">
+              03 — About
+            </h3>
+            <div className="font-serif text-xl lg:text-2xl lg:flex lg:flex-col lg:gap-2 my-2">
+              <h2>Built by a freelancer,</h2>
+              <h2>for freelancers.</h2>
+            </div>
+            <p className="text-ink-muted text-[12px] lg:text-[14px] font-sans max-w-82 lg:max-w-176">
+              Freelance OS started as a personal tool to manage client projects
+              without the overhead of bloated PM software. Most tools are built
+              for agencies or large teams — not for a single developer managing
+              three clients from a tier-3 city.
+            </p>
+            <p className="mt-5 text-ink-muted text-[12px] lg:text-[14px] font-sans max-w-82 lg:max-w-176">
+              The payment system is built around how Indian freelancers actually
+              get paid — UPI, transaction IDs, manual verification. No Stripe,
+              no dollar accounts, no 3% gateway fees.
+            </p>
+            <motion.h3
+              variants={fadeRight}
+              initial="hidden"
+              whileInView="show"
+              viewport={viewPort}
+              className="mt-10"
+            >
+              Designed and developed by Narendra — full-stack developer.
+            </motion.h3>
+          </div>
+        </motion.div>
+      </motion.section>
     </main>
   );
 }
