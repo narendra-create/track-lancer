@@ -16,6 +16,7 @@ import {
 } from "./lib/animations";
 import { Comparecard } from "./components/ComparisonCard";
 import type { comparecard } from "./components/ComparisonCard";
+import { SideFeaturecard, sidefeaturecard } from "./components/Sidefeatures";
 
 export default function Home() {
   const features1: cardprop[] = [
@@ -102,6 +103,29 @@ export default function Home() {
       "Access your project history and payment records",
     ],
   };
+
+  const sidefeaturesstat: sidefeaturecard[] = [
+    {
+      stat: "₹0",
+      text: "GATEWAY FEES. UPI IS FREE.",
+      isFirst: true,
+    },
+    {
+      stat: "2",
+      text: "DASHBOARDS - FREELANCER & CLIENT.",
+      isFirst: false,
+    },
+    {
+      stat: "8",
+      text: "DIGIT CODE. SHARE IN ONE MESSAGE.",
+      isFirst: false,
+    },
+    {
+      stat: "100%",
+      text: "ON RECORD. EVERY PAYMENT VERIFIED.",
+      isFirst: false,
+    },
+  ];
 
   const viewPort = {
     once: true,
@@ -274,13 +298,14 @@ export default function Home() {
         whileInView="show"
         viewport={viewPort}
         initial="hidden"
+        className="flex flex-col lg:flex-row gap-2 w-full border-b border-ink-muted/70"
       >
         <motion.div
           variants={fadeUp}
           whileInView="show"
           viewport={viewPort}
           initial="hidden"
-          className="mt-6 border-b border-ink-muted/70 mb-12 pb-12"
+          className="mt-6 mb-12 pb-12"
         >
           <div className="px-4 lg:px-16 py-5 lg:py-9">
             <h3 className="font-serif italic text-sm lg:text-md font-medium text-accent/94 text-shadow-accent">
@@ -290,13 +315,13 @@ export default function Home() {
               <h2>Built by a freelancer,</h2>
               <h2>for freelancers.</h2>
             </div>
-            <p className="text-ink-muted text-[12px] lg:text-[14px] font-sans max-w-82 lg:max-w-176">
+            <p className="text-ink-muted text-[11px] lg:text-[14px] font-sans max-w-82 lg:max-w-176">
               Freelance OS started as a personal tool to manage client projects
               without the overhead of bloated PM software. Most tools are built
               for agencies or large teams — not for a single developer managing
               three clients from a tier-3 city.
             </p>
-            <p className="mt-5 text-ink-muted text-[12px] lg:text-[14px] font-sans max-w-82 lg:max-w-176">
+            <p className="mt-5 text-ink-muted text-[11px] lg:text-[14px] font-sans max-w-82 lg:max-w-176">
               The payment system is built around how Indian freelancers actually
               get paid — UPI, transaction IDs, manual verification. No Stripe,
               no dollar accounts, no 3% gateway fees.
@@ -306,11 +331,21 @@ export default function Home() {
               initial="hidden"
               whileInView="show"
               viewport={viewPort}
-              className="mt-10"
+              className="mt-10 text-sm"
             >
               Designed and developed by Narendra — full-stack developer.
             </motion.h3>
           </div>
+        </motion.div>
+        <motion.div
+          variants={fadeLeft}
+          whileInView="show"
+          initial="hidden"
+          className="lg:place-self-center w-full lg:w-158 lg:mt-14 mb-12 pb-12"
+        >
+          {sidefeaturesstat.map((stat, i) => {
+            return <SideFeaturecard feature={stat} key={i} />;
+          })}
         </motion.div>
       </motion.section>
     </main>
