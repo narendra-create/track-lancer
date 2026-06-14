@@ -298,7 +298,7 @@ export default function Home() {
         whileInView="show"
         viewport={viewPort}
         initial="hidden"
-        className="flex flex-col lg:flex-row gap-2 w-full border-b border-ink-muted/70"
+        className="flex flex-col lg:flex-row gap-2 w-full border-b border-ink-muted/70 "
       >
         <motion.div
           variants={fadeUp}
