@@ -5,10 +5,10 @@ import Link from "next/link";
 
 // ─── Nav links — label maps to the id used in page.tsx ─────────────────────────
 const links = [
-  { label: "How it works", href: "/#how" },
+  { label: "Home", href: "/" },
   { label: "Features",     href: "/#features" },
-  { label: "About",        href: "/#about" },
-  { label: "Contact",      href: "/#contact" },
+  { label: "Terms",        href: "/terms" },
+  { label: "About Us",      href: "/#about" },
   { label: "Privacy",      href: "/#privacy-policy" },
 ];
 
