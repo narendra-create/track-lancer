@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { dmSans, dmSerif, ibmMono } from "./fonts";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 export const metadata: Metadata = {
   title: "TrackLancer — Milestone & Payment Tracker for Freelancers",
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );
