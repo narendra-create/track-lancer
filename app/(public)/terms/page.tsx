@@ -7,7 +7,7 @@ import {
   fadeRight,
   scaleIn,
   staggerContainer,
-} from "../lib/animations";
+} from "@/app/lib/animations";
 
 // ─── Page metadata ─────────────────────────────────────────────────────────────
 const LAST_UPDATED = "June 2026";
