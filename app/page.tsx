@@ -169,8 +169,8 @@ export default function Home() {
             variants={scaleIn}
             className="mt-4 mb-4 flex flex-col lg:flex-row gap-1 lg:gap-3"
           >
-            <YellowButton>START FREE →</YellowButton>
-            <Secondbutton>SEE HOW IT WORKS</Secondbutton>
+            <YellowButton href="/register">START FREE →</YellowButton>
+            <Secondbutton href="/#how">SEE HOW IT WORKS</Secondbutton>
           </motion.div>
         </div>
         <motion.div variants={scaleIn} className="px-3 lg:w-3xl">
@@ -217,7 +217,6 @@ export default function Home() {
             initial="hidden"
             viewport={viewPort}
             className="px-4 lg:px-16 flex flex-col lg:flex-row"
-
           >
             {features1.map((item, i) => {
               return (
@@ -303,7 +302,7 @@ export default function Home() {
         viewport={viewPort}
         initial="hidden"
         className="flex flex-col lg:flex-row lg:gap-2 w-full border-b border-ink-muted/70 "
-         id="about"
+        id="about"
       >
         <motion.div
           variants={fadeUp}
