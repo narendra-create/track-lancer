@@ -1,25 +1,25 @@
 "use client";
 import { useRef, useState, KeyboardEvent, ClipboardEvent } from "react";
 
-// ─── types ────────────────────────────────────────────────────────────────────
 interface OtpInputProps {
-  onVerify: (otp: string) => void | Promise<void>;
-  onResend: () => void;
+  onVerify: (otp: string) => Promise<string | undefined>;
+  onResend: () => Promise<string | undefined>;
 }
 
-// ─── component ────────────────────────────────────────────────────────────────
 export function OtpInput({ onVerify, onResend }: OtpInputProps) {
   const [digits, setDigits] = useState<string[]>(Array(6).fill(""));
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
+  const [error, setError] = useState("");
   const refs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // ─── box input ────────────────────────────────────────────────────────────
   function handleChange(idx: number, value: string) {
     const digit = value.replace(/\D/g, "").slice(-1);
     const next = [...digits];
     next[idx] = digit;
     setDigits(next);
+    setError("");
     if (digit && idx < 5) refs.current[idx + 1]?.focus();
   }
 
@@ -37,35 +37,50 @@ export function OtpInput({ onVerify, onResend }: OtpInputProps) {
       next[i] = char;
     });
     setDigits(next);
+    setError("");
     refs.current[Math.min(pasted.length, 5)]?.focus();
   }
 
-  // ─── actions ──────────────────────────────────────────────────────────────
   async function handleVerify() {
     const otp = digits.join("");
     if (otp.length < 6) return;
     setLoading(true);
-    await onVerify(otp);
-    setLoading(false);
+    setError("");
+    try {
+      const message = await onVerify(otp);
+      if (message) setError(message);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function handleResend() {
-    onResend();
-    setResent(true);
-    setTimeout(() => setResent(false), 3000);
+  async function handleResend() {
+    setResending(true);
+    setError("");
+    try {
+      const message = await onResend();
+      if (message) {
+        setError(message);
+        return;
+      }
+      setResent(true);
+      setTimeout(() => setResent(false), 3000);
+    } finally {
+      setResending(false);
+    }
   }
 
   const filled = digits.every((d) => d !== "");
 
   return (
     <div className="flex flex-col gap-5">
-
-      {/* 6-digit boxes */}
-      <div className="flex gap-2.5 justify-center">
+      <div className="grid w-full grid-cols-6 gap-1.5 sm:gap-2.5">
         {digits.map((digit, i) => (
           <input
             key={i}
-            ref={(el) => { refs.current[i] = el; }}
+            ref={(el) => {
+              refs.current[i] = el;
+            }}
             type="text"
             inputMode="numeric"
             maxLength={1}
@@ -74,18 +89,24 @@ export function OtpInput({ onVerify, onResend }: OtpInputProps) {
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={handlePaste}
             className={`
-              w-11 h-12 bg-[#161616] border text-center
+              h-12 min-w-0 w-full bg-[#161616] border text-center
               font-mono text-[18px] focus:outline-none duration-150
-              ${digit
-                ? "border-[#c8a96e] text-accent"
-                : "border-[#2a2a2a] focus:border-[#c8a96e] text-ink"
+              ${
+                digit
+                  ? "border-[#c8a96e] text-accent"
+                  : "border-[#2a2a2a] focus:border-[#c8a96e] text-ink"
               }
             `}
           />
         ))}
       </div>
 
-      {/* verify */}
+      {error && (
+        <p className="font-sans text-[11px] text-[#c06060] border border-[#5a2020] bg-[rgba(192,96,96,0.08)] px-4 py-2.5">
+          {error}
+        </p>
+      )}
+
       <button
         type="button"
         onClick={handleVerify}
@@ -95,18 +116,17 @@ export function OtpInput({ onVerify, onResend }: OtpInputProps) {
         {loading ? "Verifying…" : "Verify →"}
       </button>
 
-      {/* resend */}
       <p className="font-sans text-[10px] text-ink-muted text-center">
         Didn&apos;t receive it?{" "}
         <button
           type="button"
           onClick={handleResend}
+          disabled={resending}
           className="text-accent hover:text-accent-dim duration-150"
         >
-          {resent ? "Sent ✓" : "Resend code"}
+          {resending ? "Sending..." : resent ? "Sent ✓" : "Resend code"}
         </button>
       </p>
-
     </div>
   );
 }
