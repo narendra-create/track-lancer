@@ -128,8 +128,8 @@ export default function TermsPage() {
           <TermsSection id="acceptance" number="01" title="Acceptance of Terms">
             <p>
               These Terms of Use ("Terms") govern your access to and use of
-              Track Lancer (the "Service"), operated by Narendra ("we", "us",
-              "our"). By creating an account, sharing a project code, or
+              Track Lancer (the "Service"), operated by narednra-create ("we",
+              "us", "our"). By creating an account, sharing a project code, or
               otherwise accessing the Service you confirm that you have read,
               understood, and agree to be bound by these Terms.
             </p>
@@ -173,14 +173,15 @@ export default function TermsPage() {
                 href={`mailto:${CONTACT_EMAIL}`}
                 className="text-accent hover:text-accent-dim duration-150"
               >
-                {CONTACT_EMAIL}
+                Email
               </a>{" "}
               if you suspect unauthorised access.
             </p>
             <p>
-              Clients accessing a project via an 8-digit code do not need an
-              account. They are subject to these Terms for the duration of their
-              session.
+              Clients accessing a project via an 8-digit code must also create
+              an account to view their current and past projects. By creating an
+              account, they agree to be bound by these Terms for as long as they
+              continue to use the Service.
             </p>
           </TermsSection>
 
@@ -243,8 +244,9 @@ export default function TermsPage() {
               networks or social trackers are present on this platform.
             </p>
             <p>
-              Data is stored in a PostgreSQL database hosted on Neon (EU
-              region). By using the Service you consent to this storage.
+              Data is stored in a PostgreSQL database hosted on Neon
+              (Southeast-1 region). By using the Service you consent to this
+              storage.
             </p>
             <p>
               You may request full deletion of your account and all associated
@@ -267,8 +269,8 @@ export default function TermsPage() {
           <TermsSection id="ip" number="07" title="Intellectual Property">
             <p>
               The Track Lancer codebase, design, copy, and brand elements are
-              owned by Narendra and are protected under applicable intellectual
-              property laws.
+              owned by Narendra Dubey(github - narendra-creates) and are
+              protected under applicable intellectual property laws.
             </p>
             <p>
               The content you create within the Service (project titles,
@@ -309,15 +311,15 @@ export default function TermsPage() {
             title="Limitation of Liability"
           >
             <p>
-              To the fullest extent permitted by applicable law, Narendra shall
-              not be liable for any indirect, incidental, special,
+              To the fullest extent permitted by applicable law, Narendra Dubey
+              shall not be liable for any indirect, incidental, special,
               consequential, or punitive damages arising out of your use of or
               inability to use the Service — including loss of data, loss of
               revenue, or payment disputes between users.
             </p>
             <p>
               Our total aggregate liability to you for any claim arising out of
-              these Terms shall not exceed ₹500 (five hundred Indian rupees).
+              these Terms shall not exceed ₹200 (two hundred Indian rupees).
             </p>
           </TermsSection>
 
@@ -331,8 +333,9 @@ export default function TermsPage() {
             </p>
             <p>
               Upon termination, your data will be deleted from active databases
-              within 7 business days. Archived backups may persist for up to 30
-              days before being purged.
+              within 7 business days.
+              {/* Archived backups may persist for up to 30
+              days before being purged. */}
             </p>
           </TermsSection>
 
