@@ -2,18 +2,31 @@
 import React from "react";
 import { useState } from "react";
 import Link from "next/link";
+import { authClient } from "../lib/auth-client";
+import { useRouter } from "next/navigation";
 
 // ─── Nav links — label maps to the id used in page.tsx ─────────────────────────
 const links = [
   { label: "Home", href: "/" },
-  { label: "Features",     href: "/#features" },
-  { label: "Terms",        href: "/terms" },
-  { label: "About Us",      href: "/#about" },
-  { label: "Privacy",      href: "/#privacy-policy" },
+  { label: "Features", href: "/#features" },
+  { label: "Terms", href: "/terms" },
+  { label: "About Us", href: "/#about" },
+  { label: "Privacy", href: "/#privacy-policy" },
 ];
 
 const Navbar = () => {
   const [open, setopen] = useState(false);
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+
+  const handleCTA = async () => {
+    if (session?.user) {
+      await authClient.signOut();
+      router.refresh();
+    } else {
+      router.push("/register");
+    }
+  };
 
   return (
     <>
@@ -67,8 +80,8 @@ const Navbar = () => {
         </div>
 
         {/* Desktop CTA */}
-        <Link
-          href="/register"
+        <button
+          onClick={handleCTA}
           className="
           hidden md:block
           font-mono text-[13px]
@@ -81,8 +94,8 @@ const Navbar = () => {
           no-underline
         "
         >
-          Get Started →
-        </Link>
+          {session?.user ? "Logout" : "Get Started →"}
+        </button>
 
         {/* Hamburger */}
         <button
@@ -124,9 +137,11 @@ const Navbar = () => {
           </Link>
         ))}
 
-        <Link
-          href="/register"
-          onClick={() => setopen(false)}
+        <button
+          onClick={async () => {
+            await handleCTA();
+            setopen(false);
+          }}
           className="mt-4 py-3 border border-[#3d3d3d] font-mono
             text-[10px]
             uppercase
@@ -136,8 +151,8 @@ const Navbar = () => {
             no-underline
           "
         >
-          Get Started →
-        </Link>
+          {session?.user ? "Logout" : "Get Started →"}
+        </button>
       </div>
     </>
   );
