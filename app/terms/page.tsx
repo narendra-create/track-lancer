@@ -1,7 +1,13 @@
 "use client";
 import { motion } from "motion/react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { fadeUp, fadeRight, scaleIn, staggerContainer } from "../lib/animations";
+import {
+  fadeUp,
+  fadeRight,
+  scaleIn,
+  staggerContainer,
+} from "../lib/animations";
 
 // ─── Page metadata ─────────────────────────────────────────────────────────────
 const LAST_UPDATED = "June 2026";
@@ -26,9 +32,40 @@ const sections = [
 const viewPort = { once: true, amount: 0.15 };
 
 export default function TermsPage() {
+  const [activeSection, setActiveSection] = useState("acceptance");
+
+  useEffect(() => {
+    let mounted = true;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && mounted) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: "-30% 0px -60% 0px",
+      },
+    );
+
+    sections.forEach((section) => {
+      const element = document.getElementById(section.id);
+
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <main className="overflow-hidden">
-
       {/* ─── Hero ───────────────────────────────────────────────────────────── */}
       <motion.section
         variants={staggerContainer}
@@ -62,7 +99,6 @@ export default function TermsPage() {
 
       {/* ─── Body layout: TOC + content ─────────────────────────────────────── */}
       <div className="flex flex-col lg:flex-row lg:items-start px-4 lg:px-16 py-10 lg:py-16 gap-10 lg:gap-20">
-
         {/* ─── Sticky table of contents (desktop) ─────────────────────────── */}
         <motion.aside
           variants={fadeRight}
@@ -78,7 +114,7 @@ export default function TermsPage() {
               <a
                 key={s.id}
                 href={`#${s.id}`}
-                className="font-sans text-[11px] text-[#7a7570] hover:text-[#c8a96e] duration-150 no-underline leading-snug"
+                className={`font-sans text-[11px] hover:text-[#c8a96e] duration-150 no-underline leading-snug ${activeSection === s.id ? "text-accent-dim" : "text-[#7a7570]"}`}
               >
                 {String(i + 1).padStart(2, "0")}. {s.label}
               </a>
@@ -88,7 +124,6 @@ export default function TermsPage() {
 
         {/* ─── Sections ────────────────────────────────────────────────────── */}
         <div className="flex flex-col gap-14 flex-1 max-w-3xl">
-
           {/* 01 — Acceptance */}
           <TermsSection id="acceptance" number="01" title="Acceptance of Terms">
             <p>
@@ -98,9 +133,7 @@ export default function TermsPage() {
               otherwise accessing the Service you confirm that you have read,
               understood, and agree to be bound by these Terms.
             </p>
-            <p>
-              If you do not agree, please do not use the Service.
-            </p>
+            <p>If you do not agree, please do not use the Service.</p>
           </TermsSection>
 
           {/* 02 — Service */}
@@ -122,7 +155,11 @@ export default function TermsPage() {
           </TermsSection>
 
           {/* 03 — Accounts */}
-          <TermsSection id="accounts" number="03" title="Accounts & Eligibility">
+          <TermsSection
+            id="accounts"
+            number="03"
+            title="Accounts & Eligibility"
+          >
             <p>
               You must be at least 18 years old to register an account. By
               registering, you warrant that the information you provide is
@@ -132,7 +169,10 @@ export default function TermsPage() {
               You are responsible for maintaining the confidentiality of your
               credentials. Any activity that occurs under your account is your
               responsibility. Notify us immediately at{" "}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:text-accent-dim duration-150">
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="text-accent hover:text-accent-dim duration-150"
+              >
                 {CONTACT_EMAIL}
               </a>{" "}
               if you suspect unauthorised access.
@@ -150,9 +190,16 @@ export default function TermsPage() {
             <ul>
               <li>Submit false or fraudulent transaction IDs.</li>
               <li>Use the Service to deceive, defraud, or harm other users.</li>
-              <li>Attempt to reverse-engineer, scrape, or disrupt the platform.</li>
-              <li>Share project codes with anyone outside the intended project relationship.</li>
-              <li>Use the Service for any unlawful purpose under Indian law.</li>
+              <li>
+                Attempt to reverse-engineer, scrape, or disrupt the platform.
+              </li>
+              <li>
+                Share project codes with anyone outside the intended project
+                relationship.
+              </li>
+              <li>
+                Use the Service for any unlawful purpose under Indian law.
+              </li>
             </ul>
             <p>
               We reserve the right to suspend or permanently remove any account
@@ -201,12 +248,15 @@ export default function TermsPage() {
             </p>
             <p>
               You may request full deletion of your account and all associated
-              data at any time by emailing us. Deletion is processed within
-              7 business days.
+              data at any time by emailing us. Deletion is processed within 7
+              business days.
             </p>
             <p>
               For the full privacy breakdown, see the{" "}
-              <Link href="/#privacy-policy" className="text-accent hover:text-accent-dim duration-150">
+              <Link
+                href="/#privacy-policy"
+                className="text-accent hover:text-accent-dim duration-150"
+              >
                 Privacy Policy
               </Link>{" "}
               section on the home page.
@@ -253,13 +303,17 @@ export default function TermsPage() {
           </TermsSection>
 
           {/* 09 — Liability */}
-          <TermsSection id="liability" number="09" title="Limitation of Liability">
+          <TermsSection
+            id="liability"
+            number="09"
+            title="Limitation of Liability"
+          >
             <p>
               To the fullest extent permitted by applicable law, Narendra shall
-              not be liable for any indirect, incidental, special, consequential,
-              or punitive damages arising out of your use of or inability to use
-              the Service — including loss of data, loss of revenue, or payment
-              disputes between users.
+              not be liable for any indirect, incidental, special,
+              consequential, or punitive damages arising out of your use of or
+              inability to use the Service — including loss of data, loss of
+              revenue, or payment disputes between users.
             </p>
             <p>
               Our total aggregate liability to you for any claim arising out of
@@ -271,14 +325,14 @@ export default function TermsPage() {
           <TermsSection id="termination" number="10" title="Termination">
             <p>
               You may stop using the Service at any time and request account
-              deletion by contacting us. We may suspend or terminate your
-              access without notice if you violate these Terms or if we decide
-              to discontinue the Service.
+              deletion by contacting us. We may suspend or terminate your access
+              without notice if you violate these Terms or if we decide to
+              discontinue the Service.
             </p>
             <p>
               Upon termination, your data will be deleted from active databases
-              within 7 business days. Archived backups may persist for up to
-              30 days before being purged.
+              within 7 business days. Archived backups may persist for up to 30
+              days before being purged.
             </p>
           </TermsSection>
 
@@ -310,7 +364,6 @@ export default function TermsPage() {
               </a>
             </div>
           </TermsSection>
-
         </div>
       </div>
 
@@ -326,9 +379,7 @@ export default function TermsPage() {
           <p className="font-mono text-[8px] tracking-[2px] uppercase text-[#3a3733] mb-2">
             Done reading?
           </p>
-          <p className="font-serif text-xl lg:text-2xl">
-            Back to the product.
-          </p>
+          <p className="font-serif text-xl lg:text-2xl">Back to the product.</p>
         </motion.div>
         <motion.div variants={scaleIn} className="flex gap-3">
           <Link
@@ -345,7 +396,6 @@ export default function TermsPage() {
           </Link>
         </motion.div>
       </motion.section>
-
     </main>
   );
 }
