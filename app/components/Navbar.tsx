@@ -1,11 +1,19 @@
 "use client";
 import React from "react";
 import { useState } from "react";
+import Link from "next/link";
+
+// ─── Nav links — label maps to the id used in page.tsx ─────────────────────────
+const links = [
+  { label: "How it works", href: "/#how" },
+  { label: "Features",     href: "/#features" },
+  { label: "About",        href: "/#about" },
+  { label: "Contact",      href: "/#contact" },
+  { label: "Privacy",      href: "/#privacy-policy" },
+];
 
 const Navbar = () => {
   const [open, setopen] = useState(false);
-
-  const links = ["How it works", "Features", "About", "Contact", "Privacy"];
 
   return (
     <>
@@ -21,41 +29,46 @@ const Navbar = () => {
       "
       >
         {/* Logo */}
-        <div
+        <Link
+          href="/#home"
           className="
-          font-serif 
+          font-serif
           text-[#c8a96e]
           text-lg lg:text-2xl
+          no-underline
         "
         >
           Track Lancer
-        </div>
+        </Link>
 
         {/* Desktop Links */}
         <div
           className="
-          hidden md:flex 
+          hidden md:flex
           items-center gap-7
         "
         >
           {links.map((item) => (
-            <button
-              key={item}
+            <Link
+              key={item.label}
+              href={item.href}
               className="
                 font-mono text-[14px]
                 uppercase tracking-[1.5px]
                 text-[#e3dfda]
                 hover:text-[#81817f]
                 duration-150
+                no-underline
               "
             >
-              {item}
-            </button>
+              {item.label}
+            </Link>
           ))}
         </div>
 
         {/* Desktop CTA */}
-        <button
+        <Link
+          href="/register"
           className="
           hidden md:block
           font-mono text-[13px]
@@ -65,10 +78,11 @@ const Navbar = () => {
           hover:bg-[#e8e3d8]
           hover:text-black
           duration-150
+          no-underline
         "
         >
           Get Started →
-        </button>
+        </Link>
 
         {/* Hamburger */}
         <button
@@ -100,25 +114,30 @@ const Navbar = () => {
           }`}
       >
         {links.map((item) => (
-          <button
-            key={item}
+          <Link
+            key={item.label}
+            href={item.href}
             onClick={() => setopen(false)}
-            className="text-left py-4 border-b border-[#2a2a2a] font-mono text-[10px] uppercase tracking-[1.5px] text-[#dbd6d1] hover:text-[#71706e]"
+            className="text-left py-4 border-b border-[#2a2a2a] font-mono text-[10px] uppercase tracking-[1.5px] text-[#dbd6d1] hover:text-[#71706e] no-underline"
           >
-            {item}
-          </button>
+            {item.label}
+          </Link>
         ))}
 
-        <button
-          className=" mt-4 py-3 border border-[#3d3d3d] font-mono
+        <Link
+          href="/register"
+          onClick={() => setopen(false)}
+          className="mt-4 py-3 border border-[#3d3d3d] font-mono
             text-[10px]
             uppercase
             tracking-wider
             text-[#e8e3d8]
+            text-center
+            no-underline
           "
         >
           Get Started →
-        </button>
+        </Link>
       </div>
     </>
   );
