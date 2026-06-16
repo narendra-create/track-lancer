@@ -74,23 +74,50 @@ export function RegisterForm() {
 
     try {
       if (!accountCreated) {
-        const { error } = await authClient.signUp.email({
-          email,
-          password,
-          name,
-          // @ts-expect-error Custom additional field configured in auth.ts.
-          role: role.toUpperCase(),
+        // Check if email is already taken before attempting sign-up
+        const checkRes = await fetch("/api/user/check-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
         });
+        const check = await checkRes.json() as { exists?: boolean; verified?: boolean; error?: string };
 
-        if (error) {
+        if (check.error) {
+          setErrors((previous) => ({ ...previous, form: "Could not verify email. Please try again." }));
+          return;
+        }
+
+        // Already verified → send them to login
+        if (check.exists && check.verified) {
           setErrors((previous) => ({
             ...previous,
-            form: error.message || "Registration failed.",
+            form: "An account with this email already exists. Please log in instead.",
           }));
           return;
         }
 
-        setAccountCreated(true);
+        // Exists but unverified → skip sign-up, just resend OTP
+        if (check.exists && !check.verified) {
+          setAccountCreated(true);
+        } else {
+          const { error } = await authClient.signUp.email({
+            email,
+            password,
+            name,
+            // @ts-expect-error Custom additional field configured in auth.ts.
+            role: role.toUpperCase(),
+          });
+
+          if (error) {
+            setErrors((previous) => ({
+              ...previous,
+              form: error.message || "Registration failed.",
+            }));
+            return;
+          }
+
+          setAccountCreated(true);
+        }
       }
 
       const { error: otpError } =
