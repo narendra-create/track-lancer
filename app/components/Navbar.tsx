@@ -80,10 +80,29 @@ const Navbar = () => {
         </div>
 
         {/* Desktop CTA */}
-        <button
-          onClick={handleCTA}
-          className="
+        <div className="gap-2 hidden md:flex">
+          <button
+            onClick={handleCTA}
+            className="
           hidden md:block
+          font-mono text-[13px]
+          uppercase tracking-wider
+          px-4 py-1.5
+          border border-[#3d3d3d]
+          hover:bg-[#f14d4d]
+          hover:text-black
+          duration-150
+          no-underline
+        "
+          >
+            {session?.user ? "Logout" : "Get Started →"}
+          </button>
+          <button
+            onClick={() => {
+              router.push("/dashboard");
+            }}
+            className={`hidden md:block
+${!session?.user && "md:hidden"}
           font-mono text-[13px]
           uppercase tracking-wider
           px-4 py-1.5
@@ -91,11 +110,11 @@ const Navbar = () => {
           hover:bg-[#e8e3d8]
           hover:text-black
           duration-150
-          no-underline
-        "
-        >
-          {session?.user ? "Logout" : "Get Started →"}
-        </button>
+          no-underline`}
+          >
+            Dashboard
+          </button>
+        </div>
 
         {/* Hamburger */}
         <button
@@ -152,6 +171,20 @@ const Navbar = () => {
           "
         >
           {session?.user ? "Logout" : "Get Started →"}
+        </button>
+        <button
+          onClick={() => {
+            router.push("/dashboard");
+          }}
+          className={`mt-4 py-3 border ${!session?.user} border-[#3d3d3d] font-mono
+            text-[10px]
+            uppercase
+            tracking-wider
+            text-[#e8e3d8]
+            text-center
+            no-underline`}
+        >
+          Dashboard
         </button>
       </div>
     </>
