@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Lancer — Freelancer Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ─────────────────────────────────── */
+    :root {
+      --bg:         #0d0d0d;
+      --s1:         #141414;
+      --s2:         #1a1a1a;
+      --s3:         #222222;
+      --br:         #2c2c2c;
+      --br2:        #383838;
+
+      --gold:       #c8a96e;
+      --gold-dim:   #9c7d45;
+      --gold-glow:  rgba(200,169,110,0.08);
+      --gold-glow2: rgba(200,169,110,0.15);
+
+      --ink:        #e8e3d8;
+      --ink2:       #c4bcb1;
+      --ink3:       #7a7570;
+      --ink4:       #4a4540;
+
+      --green:      #4a9e75;
+      --green-bg:   rgba(74,158,117,0.1);
+      --amber:      #c87840;
+      --amber-bg:   rgba(200,120,64,0.1);
+      --red:        #c06060;
+      --red-bg:     rgba(192,96,96,0.09);
+
+      --fw: 240px;
+      --r: 6px;
+      --r2: 4px;
+      --ease: cubic-bezier(.4,0,.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      display: flex; min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--br2); border-radius: 2px; }
+
+    /* ── SIDEBAR ─────────────────────────────────── */
+    .sidebar {
+      position: fixed; top: 0; left: 0; height: 100vh; width: var(--fw);
+      background: var(--s1);
+      border-right: 1px solid var(--br);
+      display: flex; flex-direction: column;
+      z-index: 200; transition: transform .22s var(--ease);
+    }
+    .sb-top {
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid var(--br);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sb-logo-mark {
+      width: 32px; height: 32px; background: var(--gold-glow2);
+      border: 1px solid rgba(200,169,110,.25);
+      border-radius: var(--r2);
+      display: grid; place-items: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 1rem; color: var(--gold); flex-shrink: 0;
+    }
+    .sb-brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.05rem; color: var(--gold);
+      letter-spacing: .2px; line-height: 1;
+    }
+    .sb-brand small {
+      display: block; font-family: 'IBM Plex Mono', monospace;
+      font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink3); margin-top: 2px; font-style: normal;
+    }
+
+    .sb-user {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--br);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      display: grid; place-items: center;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600; font-size: .75rem; color: #0d0d0d;
+      flex-shrink: 0;
+    }
+    .sb-user-info { min-width: 0; }
+    .sb-user-name { font-size: .82rem; font-weight: 600; color: var(--ink); }
+    .sb-user-role {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 7.5px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--ink3); margin-top: 2px;
+    }
+    .online-dot {
+      width: 5px; height: 5px; background: var(--green);
+      border-radius: 50%; margin-right: 4px; display: inline-block; vertical-align: middle;
+    }
+
+    .sb-nav { padding: 12px 10px; flex: 1; }
+    .sb-sec-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink4); padding: 8px 10px 5px;
+    }
+    .sb-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: var(--r2);
+      font-size: .82rem; font-weight: 500; color: var(--ink3);
+      cursor: pointer; text-decoration: none;
+      transition: color .15s, background .15s;
+      position: relative; margin-bottom: 2px;
+    }
+    .sb-link:hover { background: var(--s3); color: var(--ink2); }
+    .sb-link.active { background: var(--gold-glow); color: var(--gold); }
+    .sb-link.active::before {
+      content: ''; position: absolute; left: 0; top: 20%; height: 60%;
+      width: 2px; background: var(--gold); border-radius: 1px;
+    }
+    .sb-link-icon { width: 16px; text-align: center; font-size: .9rem; flex-shrink: 0; }
+    .sb-badge {
+      margin-left: auto; font-family: 'IBM Plex Mono', monospace;
+      font-size: 7px; background: var(--gold-glow2);
+      color: var(--gold); padding: 2px 6px; border-radius: 10px;
+      border: 1px solid rgba(200,169,110,.2);
+    }
+
+    .sb-bottom {
+      padding: 14px 20px;
+      border-top: 1px solid var(--br);
+    }
+    .sb-rating {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 1px; color: var(--ink3);
+    }
+    .sb-rating span { color: var(--gold); }
+
+    /* MOBILE TOPBAR */
+    .topbar {
+      display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 150;
+      height: 52px; background: var(--s1); border-bottom: 1px solid var(--br);
+      padding: 0 16px; align-items: center; justify-content: space-between;
+    }
+    .topbar-logo { font-family: 'DM Serif Display', serif; color: var(--gold); font-size: .95rem; }
+    .hbg { background: none; border: 1px solid var(--br); color: var(--ink2); cursor: pointer; padding: 6px 10px; border-radius: var(--r2); font-size: .9rem; }
+    .overlay { display: none; position: fixed; inset: 0; z-index: 150; background: rgba(0,0,0,.7); }
+    .overlay.show { display: block; }
+
+    /* ── MAIN ─────────────────────────────────────── */
+    .main { margin-left: var(--fw); flex: 1; padding: 28px 28px 40px 32px; min-width: 0; }
+
+    /* PAGE HEADER */
+    .ph {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 12px; flex-wrap: wrap;
+    }
+    .ph-left {}
+    .ph-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 6px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ph-eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--gold); }
+    .ph-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem; color: var(--ink); letter-spacing: -.3px;
+    }
+    .ph-sub { font-size: .78rem; color: var(--ink3); margin-top: 3px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: var(--r);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem; font-weight: 600; cursor: pointer;
+      border: none; transition: all .18s var(--ease);
+    }
+    .btn-gold { background: var(--gold); color: #0d0d0d; }
+    .btn-gold:hover { background: var(--ink2); transform: translateY(-1px); }
+    .btn-ghost { background: var(--s2); border: 1px solid var(--br); color: var(--ink3); }
+    .btn-ghost:hover { border-color: var(--br2); color: var(--ink2); background: var(--s3); }
+
+    /* ── STAT CARDS ──────────────────────────────── */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .scard {
+      background: var(--s1); border: 1px solid var(--br);
+      border-radius: var(--r); padding: 18px 20px;
+      transition: border-color .2s, background .2s;
+      position: relative; overflow: hidden;
+    }
+    .scard::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+      opacity: 0; transition: opacity .2s;
+    }
+    .scard:hover { border-color: var(--br2); background: var(--s2); }
+    .scard:hover::before { opacity: 1; }
+    .scard-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .scard-icon {
+      width: 34px; height: 34px; border-radius: var(--r2);
+      display: grid; place-items: center; font-size: .9rem;
+    }
+    .scard-icon.gold  { background: var(--gold-glow2); }
+    .scard-icon.green { background: var(--green-bg); }
+    .scard-icon.amber { background: var(--amber-bg); }
+    .scard-icon.dim   { background: var(--s3); }
+    .scard-trend {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px; padding: 3px 7px; border-radius: 20px; font-weight: 500;
+    }
+    .scard-trend.up   { background: var(--green-bg); color: var(--green); }
+    .scard-trend.down { background: var(--red-bg); color: var(--red); }
+    .scard-trend.neu  { background: var(--s3); color: var(--ink3); }
+    .scard-val {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.55rem; color: var(--ink);
+      letter-spacing: -.3px; line-height: 1; margin-bottom: 4px;
+    }
+    .scard-val.gold { color: var(--gold); }
+    .scard-val.green { color: var(--green); }
+    .scard-val.amber { color: var(--amber); }
+    .scard-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 7.5px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--ink3);
+    }
+    .scard-bar { height: 2px; background: var(--br); border-radius: 1px; margin-top: 14px; overflow: hidden; }
+    .scard-bar-fill { height: 100%; border-radius: 1px; transition: width .5s .1s var(--ease); }
+
+    /* ── MAIN GRID ───────────────────────────────── */
+    .main-grid { display: grid; grid-template-columns: 1fr 280px; gap: 16px; margin-bottom: 20px; }
+
+    /* ── CHART PANEL ─────────────────────────────── */
+    .panel {
+      background: var(--s1); border: 1px solid var(--br);
+      border-radius: var(--r); overflow: hidden;
+    }
+    .panel-hd {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--br);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .panel-title { font-family: 'DM Serif Display', serif; font-size: .95rem; color: var(--ink); }
+    .panel-sub { font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink3); margin-top: 2px; }
+    .panel-body { padding: 20px; }
+
+    /* Revenue Chart */
+    .chart-legend { display: flex; gap: 16px; margin-bottom: 16px; }
+    .cl-item { display: flex; align-items: center; gap: 5px; font-size: .75rem; color: var(--ink3); }
+    .cl-dot { width: 7px; height: 7px; border-radius: 2px; }
+
+    .chart-area {
+      display: flex; align-items: flex-end; gap: 8px;
+      height: 160px; padding-bottom: 0;
+    }
+    .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar-pair { display: flex; gap: 3px; align-items: flex-end; width: 100%; }
+    .bar {
+      flex: 1; border-radius: 3px 3px 1px 1px;
+      transition: filter .15s; cursor: pointer; position: relative;
+    }
+    .bar:hover { filter: brightness(1.25); }
+    .bar-a { background: linear-gradient(180deg, var(--gold) 0%, rgba(200,169,110,0.4) 100%); }
+    .bar-b { background: linear-gradient(180deg, var(--gold-dim) 0%, rgba(156,125,69,0.3) 100%); }
+    .bar-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink4); white-space: nowrap; }
+
+    .chart-yaxis {
+      display: flex; flex-direction: column; justify-content: space-between;
+      height: 160px; padding-bottom: 20px; margin-right: 8px;
+    }
+    .chart-ytick { font-family: 'IBM Plex Mono', monospace; font-size: 7px; color: var(--ink4); text-align: right; white-space: nowrap; }
+    .chart-outer { display: flex; width: 100%; }
+
+    /* ── TODO LIST ───────────────────────────────── */
+    .todo-add {
+      display: flex; gap: 8px; margin-bottom: 14px;
+    }
+    .todo-input {
+      flex: 1; background: var(--s2); border: 1px solid var(--br);
+      border-radius: var(--r2); padding: 8px 10px;
+      font-family: 'DM Sans', sans-serif; font-size: .78rem;
+      color: var(--ink); outline: none;
+      transition: border-color .15s;
+    }
+    .todo-input:focus { border-color: var(--gold); }
+    .todo-input::placeholder { color: var(--ink4); }
+    .todo-btn {
+      background: var(--gold-glow2); border: 1px solid rgba(200,169,110,.3);
+      color: var(--gold); cursor: pointer; border-radius: var(--r2);
+      padding: 8px 12px; font-size: .8rem; transition: background .15s;
+    }
+    .todo-btn:hover { background: var(--gold); color: #0d0d0d; }
+
+    .todo-list { display: flex; flex-direction: column; gap: 1px; max-height: 300px; overflow-y: auto; }
+    .todo-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid var(--br);
+    }
+    .todo-item:last-child { border-bottom: none; }
+    .todo-check {
+      width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0;
+      border: 1.5px solid var(--br2); cursor: pointer;
+      display: grid; place-items: center;
+      background: none; transition: all .15s;
+    }
+    .todo-check.done { background: var(--green); border-color: var(--green); color: #0d0d0d; font-size: .6rem; }
+    .todo-txt { flex: 1; font-size: .8rem; color: var(--ink2); }
+    .todo-txt.done { text-decoration: line-through; color: var(--ink4); }
+    .todo-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 7px; letter-spacing: .5px; padding: 2px 6px; border-radius: 10px;
+    }
+    .tt-gold   { background: var(--gold-glow); color: var(--gold); }
+    .tt-green  { background: var(--green-bg); color: var(--green); }
+    .tt-amber  { background: var(--amber-bg); color: var(--amber); }
+
+    /* ── BOTTOM GRID ─────────────────────────────── */
+    .bottom-grid { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+
+    /* ── CLIENT CARDS ────────────────────────────── */
+    .client-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .ccard {
+      background: var(--s2); border: 1px solid var(--br);
+      border-radius: var(--r); padding: 16px;
+      transition: border-color .18s, background .18s;
+      cursor: default;
+    }
+    .ccard:hover { border-color: rgba(200,169,110,.25); background: var(--s1); }
+    .ccard-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
+    .ccard-client { display: flex; align-items: center; gap: 8px; }
+    .ccard-av {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: grid; place-items: center;
+      font-weight: 600; font-size: .7rem; color: #0d0d0d;
+    }
+    .ccard-name { font-size: .82rem; font-weight: 600; color: var(--ink); }
+    .ccard-proj { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink3); margin-top: 2px; }
+    .pill {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 7px; letter-spacing: .5px; padding: 3px 8px; border-radius: 10px;
+      display: inline-flex; align-items: center; gap: 3px; white-space: nowrap;
+    }
+    .pill::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+    .pill-green  { background: var(--green-bg);  color: var(--green); }
+    .pill-amber  { background: var(--amber-bg);  color: var(--amber); }
+    .pill-dim    { background: var(--s3); color: var(--ink3); }
+
+    .ccard-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+    .cstat { text-align: center; }
+    .cstat-val { font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--ink); margin-bottom: 2px; }
+    .cstat-val.gold { color: var(--gold); }
+    .cstat-val.green { color: var(--green); }
+    .cstat-val.amber { color: var(--amber); }
+    .cstat-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 6.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink4); }
+
+    .prog-wrap { background: var(--br); border-radius: 2px; height: 4px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 2px; transition: width .5s .2s var(--ease); }
+    .prog-gold { background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
+    .prog-green { background: var(--green); }
+    .prog-amber { background: var(--amber); }
+    .ccard-prog-label {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 5px; font-family: 'IBM Plex Mono', monospace;
+      font-size: 7px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink4);
+    }
+    .ccard-prog-label span { color: var(--ink3); }
+
+    /* ── ACTIVITY ─────────────────────────────────── */
+    .act-item { display: flex; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--br); }
+    .act-item:last-child { border-bottom: none; }
+    .act-icon {
+      width: 28px; height: 28px; border-radius: var(--r2);
+      display: grid; place-items: center; font-size: .75rem; flex-shrink: 0; margin-top: 1px;
+    }
+    .ai-gold   { background: var(--gold-glow2); }
+    .ai-green  { background: var(--green-bg); }
+    .ai-amber  { background: var(--amber-bg); }
+    .ai-dim    { background: var(--s3); }
+    .act-body { flex: 1; min-width: 0; }
+    .act-text { font-size: .78rem; color: var(--ink3); line-height: 1.4; }
+    .act-text strong { color: var(--ink2); font-weight: 500; }
+    .act-time { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1px; color: var(--ink4); margin-top: 3px; }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 1160px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .main-grid { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; padding: 64px 14px 32px; }
+      .topbar { display: flex; }
+    }
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .client-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="overlay" id="ov" onclick="closeSb()"></div>
+
+<!-- ══ SIDEBAR ══════════════════════════════════ -->
+<aside class="sidebar" id="sb">
+  <div class="sb-top">
+    <div class="sb-logo-mark">T</div>
+    <div class="sb-brand">
+      Track Lancer
+      <small>Freelancer Portal</small>
+    </div>
+  </div>
+
+  <div class="sb-user">
+    <div class="avatar">AK</div>
+    <div class="sb-user-info">
+      <div class="sb-user-name">Arjun Kapoor</div>
+      <div class="sb-user-role"><span class="online-dot"></span>Full-Stack Dev</div>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-sec-lbl">Menu</div>
+    <a href="#" class="sb-link active">
+      <span class="sb-link-icon">⊞</span> Overview
+    </a>
+    <a href="#" class="sb-link">
+      <span class="sb-link-icon">◷</span> Past Projects
+    </a>
+    <a href="#" class="sb-link">
+      <span class="sb-link-icon">✉</span> Messages
+      <span class="sb-badge">2</span>
+    </a>
+    <a href="#" class="sb-link">
+      <span class="sb-link-icon">◎</span> Settings
+    </a>
+  </nav>
+
+  <div class="sb-bottom">
+    <div class="sb-rating"><span>★★★★★</span> 4.9 · 128 reviews</div>
+  </div>
+</aside>
+
+<!-- ══ TOPBAR (Mobile) ═══════════════════════════ -->
+<header class="topbar">
+  <button class="hbg" onclick="openSb()">☰</button>
+  <div class="topbar-logo">Track Lancer</div>
+  <div style="width:40px"></div>
+</header>
+
+<!-- ══ MAIN ══════════════════════════════════════ -->
+<main class="main">
+
+  <!-- Header -->
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-eyebrow">Freelancer Dashboard</div>
+      <div class="ph-title">Good evening, Arjun</div>
+      <div class="ph-sub">Tuesday, 17 June 2026 · 3 active projects</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost">Past Projects</button>
+      <button class="btn btn-gold">+ Create New Project</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="scard">
+      <div class="scard-header">
+        <div class="scard-icon gold">💰</div>
+        <div class="scard-trend up">↑ 12.4%</div>
+      </div>
+      <div class="scard-val gold">₹1,84,200</div>
+      <div class="scard-lbl">Total Earnings — June</div>
+      <div class="scard-bar"><div class="scard-bar-fill" style="width:72%;background:var(--gold)"></div></div>
+    </div>
+    <div class="scard">
+      <div class="scard-header">
+        <div class="scard-icon dim">👥</div>
+        <div class="scard-trend neu">All Time</div>
+      </div>
+      <div class="scard-val">24</div>
+      <div class="scard-lbl">Total Clients Served</div>
+      <div class="scard-bar"><div class="scard-bar-fill" style="width:55%;background:var(--ink3)"></div></div>
+    </div>
+    <div class="scard">
+      <div class="scard-header">
+        <div class="scard-icon amber">⏳</div>
+        <div class="scard-trend down">2 pending</div>
+      </div>
+      <div class="scard-val amber">₹68,000</div>
+      <div class="scard-lbl">Payment Remaining</div>
+      <div class="scard-bar"><div class="scard-bar-fill" style="width:35%;background:var(--amber)"></div></div>
+    </div>
+    <div class="scard">
+      <div class="scard-header">
+        <div class="scard-icon green">📁</div>
+        <div class="scard-trend up">↑ 2 new</div>
+      </div>
+      <div class="scard-val green">3</div>
+      <div class="scard-lbl">Active Projects</div>
+      <div class="scard-bar"><div class="scard-bar-fill" style="width:80%;background:var(--green)"></div></div>
+    </div>
+  </div>
+
+  <!-- CHART + TODO -->
+  <div class="main-grid">
+
+    <!-- Revenue Chart -->
+    <div class="panel">
+      <div class="panel-hd">
+        <div>
+          <div class="panel-title">Revenue Overview</div>
+          <div class="panel-sub">Monthly earnings vs withdrawals — 2026</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:.72rem;">Weekly</button>
+          <button class="btn btn-gold"  style="padding:6px 12px;font-size:.72rem;">Monthly</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="chart-legend">
+          <div class="cl-item"><div class="cl-dot" style="background:var(--gold)"></div> Earned</div>
+          <div class="cl-item"><div class="cl-dot" style="background:var(--gold-dim)"></div> Paid Out</div>
+        </div>
+        <div class="chart-outer">
+          <div class="chart-yaxis">
+            <div class="chart-ytick">2L</div>
+            <div class="chart-ytick">1.5L</div>
+            <div class="chart-ytick">1L</div>
+            <div class="chart-ytick">50K</div>
+            <div class="chart-ytick">0</div>
+          </div>
+          <div class="chart-area" id="chartArea">
+            <!-- Jan -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar bar-a" style="height:46%" title="₹92,000"></div>
+                <div class="bar bar-b" style="height:30%" title="₹60,000"></div>
+              </div>
+              <div class="bar-lbl">Jan</div>
+            </div>
+            <!-- Feb -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar bar-a" style="height:55%" title="₹1,10,000"></div>
+                <div class="bar bar-b" style="height:38%" title="₹76,000"></div>
+              </div>
+              <div class="bar-lbl">Feb</div>
+            </div>
+            <!-- Mar -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar bar-a" style="height:64%" title="₹1,28,000"></div>
+                <div class="bar bar-b" style="height:45%" title="₹90,000"></div>
+              </div>
+              <div class="bar-lbl">Mar</div>
+            </div>
+            <!-- Apr -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar bar-a" style="height:72%" title="₹1,44,000"></div>
+                <div class="bar bar-b" style="height:52%" title="₹1,04,000"></div>
+              </div>
+              <div class="bar-lbl">Apr</div>
+            </div>
+            <!-- May -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar bar-a" style="height:81%" title="₹1,62,000"></div>
+                <div class="bar bar-b" style="height:58%" title="₹1,16,000"></div>
+              </div>
+              <div class="bar-lbl">May</div>
+            </div>
+            <!-- Jun (current) -->
+            <div class="bar-group">
+              <div class="bar-pair">
+                <div class="bar bar-a" style="height:92%;box-shadow:0 0 12px rgba(200,169,110,0.3)" title="₹1,84,200"></div>
+                <div class="bar bar-b" style="height:60%" title="₹1,20,000"></div>
+              </div>
+              <div class="bar-lbl" style="color:var(--gold)">Jun ●</div>
+            </div>
+          </div>
+        </div>
+        <!-- X-axis total labels -->
+        <div style="display:flex;margin-top:10px;gap:8px;padding-left:36px;">
+          <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--ink4)">₹92K</div>
+          <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--ink4)">₹1.1L</div>
+          <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--ink4)">₹1.28L</div>
+          <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--ink4)">₹1.44L</div>
+          <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--ink4)">₹1.62L</div>
+          <div style="flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--gold)">₹1.84L</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODO LIST -->
+    <div class="panel">
+      <div class="panel-hd">
+        <div>
+          <div class="panel-title">Today's Tasks</div>
+          <div class="panel-sub">3 of 5 done</div>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:14px 16px;">
+        <div class="todo-add">
+          <input class="todo-input" type="text" placeholder="Add a task..." id="todoIn" />
+          <button class="todo-btn" onclick="addTodo()">+</button>
+        </div>
+        <div class="todo-list" id="todoList">
+          <div class="todo-item">
+            <div class="todo-check done" onclick="toggleTodo(this)">✓</div>
+            <span class="todo-txt done">Finalise UI mockups for TechMart</span>
+            <span class="todo-tag tt-gold">Design</span>
+          </div>
+          <div class="todo-item">
+            <div class="todo-check" onclick="toggleTodo(this)"></div>
+            <span class="todo-txt">Integrate Stripe webhook</span>
+            <span class="todo-tag tt-amber">Dev</span>
+          </div>
+          <div class="todo-item">
+            <div class="todo-check done" onclick="toggleTodo(this)">✓</div>
+            <span class="todo-txt done">Send weekly update to FitLife</span>
+            <span class="todo-tag tt-green">Client</span>
+          </div>
+          <div class="todo-item">
+            <div class="todo-check" onclick="toggleTodo(this)"></div>
+            <span class="todo-txt">Write unit tests — auth module</span>
+            <span class="todo-tag tt-amber">Dev</span>
+          </div>
+          <div class="todo-item">
+            <div class="todo-check done" onclick="toggleTodo(this)">✓</div>
+            <span class="todo-txt done">Reply to LearnWave query</span>
+            <span class="todo-tag tt-green">Client</span>
+          </div>
+          <div class="todo-item">
+            <div class="todo-check" onclick="toggleTodo(this)"></div>
+            <span class="todo-txt">Review EduTech phase 2 scope</span>
+            <span class="todo-tag tt-gold">Review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENT CARDS + ACTIVITY -->
+  <div class="bottom-grid">
+
+    <!-- Active Client Cards -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:.95rem;color:var(--ink)">Active Clients</div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--ink3);cursor:pointer;">View all →</span>
+      </div>
+      <div class="client-cards">
+
+        <!-- Card 1 -->
+        <div class="ccard">
+          <div class="ccard-top">
+            <div class="ccard-client">
+              <div class="ccard-av" style="background:linear-gradient(135deg,#c8a96e,#9c7d45)">TM</div>
+              <div>
+                <div class="ccard-name">TechMart Inc.</div>
+                <div class="ccard-proj">E-Commerce Platform</div>
+              </div>
+            </div>
+            <span class="pill pill-green">Active</span>
+          </div>
+          <div class="ccard-stats">
+            <div class="cstat">
+              <div class="cstat-val gold">₹85K</div>
+              <div class="cstat-lbl">Value</div>
+            </div>
+            <div class="cstat">
+              <div class="cstat-val green">₹55K</div>
+              <div class="cstat-lbl">Received</div>
+            </div>
+            <div class="cstat">
+              <div class="cstat-val amber">₹30K</div>
+              <div class="cstat-lbl">Remaining</div>
+            </div>
+          </div>
+          <div class="ccard-prog-label">Progress <span>72%</span></div>
+          <div class="prog-wrap"><div class="prog-fill prog-gold" style="width:72%"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--ink4)">3 of 4 milestones</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--amber)">Due Jul 20</span>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="ccard">
+          <div class="ccard-top">
+            <div class="ccard-client">
+              <div class="ccard-av" style="background:linear-gradient(135deg,#9c7d45,#c87840)">FL</div>
+              <div>
+                <div class="ccard-name">FitLife Co.</div>
+                <div class="ccard-proj">Fitness Mobile App</div>
+              </div>
+            </div>
+            <span class="pill pill-green">Active</span>
+          </div>
+          <div class="ccard-stats">
+            <div class="cstat">
+              <div class="cstat-val gold">₹60K</div>
+              <div class="cstat-lbl">Value</div>
+            </div>
+            <div class="cstat">
+              <div class="cstat-val green">₹24K</div>
+              <div class="cstat-lbl">Received</div>
+            </div>
+            <div class="cstat">
+              <div class="cstat-val amber">₹36K</div>
+              <div class="cstat-lbl">Remaining</div>
+            </div>
+          </div>
+          <div class="ccard-prog-label">Progress <span>45%</span></div>
+          <div class="prog-wrap"><div class="prog-fill prog-gold" style="width:45%"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--ink4)">2 of 4 milestones</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--ink3)">Due Aug 10</span>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="ccard">
+          <div class="ccard-top">
+            <div class="ccard-client">
+              <div class="ccard-av" style="background:linear-gradient(135deg,#c87840,#9c7d45)">LW</div>
+              <div>
+                <div class="ccard-name">LearnWave</div>
+                <div class="ccard-proj">EduTech LMS Portal</div>
+              </div>
+            </div>
+            <span class="pill pill-amber">Review</span>
+          </div>
+          <div class="ccard-stats">
+            <div class="cstat">
+              <div class="cstat-val gold">₹1.2L</div>
+              <div class="cstat-lbl">Value</div>
+            </div>
+            <div class="cstat">
+              <div class="cstat-val green">₹1.0L</div>
+              <div class="cstat-lbl">Received</div>
+            </div>
+            <div class="cstat">
+              <div class="cstat-val amber">₹20K</div>
+              <div class="cstat-lbl">Remaining</div>
+            </div>
+          </div>
+          <div class="ccard-prog-label">Progress <span>88%</span></div>
+          <div class="prog-wrap"><div class="prog-fill prog-green" style="width:88%"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--ink4)">4 of 5 milestones</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:7px;color:var(--red)">Due Jun 25</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Add new -->
+        <div class="ccard" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:160px;cursor:pointer;border-color:var(--br2);" onclick="">
+          <div style="font-size:1.5rem;color:var(--ink4)">+</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4)">New Project</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Activity Feed -->
+    <div>
+      <div style="font-family:'DM Serif Display',serif;font-size:.95rem;color:var(--ink);margin-bottom:12px;">Activity</div>
+      <div class="panel">
+        <div style="padding:4px 16px 0;">
+          <div class="act-item">
+            <div class="act-icon ai-green">💸</div>
+            <div class="act-body">
+              <div class="act-text"><strong>₹20,000 received</strong> from TechMart for Milestone 2</div>
+              <div class="act-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon ai-gold">✉</div>
+            <div class="act-body">
+              <div class="act-text"><strong>New message</strong> from Priya (FitLife) — API scope change</div>
+              <div class="act-time">5 hours ago</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon ai-amber">⚑</div>
+            <div class="act-body">
+              <div class="act-text">Client flagged <strong>delay notice</strong> on EduTech Portal</div>
+              <div class="act-time">Yesterday · 3 PM</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon ai-green">★</div>
+            <div class="act-body">
+              <div class="act-text"><strong>5-star review</strong> from FitLife Co. — "Excellent work!"</div>
+              <div class="act-time">Yesterday · 6 PM</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon ai-dim">📋</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Milestone 3</strong> marked done on E-Commerce Platform</div>
+              <div class="act-time">2 days ago</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon ai-gold">🔔</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Reminder:</strong> LearnWave deadline in 8 days</div>
+              <div class="act-time">2 days ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function openSb() { document.getElementById('sb').classList.add('open'); document.getElementById('ov').classList.add('show'); }
+  function closeSb() { document.getElementById('sb').classList.remove('open'); document.getElementById('ov').classList.remove('show'); }
+
+  document.querySelectorAll('.sb-link').forEach(l => {
+    l.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.sb-link').forEach(x => x.classList.remove('active'));
+      l.classList.add('active');
+      if (window.innerWidth < 860) closeSb();
+    });
+  });
+
+  function toggleTodo(el) {
+    el.classList.toggle('done');
+    el.textContent = el.classList.contains('done') ? '✓' : '';
+    const txt = el.nextElementSibling;
+    txt.classList.toggle('done', el.classList.contains('done'));
+    updateTodoCount();
+  }
+
+  function updateTodoCount() {
+    const done = document.querySelectorAll('.todo-check.done').length;
+    const total = document.querySelectorAll('.todo-check').length;
+    document.querySelector('.panel-sub').textContent = done + ' of ' + total + ' done';
+  }
+
+  function addTodo() {
+    const inp = document.getElementById('todoIn');
+    const val = inp.value.trim();
+    if (!val) return;
+    const li = document.createElement('div');
+    li.className = 'todo-item';
+    li.innerHTML = `<div class="todo-check" onclick="toggleTodo(this)"></div><span class="todo-txt">${val}</span><span class="todo-tag tt-gold">Task</span>`;
+    document.getElementById('todoList').appendChild(li);
+    inp.value = '';
+    updateTodoCount();
+  }
+
+  document.getElementById('todoIn').addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
+</script>
+</body>
+</html>

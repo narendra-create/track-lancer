@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Lancer — Client Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ─────────────────────────────────── */
+    :root {
+      --bg:         #0d0d0d;
+      --s1:         #141414;
+      --s2:         #1a1a1a;
+      --s3:         #222222;
+      --br:         #2c2c2c;
+      --br2:        #383838;
+
+      --gold:       #c8a96e;
+      --gold-dim:   #9c7d45;
+      --gold-glow:  rgba(200,169,110,0.08);
+      --gold-glow2: rgba(200,169,110,0.15);
+
+      --ink:        #e8e3d8;
+      --ink2:       #c4bcb1;
+      --ink3:       #7a7570;
+      --ink4:       #4a4540;
+
+      --green:      #4a9e75;
+      --green-bg:   rgba(74,158,117,0.1);
+      --amber:      #c87840;
+      --amber-bg:   rgba(200,120,64,0.1);
+      --red:        #c06060;
+      --red-bg:     rgba(192,96,96,0.09);
+
+      --fw: 240px;
+      --r: 6px;
+      --r2: 4px;
+      --ease: cubic-bezier(.4,0,.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      display: flex; min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--br2); border-radius: 2px; }
+
+    /* ── SIDEBAR ─────────────────────────────────── */
+    .sidebar {
+      position: fixed; top: 0; left: 0; height: 100vh; width: var(--fw);
+      background: var(--s1); border-right: 1px solid var(--br);
+      display: flex; flex-direction: column;
+      z-index: 200; transition: transform .22s var(--ease);
+    }
+    .sb-top {
+      padding: 22px 20px 18px; border-bottom: 1px solid var(--br);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sb-logo-mark {
+      width: 32px; height: 32px; background: var(--gold-glow2);
+      border: 1px solid rgba(200,169,110,.25); border-radius: var(--r2);
+      display: grid; place-items: center;
+      font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--gold); flex-shrink: 0;
+    }
+    .sb-brand { font-family: 'DM Serif Display', serif; font-size: 1.05rem; color: var(--gold); }
+    .sb-brand small {
+      display: block; font-family: 'IBM Plex Mono', monospace;
+      font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink3); margin-top: 2px;
+    }
+
+    .sb-company {
+      padding: 12px 20px; border-bottom: 1px solid var(--br);
+      background: var(--s2);
+    }
+    .sb-company-name { font-size: .82rem; font-weight: 600; color: var(--ink); }
+    .sb-company-meta { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink3); margin-top: 2px; }
+
+    .sb-nav { padding: 12px 10px; flex: 1; }
+    .sb-sec-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink4); padding: 8px 10px 5px; }
+    .sb-link {
+      display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+      border-radius: var(--r2); font-size: .82rem; font-weight: 500; color: var(--ink3);
+      cursor: pointer; text-decoration: none; transition: color .15s, background .15s;
+      position: relative; margin-bottom: 2px;
+    }
+    .sb-link:hover { background: var(--s3); color: var(--ink2); }
+    .sb-link.active { background: var(--gold-glow); color: var(--gold); }
+    .sb-link.active::before {
+      content: ''; position: absolute; left: 0; top: 20%; height: 60%;
+      width: 2px; background: var(--gold); border-radius: 1px;
+    }
+    .sb-link-icon { width: 16px; text-align: center; font-size: .9rem; flex-shrink: 0; }
+    .sb-badge { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 7px; background: var(--gold-glow2); color: var(--gold); padding: 2px 6px; border-radius: 10px; border: 1px solid rgba(200,169,110,.2); }
+
+    .sb-user { margin-top: auto; border-top: 1px solid var(--br); padding: 14px 20px; display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,var(--gold-dim),var(--gold)); display: grid; place-items: center; font-weight: 600; font-size: .72rem; color: #0d0d0d; flex-shrink: 0; }
+    .sb-user-name { font-size: .8rem; font-weight: 600; color: var(--ink); }
+    .sb-user-role { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink3); margin-top: 2px; }
+    .online-dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; margin-right: 4px; display: inline-block; vertical-align: middle; }
+
+    /* TOPBAR */
+    .topbar { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 150; height: 52px; background: var(--s1); border-bottom: 1px solid var(--br); padding: 0 16px; align-items: center; justify-content: space-between; }
+    .topbar-logo { font-family: 'DM Serif Display', serif; color: var(--gold); font-size: .95rem; }
+    .hbg { background: none; border: 1px solid var(--br); color: var(--ink2); cursor: pointer; padding: 6px 10px; border-radius: var(--r2); font-size: .9rem; }
+    .overlay { display: none; position: fixed; inset: 0; z-index: 150; background: rgba(0,0,0,.7); }
+    .overlay.show { display: block; }
+
+    /* ── MAIN ─────────────────────────────────────── */
+    .main { margin-left: var(--fw); flex: 1; padding: 28px 28px 40px 32px; min-width: 0; }
+
+    /* PAGE HEADER */
+    .ph { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+    .ph-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .ph-eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--gold); }
+    .ph-title { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--ink); letter-spacing: -.3px; }
+    .ph-sub { font-size: .78rem; color: var(--ink3); margin-top: 3px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--r); font-family: 'DM Sans', sans-serif; font-size: .78rem; font-weight: 600; cursor: pointer; border: none; transition: all .18s var(--ease); }
+    .btn-gold { background: var(--gold); color: #0d0d0d; }
+    .btn-gold:hover { background: var(--ink2); transform: translateY(-1px); }
+    .btn-ghost { background: var(--s2); border: 1px solid var(--br); color: var(--ink3); }
+    .btn-ghost:hover { border-color: var(--br2); color: var(--ink2); background: var(--s3); }
+
+    /* ── STATS ───────────────────────────────────── */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .scard { background: var(--s1); border: 1px solid var(--br); border-radius: var(--r); padding: 18px 20px; transition: border-color .2s, background .2s; position: relative; overflow: hidden; }
+    .scard::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); opacity: 0; transition: opacity .2s; }
+    .scard:hover { border-color: var(--br2); background: var(--s2); }
+    .scard:hover::before { opacity: 1; }
+    .scard-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .scard-icon { width: 34px; height: 34px; border-radius: var(--r2); display: grid; place-items: center; font-size: .9rem; }
+    .scard-icon.gold  { background: var(--gold-glow2); }
+    .scard-icon.green { background: var(--green-bg); }
+    .scard-icon.amber { background: var(--amber-bg); }
+    .scard-icon.dim   { background: var(--s3); }
+    .scard-trend { font-family: 'IBM Plex Mono', monospace; font-size: 8px; padding: 3px 7px; border-radius: 20px; }
+    .scard-trend.warn { background: var(--amber-bg); color: var(--amber); }
+    .scard-trend.good { background: var(--green-bg); color: var(--green); }
+    .scard-trend.neu  { background: var(--s3); color: var(--ink3); }
+    .scard-val { font-family: 'DM Serif Display', serif; font-size: 1.55rem; color: var(--ink); letter-spacing: -.3px; line-height: 1; margin-bottom: 4px; }
+    .scard-val.gold  { color: var(--gold); }
+    .scard-val.amber { color: var(--amber); }
+    .scard-val.green { color: var(--green); }
+    .scard-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink3); }
+    .scard-bar { height: 2px; background: var(--br); border-radius: 1px; margin-top: 14px; overflow: hidden; }
+    .scard-bar-fill { height: 100%; border-radius: 1px; }
+
+    /* ── MAIN GRID ───────────────────────────────── */
+    .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+
+    /* ── PANEL ───────────────────────────────────── */
+    .panel { background: var(--s1); border: 1px solid var(--br); border-radius: var(--r); overflow: hidden; }
+    .panel-hd { padding: 16px 20px; border-bottom: 1px solid var(--br); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .panel-title { font-family: 'DM Serif Display', serif; font-size: .95rem; color: var(--ink); }
+    .panel-sub { font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink3); margin-top: 2px; }
+
+    /* ── PROJECT CARDS GRID ──────────────────────── */
+    .proj-grid { padding: 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+    .pcard {
+      background: var(--s2); border: 1px solid var(--br);
+      border-radius: var(--r); padding: 14px;
+      cursor: pointer; transition: border-color .18s, background .18s;
+    }
+    .pcard:hover { border-color: rgba(200,169,110,.25); background: var(--s1); }
+
+    .pcard-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 6px; }
+    .pcard-info { min-width: 0; }
+    .pcard-name { font-size: .83rem; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .pcard-fl { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink3); }
+
+    .pill { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: .5px; padding: 3px 8px; border-radius: 10px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; flex-shrink: 0; }
+    .pill::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+    .pill-green  { background: var(--green-bg);  color: var(--green); }
+    .pill-amber  { background: var(--amber-bg);  color: var(--amber); }
+    .pill-red    { background: var(--red-bg);    color: var(--red); }
+    .pill-dim    { background: var(--s3); color: var(--ink3); }
+
+    .pcard-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+    .pstat { text-align: center; background: var(--s3); border-radius: var(--r2); padding: 7px 4px; }
+    .pstat-val { font-family: 'DM Serif Display', serif; font-size: .95rem; line-height: 1; margin-bottom: 2px; }
+    .pstat-val.gold  { color: var(--gold); }
+    .pstat-val.green { color: var(--green); }
+    .pstat-val.amber { color: var(--amber); }
+    .pstat-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 6px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink4); }
+
+    .prog-label { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .prog-label-txt { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink4); }
+    .prog-label-pct { font-family: 'IBM Plex Mono', monospace; font-size: 7px; color: var(--ink3); }
+    .prog-wrap { background: var(--br); border-radius: 2px; height: 4px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 2px; transition: width .5s .1s var(--ease); }
+    .prog-gold  { background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
+    .prog-green { background: var(--green); }
+    .prog-amber { background: var(--amber); }
+    .prog-red   { background: var(--red); }
+
+    .pcard-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .pcard-code { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1px; color: var(--ink4); }
+    .pcard-due { font-family: 'IBM Plex Mono', monospace; font-size: 7px; color: var(--ink3); }
+    .pcard-due.warn { color: var(--amber); }
+    .pcard-due.late { color: var(--red); }
+
+    /* ADD PROJECT CARD */
+    .pcard-add {
+      background: var(--s2); border: 1px dashed var(--br2);
+      border-radius: var(--r); padding: 14px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; cursor: pointer; transition: border-color .18s;
+      min-height: 130px;
+    }
+    .pcard-add:hover { border-color: var(--gold-dim); }
+    .pcard-add-icon { font-size: 1.2rem; color: var(--ink4); }
+    .pcard-add-lbl { font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink4); }
+
+    /* ── PAYMENT HISTORY ─────────────────────────── */
+    .pay-item { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--br); transition: background .15s; }
+    .pay-item:last-child { border-bottom: none; }
+    .pay-item:hover { background: var(--s2); }
+    .pay-icon { width: 28px; height: 28px; border-radius: var(--r2); display: grid; place-items: center; font-size: .7rem; flex-shrink: 0; }
+    .pi-green { background: var(--green-bg); }
+    .pi-amber { background: var(--amber-bg); }
+    .pi-red   { background: var(--red-bg); }
+    .pay-body { flex: 1; min-width: 0; }
+    .pay-name { font-size: .78rem; font-weight: 500; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pay-meta { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1px; color: var(--ink4); margin-top: 2px; }
+    .pay-right { text-align: right; flex-shrink: 0; }
+    .pay-amount { font-family: 'IBM Plex Mono', monospace; font-size: .8rem; font-weight: 500; }
+    .pay-amount.green { color: var(--green); }
+    .pay-amount.amber { color: var(--amber); }
+    .pay-amount.red   { color: var(--red); }
+    .pay-badge { font-family: 'IBM Plex Mono', monospace; font-size: 7px; padding: 2px 6px; border-radius: 8px; display: inline-block; margin-top: 3px; }
+    .pb-green { background: var(--green-bg); color: var(--green); }
+    .pb-amber { background: var(--amber-bg); color: var(--amber); }
+    .pb-red   { background: var(--red-bg); color: var(--red); }
+
+    /* ── ACTIVITY ─────────────────────────────────── */
+    .act-item { display: flex; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--br); }
+    .act-item:last-child { border-bottom: none; }
+    .act-icon { width: 28px; height: 28px; border-radius: var(--r2); display: grid; place-items: center; font-size: .75rem; flex-shrink: 0; margin-top: 1px; }
+    .ai-gold  { background: var(--gold-glow2); }
+    .ai-green { background: var(--green-bg); }
+    .ai-amber { background: var(--amber-bg); }
+    .ai-dim   { background: var(--s3); }
+    .act-body { flex: 1; min-width: 0; }
+    .act-text { font-size: .78rem; color: var(--ink3); line-height: 1.4; }
+    .act-text strong { color: var(--ink2); font-weight: 500; }
+    .act-time { font-family: 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1px; color: var(--ink4); margin-top: 3px; }
+
+    /* ── RIGHT COLUMN ────────────────────────────── */
+    .right-col { display: flex; flex-direction: column; gap: 14px; }
+
+    /* Budget summary */
+    .budget-summary { padding: 16px; }
+    .budget-total-label { font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink3); margin-bottom: 6px; }
+    .budget-total-val { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--gold); letter-spacing: -.3px; margin-bottom: 14px; }
+    .budget-breakdown { display: flex; flex-direction: column; gap: 8px; }
+    .bb-row { display: flex; align-items: center; gap: 8px; }
+    .bb-label { font-family: 'IBM Plex Mono', monospace; font-size: 7.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink3); flex: 1; }
+    .bb-val { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--ink2); text-align: right; min-width: 55px; }
+    .bb-bar-wrap { width: 60px; background: var(--br); border-radius: 1px; height: 2px; overflow: hidden; }
+    .bb-bar-fill { height: 100%; border-radius: 1px; }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 1100px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .proj-grid  { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; padding: 64px 14px 32px; }
+      .topbar { display: flex; }
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 580px) {
+      .stats { grid-template-columns: 1fr; }
+      .proj-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="overlay" id="ov" onclick="closeSb()"></div>
+
+<!-- ══ SIDEBAR ══════════════════════════════════ -->
+<aside class="sidebar" id="sb">
+  <div class="sb-top">
+    <div class="sb-logo-mark">T</div>
+    <div class="sb-brand">
+      Track Lancer
+      <small>Client Portal</small>
+    </div>
+  </div>
+
+  <div class="sb-company">
+    <div class="sb-company-name">NovaTech Solutions</div>
+    <div class="sb-company-meta"><span class="online-dot"></span>Active Client</div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-sec-lbl">Menu</div>
+    <a href="#" class="sb-link active">
+      <span class="sb-link-icon">⊞</span> Overview
+    </a>
+    <a href="#" class="sb-link">
+      <span class="sb-link-icon">📁</span> My Projects
+      <span class="sb-badge">4</span>
+    </a>
+    <a href="#" class="sb-link">
+      <span class="sb-link-icon">💳</span> Payments
+      <span class="sb-badge">2</span>
+    </a>
+    <a href="#" class="sb-link">
+      <span class="sb-link-icon">✉</span> Messages
+      <span class="sb-badge">3</span>
+    </a>
+    <a href="#" class="sb-link">
+      <span class="sb-link-icon">◎</span> Settings
+    </a>
+  </nav>
+
+  <div class="sb-user">
+    <div class="avatar">RS</div>
+    <div>
+      <div class="sb-user-name">Rahul Sharma</div>
+      <div class="sb-user-role"><span class="online-dot"></span>Project Manager</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ TOPBAR ════════════════════════════════════ -->
+<header class="topbar">
+  <button class="hbg" onclick="openSb()">☰</button>
+  <div class="topbar-logo">Track Lancer</div>
+  <div style="width:40px"></div>
+</header>
+
+<!-- ══ MAIN ══════════════════════════════════════ -->
+<main class="main">
+
+  <!-- Header -->
+  <div class="ph">
+    <div>
+      <div class="ph-eyebrow">Client Dashboard</div>
+      <div class="ph-title">Good evening, Rahul</div>
+      <div class="ph-sub">NovaTech Solutions · 4 active projects · 2 awaiting payment</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost">Payment History</button>
+      <button class="btn btn-gold">+ New Project</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="scard">
+      <div class="scard-header">
+        <div class="scard-icon amber">⏳</div>
+        <div class="scard-trend warn">2 due now</div>
+      </div>
+      <div class="scard-val amber">₹65,000</div>
+      <div class="scard-lbl">Remaining Fee (All Projects)</div>
+      <div class="scard-bar"><div class="scard-bar-fill" style="width:38%;background:var(--amber)"></div></div>
+    </div>
+    <div class="scard">
+      <div class="scard-header">
+        <div class="scard-icon green">✓</div>
+        <div class="scard-trend good">↑ 4 this quarter</div>
+      </div>
+      <div class="scard-val green">₹3,24,000</div>
+      <div class="scard-lbl">Total Paid (All Projects)</div>
+      <div class="scard-bar"><div class="scard-bar-fill" style="width:72%;background:var(--green)"></div></div>
+    </div>
+    <div class="scard">
+      <div class="scard-header">
+        <div class="scard-icon dim">📁</div>
+        <div class="scard-trend neu">1 in review</div>
+      </div>
+      <div class="scard-val">4</div>
+      <div class="scard-lbl">Active Projects</div>
+      <div class="scard-bar"><div class="scard-bar-fill" style="width:50%;background:var(--ink3)"></div></div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- LEFT: Projects -->
+    <div>
+      <div class="panel">
+        <div class="panel-hd">
+          <div>
+            <div class="panel-title">Current Projects</div>
+            <div class="panel-sub">4 active · click to view milestones</div>
+          </div>
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:.72rem;">View All →</button>
+        </div>
+        <div class="proj-grid">
+
+          <!-- Project 1 -->
+          <div class="pcard">
+            <div class="pcard-top">
+              <div class="pcard-info">
+                <div class="pcard-name">E-Commerce Platform</div>
+                <div class="pcard-fl">Arjun Kapoor</div>
+              </div>
+              <span class="pill pill-green">Active</span>
+            </div>
+            <div class="pcard-stats">
+              <div class="pstat">
+                <div class="pstat-val gold">₹85K</div>
+                <div class="pstat-lbl">Total</div>
+              </div>
+              <div class="pstat">
+                <div class="pstat-val green">₹55K</div>
+                <div class="pstat-lbl">Paid</div>
+              </div>
+              <div class="pstat">
+                <div class="pstat-val amber">₹30K</div>
+                <div class="pstat-lbl">Left</div>
+              </div>
+            </div>
+            <div class="prog-label">
+              <span class="prog-label-txt">Progress</span>
+              <span class="prog-label-pct">72%</span>
+            </div>
+            <div class="prog-wrap"><div class="prog-fill prog-gold" style="width:72%"></div></div>
+            <div class="pcard-footer">
+              <span class="pcard-code">ADH7F29K</span>
+              <span class="pcard-due warn">Due Jul 20</span>
+            </div>
+          </div>
+
+          <!-- Project 2 -->
+          <div class="pcard">
+            <div class="pcard-top">
+              <div class="pcard-info">
+                <div class="pcard-name">Fitness Mobile App</div>
+                <div class="pcard-fl">Sneha Patel</div>
+              </div>
+              <span class="pill pill-amber">Review</span>
+            </div>
+            <div class="pcard-stats">
+              <div class="pstat">
+                <div class="pstat-val gold">₹60K</div>
+                <div class="pstat-lbl">Total</div>
+              </div>
+              <div class="pstat">
+                <div class="pstat-val green">₹24K</div>
+                <div class="pstat-lbl">Paid</div>
+              </div>
+              <div class="pstat">
+                <div class="pstat-val amber">₹35K</div>
+                <div class="pstat-lbl">Left</div>
+              </div>
+            </div>
+            <div class="prog-label">
+              <span class="prog-label-txt">Progress</span>
+              <span class="prog-label-pct">88%</span>
+            </div>
+            <div class="prog-wrap"><div class="prog-fill prog-green" style="width:88%"></div></div>
+            <div class="pcard-footer">
+              <span class="pcard-code">BKP2X91M</span>
+              <span class="pcard-due late">Due Jun 28</span>
+            </div>
+          </div>
+
+          <!-- Project 3 -->
+          <div class="pcard">
+            <div class="pcard-top">
+              <div class="pcard-info">
+                <div class="pcard-name">AI Chatbot Integration</div>
+                <div class="pcard-fl">Vikram Singh</div>
+              </div>
+              <span class="pill pill-green">Active</span>
+            </div>
+            <div class="pcard-stats">
+              <div class="pstat">
+                <div class="pstat-val gold">₹65K</div>
+                <div class="pstat-lbl">Total</div>
+              </div>
+              <div class="pstat">
+                <div class="pstat-val green">₹20K</div>
+                <div class="pstat-lbl">Paid</div>
+              </div>
+              <div class="pstat">
+                <div class="pstat-val amber">₹45K</div>
+                <div class="pstat-lbl">Left</div>
+              </div>
+            </div>
+            <div class="prog-label">
+              <span class="prog-label-txt">Progress</span>
+              <span class="prog-label-pct">35%</span>
+            </div>
+            <div class="prog-wrap"><div class="prog-fill prog-gold" style="width:35%"></div></div>
+            <div class="pcard-footer">
+              <span class="pcard-code">NMX4T82Z</span>
+              <span class="pcard-due">Due Aug 15</span>
+            </div>
+          </div>
+
+          <!-- Project 4 -->
+          <div class="pcard">
+            <div class="pcard-top">
+              <div class="pcard-info">
+                <div class="pcard-name">Analytics Dashboard</div>
+                <div class="pcard-fl">Meera Joshi</div>
+              </div>
+              <span class="pill pill-dim">Starting</span>
+            </div>
+            <div class="pcard-stats">
+              <div class="pstat">
+                <div class="pstat-val gold">₹50K</div>
+                <div class="pstat-lbl">Total</div>
+              </div>
+              <div class="pstat">
+                <div class="pstat-val green">₹0</div>
+                <div class="pstat-lbl">Paid</div>
+              </div>
+              <div class="pstat">
+                <div class="pstat-val amber">₹50K</div>
+                <div class="pstat-lbl">Left</div>
+              </div>
+            </div>
+            <div class="prog-label">
+              <span class="prog-label-txt">Progress</span>
+              <span class="prog-label-pct">8%</span>
+            </div>
+            <div class="prog-wrap"><div class="prog-fill prog-amber" style="width:8%"></div></div>
+            <div class="pcard-footer">
+              <span class="pcard-code">PQR9K77X</span>
+              <span class="pcard-due">Due Sep 1</span>
+            </div>
+          </div>
+
+          <!-- Add project -->
+          <div class="pcard-add" style="grid-column:span 2;" onclick="alert('Post a new project')">
+            <div class="pcard-add-icon">+</div>
+            <div class="pcard-add-lbl">Add New Project</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-col">
+
+      <!-- Budget Summary -->
+      <div class="panel">
+        <div class="panel-hd">
+          <div>
+            <div class="panel-title">Budget Summary</div>
+            <div class="panel-sub">All projects combined</div>
+          </div>
+        </div>
+        <div class="budget-summary">
+          <div class="budget-total-label">Total Project Value</div>
+          <div class="budget-total-val">₹2,60,000</div>
+          <div class="budget-breakdown">
+            <div class="bb-row">
+              <div class="bb-label" style="color:var(--green)">Paid</div>
+              <div class="bb-bar-wrap"><div class="bb-bar-fill" style="width:76%;background:var(--green)"></div></div>
+              <div class="bb-val" style="color:var(--green)">₹1,95,000</div>
+            </div>
+            <div class="bb-row">
+              <div class="bb-label" style="color:var(--amber)">Pending</div>
+              <div class="bb-bar-wrap"><div class="bb-bar-fill" style="width:25%;background:var(--amber)"></div></div>
+              <div class="bb-val" style="color:var(--amber)">₹65,000</div>
+            </div>
+            <div class="bb-row">
+              <div class="bb-label">Utilised</div>
+              <div class="bb-bar-wrap"><div class="bb-bar-fill" style="width:88%;background:var(--gold)"></div></div>
+              <div class="bb-val">75%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment History -->
+      <div class="panel">
+        <div class="panel-hd">
+          <div>
+            <div class="panel-title">Payment History</div>
+            <div class="panel-sub">UPI transactions</div>
+          </div>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:8px;color:var(--ink3);cursor:pointer;">All →</span>
+        </div>
+        <div>
+          <div class="pay-item">
+            <div class="pay-icon pi-amber">⏳</div>
+            <div class="pay-body">
+              <div class="pay-name">E-Commerce — Milestone 3</div>
+              <div class="pay-meta">Awaiting · Arjun Kapoor</div>
+            </div>
+            <div class="pay-right">
+              <div class="pay-amount amber">₹30,000</div>
+              <span class="pay-badge pb-amber">Pending</span>
+            </div>
+          </div>
+          <div class="pay-item">
+            <div class="pay-icon pi-amber">⏳</div>
+            <div class="pay-body">
+              <div class="pay-name">Fitness App — Milestone 3</div>
+              <div class="pay-meta">Awaiting · Sneha Patel</div>
+            </div>
+            <div class="pay-right">
+              <div class="pay-amount amber">₹35,000</div>
+              <span class="pay-badge pb-amber">Pending</span>
+            </div>
+          </div>
+          <div class="pay-item">
+            <div class="pay-icon pi-green">✓</div>
+            <div class="pay-body">
+              <div class="pay-name">E-Commerce — Milestone 2</div>
+              <div class="pay-meta">Jun 10 · UPI · Arjun</div>
+            </div>
+            <div class="pay-right">
+              <div class="pay-amount green">₹20,000</div>
+              <span class="pay-badge pb-green">Paid</span>
+            </div>
+          </div>
+          <div class="pay-item">
+            <div class="pay-icon pi-green">✓</div>
+            <div class="pay-body">
+              <div class="pay-name">Fitness App — Milestone 2</div>
+              <div class="pay-meta">Jun 5 · UPI · Sneha</div>
+            </div>
+            <div class="pay-right">
+              <div class="pay-amount green">₹12,000</div>
+              <span class="pay-badge pb-green">Paid</span>
+            </div>
+          </div>
+          <div class="pay-item">
+            <div class="pay-icon pi-green">✓</div>
+            <div class="pay-body">
+              <div class="pay-name">E-Commerce — Milestone 1</div>
+              <div class="pay-meta">Jun 1 · UPI · Arjun</div>
+            </div>
+            <div class="pay-right">
+              <div class="pay-amount green">₹15,000</div>
+              <span class="pay-badge pb-green">Paid</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="panel">
+        <div class="panel-hd">
+          <div class="panel-title">Activity</div>
+        </div>
+        <div>
+          <div class="act-item">
+            <div class="act-icon ai-amber">⏳</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Milestone done</strong> — Sneha submitted Fitness App Phase 3 for review</div>
+              <div class="act-time">3 hours ago</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon ai-gold">✉</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Message</strong> from Arjun — deployment timeline update</div>
+              <div class="act-time">6 hours ago</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon ai-green">✓</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Payment confirmed</strong> — Arjun approved ₹20,000 UPI</div>
+              <div class="act-time">Yesterday</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-icon ai-dim">🔔</div>
+            <div class="act-body">
+              <div class="act-text"><strong>Delay flagged</strong> — Vikram: "Stripe webhook issue"</div>
+              <div class="act-time">2 days ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function openSb() { document.getElementById('sb').classList.add('open'); document.getElementById('ov').classList.add('show'); }
+  function closeSb() { document.getElementById('sb').classList.remove('open'); document.getElementById('ov').classList.remove('show'); }
+  document.querySelectorAll('.sb-link').forEach(l => {
+    l.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.sb-link').forEach(x => x.classList.remove('active'));
+      l.classList.add('active');
+      if (window.innerWidth < 860) closeSb();
+    });
+  });
+</script>
+</body>
+</html>
