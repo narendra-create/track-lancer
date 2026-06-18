@@ -43,6 +43,12 @@ async function sendOtpEmail({
 }
 
 export const auth = betterAuth({
+  trustedOrigins: [
+    "http://localhost:3000",
+    ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS
+      ?.split(",")
+      .map(origin => origin.trim()) ?? [])
+  ],
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
