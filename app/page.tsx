@@ -301,7 +301,7 @@ export default function Home() {
         whileInView="show"
         viewport={viewPort}
         initial="hidden"
-        className="flex flex-col lg:flex-row lg:gap-2 w-full border-b border-ink-muted/70 "
+        className="flex flex-col lg:flex-row lg:justify-between lg:pr-24 lg:gap-2 w-full border-b border-ink-muted/70 "
         id="about"
       >
         <motion.div
@@ -366,7 +366,7 @@ export default function Home() {
           initial="hidden"
           className="mt-6 border-b border-ink-muted/70 mb-12 pb-8 lg:pb-12"
         >
-          <div className="px-4 lg:px-16 py-5 lg:py-9 flex flex-col lg:gap-68 lg:flex-row">
+          <div className="px-4 lg:px-16 py-5 lg:py-9 flex flex-col lg:justify-between lg:pr-102 lg:flex-row">
             <div>
               <h3 className="font-serif italic text-sm lg:text-md font-medium text-accent/94 text-shadow-accent">
                 04 — Contact
