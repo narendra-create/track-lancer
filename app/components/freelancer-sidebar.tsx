@@ -1,12 +1,12 @@
+"use client";
 import Link from "next/link";
+import { Home } from "lucide-react";
 
 interface SidebarProps {
   activePath?: string;
 }
 
-export function FreelancerSidebar({
-  activePath = "/dashboard",
-}: SidebarProps) {
+export function FreelancerSidebar({ activePath = "/dashboard" }: SidebarProps) {
   return (
     <>
       <aside
@@ -47,6 +47,12 @@ export function FreelancerSidebar({
           </div>
 
           <NavLink
+            href="/"
+            icon="🛖"
+            label="Home"
+            isActive={activePath === "/freelancer/"}
+          />
+          <NavLink
             href="/overview"
             icon="⊞"
             label="Overview"
@@ -54,20 +60,20 @@ export function FreelancerSidebar({
           />
           <NavLink
             href="/past-projects"
-            icon="◷"
+            icon="🕛"
             label="Past Projects"
             isActive={activePath === "/freelancer/past-projects"}
           />
           <NavLink
             href="/messages"
-            icon="✉"
+            icon="✉️"
             label="Messages"
             badge={2}
             isActive={activePath === "/freelancer/messages"}
           />
           <NavLink
             href="/settings"
-            icon="◎"
+            icon="⚙️"
             label="Settings"
             isActive={activePath === "/freelancer/settings"}
           />

@@ -38,11 +38,12 @@ export function ClientSidebar({ activePath = '/overview' }: SidebarProps) {
             Menu
           </div>
           
+          <NavLink href="/" icon="🛖" label="Home" isActive={activePath === '/'} />
           <NavLink href="/overview" icon="⊞" label="Overview" isActive={activePath === '/overview'} />
           <NavLink href="/my-projects" icon="📁" label="My Projects" badge={4} isActive={activePath === '/my-projects'} />
           <NavLink href="/payments" icon="💳" label="Payments" badge={2} isActive={activePath === '/payments'} />
-          <NavLink href="/messages" icon="✉" label="Messages" badge={3} isActive={activePath === '/messages'} />
-          <NavLink href="/settings" icon="◎" label="Settings" isActive={activePath === '/settings'} />
+          <NavLink href="/messages" icon="✉️" label="Messages" badge={3} isActive={activePath === '/messages'} />
+          <NavLink href="/settings" icon="⚙️" label="Settings" isActive={activePath === '/settings'} />
         </nav>
 
         <div className="hidden md:flex mt-auto items-center gap-2.5 border-t border-dash-border p-[14px_20px]">
