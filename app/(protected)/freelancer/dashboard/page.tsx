@@ -77,7 +77,7 @@ const Dashboard = () => {
     },
   ];
   return (
-    <motion.main className="bg-brand-surface">
+    <motion.main className="bg-brand-bg">
       <section className="mx-2 flex flex-col lg:flex-row gap-4 mb-6 lg:justify-between">
         <div className="mt-5 mx-2.5">
           <h4 className="hero-tag">FREELANCER DASHBOARD</h4>
@@ -101,7 +101,7 @@ const Dashboard = () => {
         variants={staggerContainer}
         initial="hidden"
         animate="show"
-        className="mx-2 my-2 grid grid-cols-2 gap-2"
+        className="mx-2 my-2 lg:my-4 grid grid-cols-2 lg:grid-cols-4 gap-2"
       >
         {demostats &&
           demostats.map((item, i) => {
