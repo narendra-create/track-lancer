@@ -1,6 +1,6 @@
 "use client";
 import { FreelancerSidebar } from "@/app/components/freelancer-sidebar";
-import { useState, ReactNode } from "react";
+import { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
 export default function Freelancerlayout({
@@ -8,18 +8,16 @@ export default function Freelancerlayout({
 }: {
   children: ReactNode;
 }) {
-  const [isOpen, setisOpen] = useState(false);
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-screen w-full bg-dash-surface flex-col">
-      <FreelancerSidebar
-        isOpen={isOpen}
-        onClose={() => setisOpen(false)}
-        activePath={pathname}
-      />
+    <div className="flex min-h-screen w-full bg-dash-surface flex-col mt-5">
+      <FreelancerSidebar activePath={pathname} />
 
-      <main className="flex-1 pb-[80px] md:pb-0">{children}</main>
+      {/* Main Content Area (80% width on desktop, 20% left margin) */}
+      <main className="flex-1 pb-[80px] lg:ml-[20%] lg:px-3 lg:w-[80%] lg:pb-0">
+        {children}
+      </main>
     </div>
   );
 }
