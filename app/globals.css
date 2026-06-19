@@ -62,17 +62,17 @@
   --color-dash-surface3: #222222;
   --color-dash-border: #2c2c2c;
   --color-dash-border-hover: #383838;
-  
+
   --color-dash-gold: #c8a96e;
   --color-dash-gold-dim: #9c7d45;
   --color-dash-gold-glow: rgba(200, 169, 110, 0.08);
   --color-dash-gold-glow2: rgba(200, 169, 110, 0.15);
-  
+
   --color-dash-ink: #e8e3d8;
   --color-dash-ink2: #c4bcb1;
   --color-dash-ink3: #7a7570;
   --color-dash-ink4: #4a4540;
-  
+
   --color-dash-green: #4a9e75;
   --color-dash-green-bg: rgba(74, 158, 117, 0.1);
   --color-dash-amber: #c87840;
@@ -80,7 +80,7 @@
   --color-dash-red: #c06060;
   --color-dash-red-bg: rgba(192, 96, 96, 0.09);
 
-  --ease-dash-custom: cubic-bezier(.4, 0, .2, 1);
+  --ease-dash-custom: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* FONTS */
   --font-serif: var(--font-serif), Georgia, serif;
@@ -146,7 +146,7 @@ body {
 
 .hero-tag {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 2.5px;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -154,6 +154,11 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+@media (min-width: 1024px) {
+  .hero-tag {
+    font-size: 16px;
+  }
 }
 
 .hero-tag::before {
