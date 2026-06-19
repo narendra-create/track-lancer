@@ -2,26 +2,15 @@ import Link from 'next/link';
 
 interface SidebarProps {
   activePath?: string;
-  isOpen: boolean;
-  onClose: () => void;
 }
 
-export function ClientSidebar({ activePath = '/overview', isOpen, onClose }: SidebarProps) {
+export function ClientSidebar({ activePath = '/overview' }: SidebarProps) {
   return (
     <>
-      {isOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/70 md:hidden" 
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
-
       <aside 
         className={`fixed z-50 flex bg-dash-surface1 transition-transform duration-200 ease-dash-custom
         bottom-0 left-0 w-full flex-row border-t border-dash-border
-        md:top-0 md:h-screen md:w-[240px] md:flex-col md:border-r md:border-t-0
-        ${isOpen ? 'md:translate-x-0' : 'md:-translate-x-full'}`}
+        md:top-0 md:h-screen md:w-[20%] md:flex-col md:border-r md:border-t-0 md:translate-x-0`}
       >
         
         <div className="hidden md:flex relative items-center gap-2.5 border-b border-dash-border p-[22px_20px_18px]">
@@ -34,14 +23,6 @@ export function ClientSidebar({ activePath = '/overview', isOpen, onClose }: Sid
               Client Portal
             </small>
           </div>
-
-          <button 
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded p-1.5 text-dash-ink3 hover:bg-dash-surface3 hover:text-dash-ink2"
-            onClick={onClose}
-            aria-label="Close sidebar"
-          >
-            ✕
-          </button>
         </div>
 
         <div className="hidden md:block border-b border-dash-border bg-dash-surface2 p-[12px_20px]">
