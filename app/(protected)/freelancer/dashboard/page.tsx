@@ -7,6 +7,7 @@ import {
   Primarydashboardbutton,
   Seconddashboardbutton,
 } from "@/app/components/Buttons/Dashboardbuttons";
+import TodayTasks from "@/app/components/FreelancerTodo";
 import {
   fadeLeft,
   fadeRight,
@@ -112,13 +113,30 @@ const Dashboard = () => {
           })}
       </motion.section>
       <motion.section
-        variants={fadeUp}
+        variants={staggerContainer}
         whileInView="show"
         initial="hidden"
         viewport={viewPort}
-        className="my-5 mx-2"
+        className="my-5 mx-2 flex flex-col lg:flex-row gap-2 pb-4"
       >
-        <RavenueChart monthlyData={monthlyData} weeklyData={weeklyData} />
+        <motion.div
+          variants={fadeUp}
+          whileInView="show"
+          initial="hidden"
+          viewport={viewPort}
+          className="lg:w-[75%]"
+        >
+          <RavenueChart monthlyData={monthlyData} weeklyData={weeklyData} />
+        </motion.div>
+        <motion.div
+          variants={fadeLeft}
+          whileInView="show"
+          initial="hidden"
+          viewport={viewPort}
+          className="lg:w-[25%] lg:h-88 overflow-y-auto custom-scrollbar"
+        >
+          <TodayTasks />
+        </motion.div>
       </motion.section>
     </motion.main>
   );
