@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "../lib/auth-client";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 // ─── Nav links — label maps to the id used in page.tsx ─────────────────────────
 const links = [
@@ -18,6 +19,9 @@ const Navbar = () => {
   const [open, setopen] = useState(false);
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const pathname = usePathname();
+  const isdashboard =
+    pathname.startsWith("/client") || pathname.startsWith("/freelancer");
 
   const handleCTA = async () => {
     if (session?.user) {
@@ -31,7 +35,7 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className="
+        className={` ${isdashboard && "hidden"}
         sticky top-0 z-50
         h-[66px]
         px-5 md:px-10
@@ -39,7 +43,7 @@ const Navbar = () => {
         bg-[#0f0f0f]/90
         backdrop-blur-md
         border-b border-[#2a2a2a]
-      "
+      `}
       >
         {/* Logo */}
         <Link
