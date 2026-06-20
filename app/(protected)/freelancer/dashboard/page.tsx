@@ -8,6 +8,7 @@ import {
   Seconddashboardbutton,
 } from "@/app/components/Buttons/Dashboardbuttons";
 import TodayTasks from "@/app/components/FreelancerTodo";
+import FreelancerActivity from "@/app/components/FreelancerActivity";
 import {
   CurrentClientcard,
   Dummycard,
@@ -137,7 +138,7 @@ const Dashboard = () => {
           whileInView="show"
           initial="hidden"
           viewport={viewPort}
-          className="lg:w-[25%] lg:h-88 overflow-y-auto custom-scrollbar"
+          className="lg:w-[25%] lg:h-89 overflow-y-auto custom-scrollbar"
         >
           <TodayTasks />
         </motion.div>
@@ -147,12 +148,16 @@ const Dashboard = () => {
         viewport={viewPort}
         initial="hidden"
         variants={staggerContainer}
-        className="flex flex-col lg:flex-row justify-center gap-3"
+        className="flex flex-col lg:flex-row justify-center gap-3 mx-2 mt-2"
       >
         <div className="lg:w-[75%]">
-          <div>
-            <h3>Active clients</h3>
-            <h4>View all →</h4>
+          <div className="flex justify-between pr-4 pl-2 mb-3 items-center">
+            <h3 className="text-md lg:text-lg font-serif text-ink flex items-center">
+              Active clients
+            </h3>
+            <h4 className="text-ink text-[11px] flex items-center">
+              View all →
+            </h4>
           </div>
           <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
             {[1, 2, 3, 4].map((item) => {
@@ -162,12 +167,14 @@ const Dashboard = () => {
                 </motion.div>
               );
             })}
-            <div className="w-full h-full">
+            <div className="w-full h-43">
               <Dummycard />
             </div>
           </div>
         </div>
-        <div className="lg:w-[25%]">djf</div>
+        <div className="lg:w-[25%] mt-1">
+          <FreelancerActivity />
+        </div>
       </motion.section>
     </motion.main>
   );
