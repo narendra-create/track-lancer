@@ -15,7 +15,7 @@ export default function Freelancerlayout({
       <FreelancerSidebar activePath={pathname} />
 
       {/* Main Content Area (80% width on desktop, 20% left margin) */}
-      <main className="flex-1 pb-[80px] lg:ml-[20%] lg:px-3 lg:w-[80%] lg:pb-0">
+      <main className="flex-1 pb-[80px] lg:ml-[15%] lg:px-3 lg:w-[85%] lg:pb-0">
         {children}
       </main>
     </div>
