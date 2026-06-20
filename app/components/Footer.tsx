@@ -35,7 +35,7 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#161616] border-t border-[#2a2a2a] px-5 md:px-10 lg:px-[40px] pt-9 pb-6">
+    <footer className="relative z-[60] bg-[#161616] border-t border-[#2a2a2a] px-5 md:px-10 lg:px-[40px] pt-9 pb-6">
       {/* Top grid — 4 cols desktop, 2 cols tablet, 1 col mobile */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7 lg:gap-[30px] mb-7 pb-7 border-b border-[#2a2a2a]">
         {/* Brand */}
