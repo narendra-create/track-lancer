@@ -9,6 +9,10 @@ import {
 } from "@/app/components/Buttons/Dashboardbuttons";
 import TodayTasks from "@/app/components/FreelancerTodo";
 import {
+  CurrentClientcard,
+  Dummycard,
+} from "@/app/components/Cards/CurrentClientcard";
+import {
   fadeLeft,
   fadeRight,
   fadeUp,
@@ -137,6 +141,29 @@ const Dashboard = () => {
         >
           <TodayTasks />
         </motion.div>
+      </motion.section>
+      <motion.section
+        whileInView="show"
+        viewport={viewPort}
+        initial="hidden"
+        variants={staggerContainer}
+      >
+        <div>
+          <h3>Active clients</h3>
+          <h4>View all →</h4>
+        </div>
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
+          {[1, 2, 3, 4].map((item) => {
+            return (
+              <motion.div key={item}>
+                <CurrentClientcard />
+              </motion.div>
+            );
+          })}
+          <div className="w-full h-full">
+            <Dummycard />
+          </div>
+        </div>
       </motion.section>
     </motion.main>
   );
