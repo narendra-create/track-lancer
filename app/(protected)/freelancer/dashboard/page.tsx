@@ -15,7 +15,6 @@ import {
 } from "@/app/components/Cards/CurrentClientcard";
 import {
   fadeLeft,
-  fadeRight,
   fadeUp,
   scaleIn,
   staggerContainer,
