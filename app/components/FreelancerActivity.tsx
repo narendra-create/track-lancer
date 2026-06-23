@@ -94,6 +94,54 @@ const activities: ActivityItem[] = [
     ),
     time: "2 days ago",
   },
+  {
+    id: 17,
+    icon: "🔔",
+    iconColorClass: "bg-[#c8a96e]/[0.15]",
+    text: (
+      <>
+        <strong className="font-medium text-[#c4bcb1]">Reminder:</strong>{" "}
+        LearnWave deadline in 8 days
+      </>
+    ),
+    time: "2 days ago",
+  },
+  {
+    id: 76,
+    icon: "🔔",
+    iconColorClass: "bg-[#c8a96e]/[0.15]",
+    text: (
+      <>
+        <strong className="font-medium text-[#c4bcb1]">Reminder:</strong>{" "}
+        LearnWave deadline in 8 days
+      </>
+    ),
+    time: "2 days ago",
+  },
+  {
+    id: 57,
+    icon: "🔔",
+    iconColorClass: "bg-[#c8a96e]/[0.15]",
+    text: (
+      <>
+        <strong className="font-medium text-[#c4bcb1]">Reminder:</strong>{" "}
+        LearnWave deadline in 8 days
+      </>
+    ),
+    time: "2 days ago",
+  },
+  {
+    id: 77,
+    icon: "🔔",
+    iconColorClass: "bg-[#c8a96e]/[0.15]",
+    text: (
+      <>
+        <strong className="font-medium text-[#c4bcb1]">Reminder:</strong>{" "}
+        LearnWave deadline in 8 days
+      </>
+    ),
+    time: "2 days ago",
+  },
 ];
 
 export default function FreelancerActivity() {
@@ -103,7 +151,7 @@ export default function FreelancerActivity() {
         Activity
       </div>
       <div className="overflow-hidden rounded-[6px] border border-[#2c2c2c] bg-[#141414]">
-        <div className="px-[16px] pb-0 pt-[4px] max-h-89 lg:h-89 overflow-y-auto custom-scrollbar">
+        <div className="px-[16px] py-[18px] max-h-89 lg:max-h-130 overflow-y-auto custom-scrollbar lg:h-full">
           {activities.map((act) => (
             <div
               key={act.id}
@@ -115,10 +163,10 @@ export default function FreelancerActivity() {
                 {act.icon}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-[.78rem] leading-[1.4] text-[#7a7570]">
+                <div className="text-[.78rem] leading-[1.4] text-[#97918b]">
                   {act.text}
                 </div>
-                <div className="mt-[3px] font-mono text-[7px] tracking-[1px] text-[#4a4540]">
+                <div className="mt-[3px] font-mono text-[7px] tracking-[1px] text-[#cdc3b8]">
                   {act.time}
                 </div>
               </div>

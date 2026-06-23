@@ -148,7 +148,7 @@ const Dashboard = () => {
         viewport={viewPort}
         initial="hidden"
         variants={staggerContainer}
-        className="flex flex-col lg:flex-row justify-center gap-3 mx-2 mt-2"
+        className="flex flex-col lg:flex-row justify-center gap-3 mx-2 mt-2 mb-18"
       >
         <div className="lg:w-[75%]">
           <div className="flex justify-between pr-4 pl-2 mb-3 items-center">
