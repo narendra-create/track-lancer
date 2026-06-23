@@ -2,7 +2,7 @@
 import StatCardFreelancer from "@/app/components/Cards/StatCardFreelancer";
 import { Folder, Hourglass, Users, Wallet } from "lucide-react";
 import type { statcardprop } from "@/app/components/Cards/StatCardFreelancer";
-import { motion } from "motion/react";
+import { motion, scale } from "motion/react";
 import {
   Primarydashboardbutton,
   Seconddashboardbutton,
@@ -159,10 +159,10 @@ const Dashboard = () => {
               View all →
             </h4>
           </div>
-          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
+          <motion.div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
             {[1, 2, 3, 4].map((item) => {
               return (
-                <motion.div key={item}>
+                <motion.div variants={scaleIn} key={item}>
                   <CurrentClientcard />
                 </motion.div>
               );
@@ -170,11 +170,11 @@ const Dashboard = () => {
             <div className="w-full h-43">
               <Dummycard />
             </div>
-          </div>
+          </motion.div>
         </div>
-        <div className="lg:w-[25%] mt-1">
+        <motion.div variants={fadeLeft} className="lg:w-[25%] mt-1">
           <FreelancerActivity />
-        </div>
+        </motion.div>
       </motion.section>
     </motion.main>
   );

@@ -81,6 +81,11 @@ model Payment {
   due_date       DateTime
   projectId      String?
   project        Project?      @relation(fields: [projectId], references: [id])
+  createdAt      DateTime      @default(now())
+
+  @@index([projectId])
+  @@index([createdAt])
+  @@index([payment_status])
 }
 
 model Freelancer {
@@ -114,6 +119,9 @@ model Milestone {
 
   project   Project? @relation(fields: [projectId], references: [id])
   projectId String?
+
+  @@index([projectId])
+  @@index([status])
 }
 
 model Project {
@@ -130,6 +138,10 @@ model Project {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([freelancerId])
+  @@index([clientId])
+  @@index([createdAt])
 }
 
 enum Categorys {
