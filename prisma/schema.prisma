@@ -125,10 +125,11 @@ model Milestone {
 }
 
 model Project {
-  id           String  @id @default(cuid())
+  id           String        @id @default(cuid())
   title        String
   clientId     String
   freelancerId String?
+  status       Projectstatus
 
   client     Userprofile @relation(fields: [clientId], references: [id])
   freelancer Freelancer? @relation(fields: [freelancerId], references: [id])
@@ -168,4 +169,10 @@ enum Paymentstatus {
 enum userrole {
   FREELANCER
   CLIENT
+}
+
+enum Projectstatus {
+  COMPLETED
+  PENDING
+  STOPPED
 }
