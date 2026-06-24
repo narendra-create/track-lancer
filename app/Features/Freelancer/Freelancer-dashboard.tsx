@@ -20,30 +20,68 @@ import {
   staggerContainer,
 } from "@/app/lib/animations";
 import RavenueChart from "@/app/components/FreelancerChart";
-import type { ChartDataPoint } from "@/app/components/FreelancerChart";
+import { FreelancerDashboardData } from "@/types/dashboard";
 
-const FreelancerDashboard = ({
-  data,
-}: {
-  data: {
-    monthlyData: ChartDataPoint[];
-    weeklyData: ChartDataPoint[];
-    stats: statcardprop[];
-  };
-}) => {
+const FreelancerDashboard = ({ data }: { data: FreelancerDashboardData }) => {
   const viewPort = {
     once: true,
     amount: 0.2,
   };
+
+  const stats: statcardprop[] = [
+    {
+      icon: Wallet,
+      statnumber: `₹${data.moneyStats.currentmonthearning.toLocaleString("en-IN")}`,
+      supporttext1: "Total Earnings",
+      supporttext2: `- ${new Date().toLocaleString("en-US", { month: "long" })}`,
+      trendtext: `${data.moneyStats.trendpercentage >= 0 ? "↑" : "↓"} ${Math.abs(data.moneyStats.trendpercentage)}%`,
+      trendtype: "MONEY",
+    },
+    {
+      icon: Users,
+      statnumber: String(data.clientCount),
+      supporttext1: "Clients Served",
+      trendtype: "NEUTRAL",
+      trendtext: "All time",
+    },
+    {
+      icon: Hourglass,
+      statnumber: `₹${data.moneyStats.due.toLocaleString("en-IN")}`,
+      supporttext1: "Payment Remaining",
+      trendtype: data.moneyStats.pendingcount > 0 ? "WARNING" : "SUCCESS",
+      trendtext:
+        data.moneyStats.pendingcount > 0
+          ? `${data.moneyStats.pendingcount} Pending`
+          : "All clear",
+    },
+    {
+      icon: Folder,
+      statnumber: String(data.moneyStats.activeprojects),
+      supporttext1: "Active Projects",
+      trendtype: "SUCCESS",
+      trendtext: "In progress",
+    },
+  ];
+
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "Asia/Kolkata",
+  });
+
   return (
     <motion.main className="bg-brand-bg">
       <section className="mx-2 flex flex-col lg:flex-row gap-4 mb-6 lg:justify-between">
         <div className="mt-5 mx-2.5">
           <h4 className="hero-tag">FREELANCER DASHBOARD</h4>
           <div className="flex flex-col gap-0.5">
-            <h1 className="font-serif text-2xl text-ink">Good Morning Dummy</h1>
+            <h1 className="font-serif text-2xl text-ink">
+              Good Morning {data.name}
+            </h1>
             <h1 className="font-sans text-[13px] text-ink-muted">
-              Friday, June 19 2026 • 3 Active projects
+              `{today} • {data.projects?.length} Active projects`
             </h1>
           </div>
         </div>
@@ -62,8 +100,8 @@ const FreelancerDashboard = ({
         animate="show"
         className="mx-2 my-2 lg:my-4 grid grid-cols-2 lg:grid-cols-4 gap-2"
       >
-        {data.stats &&
-          data.stats.map((item, i) => {
+        {stats &&
+          stats.map((item, i) => {
             return (
               <motion.div variants={scaleIn} key={i}>
                 <StatCardFreelancer prop={item} />
@@ -86,8 +124,8 @@ const FreelancerDashboard = ({
           className="lg:w-[75%]"
         >
           <RavenueChart
-            monthlyData={data.monthlyData}
-            weeklyData={data.weeklyData}
+            monthlyData={data.ravenuechartdata.monthly}
+            weeklyData={data.ravenuechartdata.weekly}
           />
         </motion.div>
         <motion.div
@@ -117,13 +155,14 @@ const FreelancerDashboard = ({
             </h4>
           </div>
           <motion.div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
-            {[1, 2, 3, 4].map((item) => {
-              return (
-                <motion.div variants={scaleIn} key={item}>
-                  <CurrentClientcard />
-                </motion.div>
-              );
-            })}
+            {data.projects &&
+              data.projects.map((item) => {
+                return (
+                  <motion.div variants={scaleIn} key={item.id}>
+                    <CurrentClientcard project={item} />
+                  </motion.div>
+                );
+              })}
             <div className="w-full h-43">
               <Dummycard />
             </div>
