@@ -32,34 +32,38 @@ export const addprofile = async (
   return { success: false };
 };
 
-export const getProfile = async (role: string, email: string) => {
-  if (role === "client") {
-    const foundclient = await prisma.user.findUnique({
-      where: { email: email },
-      select: {
-        role: true,
-        name: true,
-        image: true
-      }
-    });
-
-    return { success: true, profile: foundclient }
-  }
-  if (role === "freelancer") {
-    const foundfreelancer = await prisma.user.findUnique({
-      where: { email: email },
-      select: {
-        name: true,
-        image: true,
-        Freelancer: {
-          select: {
-            id: true,
-            category: true,
-          }
+export const getClientProfile = async (email: string) => {
+  const foundclient = await prisma.user.findUnique({
+    where: { email: email },
+    select: {
+      id: true,
+      role: true,
+      name: true,
+      image: true,
+      userprofiles: {
+        select: {
+          id: true
         }
       }
-    });
-    return { success: true, profile: foundfreelancer }
-  }
-  return { success: false };
+    }
+  });
+
+  return { success: true, profile: foundclient }
+}
+
+export const getFreelancerProfile = async (email: string) => {
+  const foundfreelancer = await prisma.user.findUnique({
+    where: { email: email },
+    select: {
+      name: true,
+      image: true,
+      Freelancer: {
+        select: {
+          id: true,
+          category: true,
+        }
+      }
+    }
+  });
+  return { success: true, profile: foundfreelancer }
 }
