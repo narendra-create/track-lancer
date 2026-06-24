@@ -6,6 +6,7 @@ export type ChartDataPoint = {
   earned: number;
   paidOut: number;
   isCurrent?: boolean;
+  key?: string;
 };
 
 export default function RavenueChart({
@@ -19,8 +20,9 @@ export default function RavenueChart({
 
   const data = view === "Monthly" ? monthlyData : weeklyData;
 
-  const maxVal = data && Math.max(...data.map((d) => Math.max(d.earned, d.paidOut)));
-  
+  const maxVal =
+    data && Math.max(...data.map((d) => Math.max(d.earned, d.paidOut)));
+
   const roundingFactor = view === "Monthly" ? 50000 : 10000;
   const chartMax = Math.ceil((maxVal * 1.1) / roundingFactor) * roundingFactor;
 
@@ -37,7 +39,6 @@ export default function RavenueChart({
     return `₹${val}`;
   };
 
-  
   const generatedTicks = [
     chartMax,
     chartMax * 0.75,
