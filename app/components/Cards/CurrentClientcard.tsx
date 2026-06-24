@@ -1,50 +1,77 @@
 import React from "react";
 import { ClientProgressBar } from "../Currentclientprogressbar";
 import { AvatarInitials } from "../Initials";
+import type { DashboardProject } from "@/types/dashboard";
+import { formatMoney, getInitials } from "@/app/lib/utilitys";
 
-export const CurrentClientcard = () => {
+export const CurrentClientcard = ({
+  project,
+}: {
+  project: DashboardProject;
+}) => {
+  const initials = getInitials(project.client.user.name);
+  const varient =
+    project.status === "STOPPED"
+      ? "amber"
+      : project.stats.progress >= 50
+        ? "green"
+        : "gold";
   return (
     <section className="flex flex-col bg-dash-surface1 rounded-md border border-dash-border hover:border-brand-surface hover:bg-dash-surface1/20 transition-all ease-in-out duration-200 p-5 lg:p-4">
       <div className="flex justify-between">
         <div className="flex gap-3 items-top">
           <div className="mt-1">
-            <AvatarInitials initials="TN" variant="gold" />
+            <AvatarInitials initials={initials} variant="gold" />
           </div>
           <div className="flex flex-col">
             <h3 className="font-serif text-lg lg:text-md text-gray-300 text-shadow-2xs text-shadow-accent">
-              TechMart Inc.
+              {project.client.user.name}
             </h3>
             <p className="text-[11px] lg:text-[9px] font-sans text-ink-muted">
-              E-COMMERCE PLATFORM
+              {project.title.toUpperCase()}
             </p>
           </div>
         </div>
         <div className="bg-dash-green-bg gap-1.5 text-dash-green/70 font-sans font-semibold text-[12px] rounded-full flex items-center justify-center px-3 h-6">
           <span className="font-bold text-lg">•</span>
-          <span>Active</span>
+          <span>{project.status.toUpperCase()}</span>
         </div>
       </div>
       <div className="flex justify-evenly my-3">
         <div className="flex flex-col items-center justify-center">
-          <h3 className="text-lg text-accent font-serif">₹85K</h3>
+          <h3 className="text-lg text-accent font-serif">
+            ₹{formatMoney(project.money.totalAmount)}
+          </h3>
           <p className="text-sm text-ink-muted font-sans">VALUE</p>
         </div>
         <div className="flex flex-col items-center justify-center">
-          <h3 className="text-lg text-dash-green font-serif">₹55K</h3>
+          <h3 className="text-lg text-dash-green font-serif">
+            ₹{formatMoney(project.money.received)}
+          </h3>
           <p className="text-sm text-ink-muted font-sans">RECEIVED</p>
         </div>
         <div className="flex flex-col items-center justify-center">
-          <h3 className="text-lg text-dash-amber font-serif">₹30K</h3>
+          <h3 className="text-lg text-dash-amber font-serif">
+            ₹{formatMoney(project.money.remaining)}
+          </h3>
           <p className="text-sm text-ink-muted font-sans">REMAINING</p>
         </div>
       </div>
       <div className="mt-1.5 lg:mt-1.5">
         <ClientProgressBar
-          dueDate="22 June"
-          milestonesCompleted={5}
-          progress={50}
-          totalMilestones={10}
-          variant="gold"
+          dueDate={
+            project.stats.projectDeadline
+              ? project.stats.projectDeadline.toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "_"
+          }
+          milestonesCompleted={project.stats.completedMilestones}
+          progress={project.stats.progress}
+          totalMilestones={project.stats.totalMilestones}
+          variant={varient}
         />
       </div>
     </section>
