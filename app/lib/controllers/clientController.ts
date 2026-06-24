@@ -161,3 +161,82 @@ export const getMoneyStats = async (freelancerId: string) => {
         }
     }
 }
+
+export const getRavnuechartStats = async (freelancerId: string) => {
+    if (!freelancerId) {
+        return { success: false, error: "Invalid freelancer id", status: 400 };
+    };
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    //for getting start of previous month
+    const startofRange = new Date(currentYear, currentMonth - 11, 1);
+
+    const payments = await prisma.payment.findMany({
+        where: {
+            project: { freelancerId },
+            payment_status: "PAID",
+            createdAt: {
+                gte: startofRange
+            }
+        }
+    });
+
+    //Getting monthly report
+    const Months: ChartDataPoint[] = Array.from({ length: 12 }, (_, i) => {
+        const date = new Date(currentYear, currentMonth - 11 + i, 1);
+        return {
+            label: date.toLocaleDateString("en-US", { month: "short" }),
+            key: `${date.getMonth()}-${date.getFullYear()}`,
+            earned: 0,
+            paidOut: 0,
+            isCurrent: date.getMonth() === currentMonth && date.getFullYear() === currentYear
+        }
+    });
+
+    //for loop to add money
+    for (const p of payments) {
+        const key = `${p.createdAt.getMonth()}-${p.createdAt.getFullYear()}`;
+        const month = Months.find(m => m.key === key);
+        if (month) {
+            month.earned += p.total_cost;
+            month.paidOut += p.paid_amount;
+        }
+    };
+
+    //Weekly report: 4Weeks of current month
+    const thismonthpayments = payments.filter(p =>
+        p.createdAt.getMonth() === currentMonth &&
+        p.createdAt.getFullYear() === currentYear
+    );
+
+    //Weeks array
+    const WeekDays: ChartDataPoint[] = Array.from({ length: 4 }, (_, i) => ({
+        label: `Week ${i + 1}`,
+        earned: 0,
+        paidOut: 0,
+        isCurrent: false
+    }));
+
+    //Filling values of payments
+    for (const p of payments) {
+        const day = p.createdAt.getDate();
+        const weekindex = Math.min(Math.floor((day - 1) / 7), 3);
+        WeekDays[weekindex].earned += p.total_cost;
+        WeekDays[weekindex].paidOut += p.paid_amount;
+    }
+
+    // Mark current week
+    const currentWeekIndex = Math.min(Math.floor((now.getDate() - 1) / 7), 3);
+    WeekDays[currentWeekIndex].isCurrent = true;
+
+    return {
+        success: true,
+        // Striping internal `key` before returning
+        monthly: Months.map(({ label, earned, paidOut, isCurrent }) => ({
+            label, earned, paidOut, isCurrent
+        })),
+        weekly: WeekDays
+    };
+}
