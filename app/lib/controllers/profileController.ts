@@ -1,6 +1,5 @@
 import { prisma } from "@/app/lib/prisma";
 import type { Categorys } from "@/app/generated/prisma/enums";
-import type { ChartDataPoint } from "@/app/components/FreelancerChart";
 
 export const addprofile = async (
   userId: string,
