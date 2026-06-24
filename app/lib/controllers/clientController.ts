@@ -147,8 +147,28 @@ export const getMoneyStats = async (freelancerId: string) => {
         p.createdAt.getFullYear() === now.getFullYear()
     ).reduce((sum, p) => sum + p.paid_amount, 0);
 
+    //Last month earnings for trend comparison
+    const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEarned = payments.filter(p =>
+        p.createdAt.getMonth() === lastMonthDate.getMonth() &&
+        p.createdAt.getFullYear() === lastMonthDate.getFullYear()
+    ).reduce((sum, p) => sum + p.paid_amount, 0);
+
+    //Trend percentage: ((current - last) / last) * 100
+    const trendpercentage = lastMonthEarned === 0
+        ? (thisMonthEarned > 0 ? 100 : 0)
+        : Math.round(((thisMonthEarned - lastMonthEarned) / lastMonthEarned) * 100);
+
     const projectscount = await prisma.project.count({
         where: { freelancerId: freelancerFound.id, status: { not: "COMPLETED" } }
+    });
+
+    //Pending payment count
+    const pendingcount = await prisma.payment.count({
+        where: {
+            project: { freelancerId: freelancerFound.id },
+            payment_status: { not: "PAID" }
+        }
     });
 
     return {
@@ -157,7 +177,9 @@ export const getMoneyStats = async (freelancerId: string) => {
             due: lifetimeDue,
             activeprojects: projectscount,
             currentmonthearning: thisMonthEarned,
-            lifetimeearning: lifetimeEarned
+            lifetimeearning: lifetimeEarned,
+            trendpercentage,
+            pendingcount
         }
     }
 }
