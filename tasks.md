@@ -1,0 +1,28 @@
+# tasks list
+
+- [ ] CONTROLLER: Create authentication middleware and protected routes for Freelancer and Client roles
+- [x] CONTROLLER: Implement logic for Freelancer onboarding and profile creation
+- [x] CONTROLLER: Implement logic for Client onboarding and profile creation
+- [ ] CONTROLLER: Add controller for creating new Projects and assigning them to Clients/Freelancers
+- [ ] CONTROLLER: Add logic for Freelancers to propose Projects
+- [ ] CONTROLLER: Implement Milestone creation, updates workflows
+- [ ] CONTROLLER: Handle Budget Raise Requests (creation, approval, rejection)
+- [x] API/REALDATA: Fetch paginated list of projects for Freelancer dashboard
+- [ ] API/REALDATA: Fetch paginated list of projects for Client dashboard
+- [ ] API/REALDATA: Fetch detailed view of a single project including milestones and payments
+- [ ] API/REALDATA: Fetch and calculate payment due dates and amounts
+- [ ] API/REALDATA: Create endpoints for budget raise request actions
+- [x] UI: Design and implement the Freelancer dashboard overview page
+- [ ] UI: Design and implement the Client dashboard overview page
+- [ ] UI: Create the Project Details view (showing timeline, budget, and milestones)
+- [ ] UI: Build the component for adding/editing milestones within a project
+- [ ] UI: Create the Budget Raise Request form modal or page
+- [ ] UI: Design the Payment history and status tracking table
+- [x] WIREUP: Connect the Freelancer dashboard UI to the project fetching API
+- [ ] WIREUP: Connect the Client dashboard UI to the project fetching API
+- [ ] WIREUP: Integrate the Project Details view with live milestone and payment data
+- [ ] WIREUP: Wire up the Milestone status update buttons (Approve, Stop, Pending) to backend
+- [ ] WIREUP: Connect Budget Raise Request actions to real API endpoints
+- [ ] ADDITIONAL: Set up email notifications or in-app alerts for milestone status changes
+- [ ] ADDITIONAL: Implement automated reminders for pending payments
+- [ ] ADDITIONAL: Add role-based access control (RBAC) checks on all sensitive API routes
