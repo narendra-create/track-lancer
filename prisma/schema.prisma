@@ -93,8 +93,9 @@ model Freelancer {
   userId   String    @unique
   category Categorys
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projects Project[]
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects            Project[]
+  budgetRaiseRequests BudgetRaiseRequest[]
 }
 
 model Userprofile {
@@ -154,6 +155,7 @@ model BudgetRaiseRequest {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   requestedById   String // freelancerId
+  requestedby     Freelancer @relation(fields: [requestedById], references: [id])
   currentBudget   Int
   requestedBudget Int
   reason          String
