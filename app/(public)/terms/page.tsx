@@ -20,6 +20,7 @@ const sections = [
   { id: "accounts", label: "Accounts & Eligibility" },
   { id: "user-conduct", label: "User Conduct" },
   { id: "payments", label: "Payments & UPI" },
+  { id: "budgets", label: "Project Budgets & Milestones" },
   { id: "data", label: "Data & Privacy" },
   { id: "ip", label: "Intellectual Property" },
   { id: "disclaimer", label: "Disclaimers" },
@@ -231,8 +232,21 @@ export default function TermsPage() {
             </p>
           </TermsSection>
 
-          {/* 06 — Data */}
-          <TermsSection id="data" number="06" title="Data & Privacy">
+          {/* 06 — Budgets */}
+          <TermsSection id="budgets" number="06" title="Project Budgets & Milestones">
+            <p>
+              When initiating a project, the freelancer must specify a Total Cost agreed upon with the client. This Total Cost serves as the maximum authorized budget for the project.
+            </p>
+            <p>
+              Freelancers may autonomously create milestones and assign costs to them without requiring individual client approval, provided that the cumulative cost of all milestones does not exceed the predefined Total Cost.
+            </p>
+            <p>
+              Any milestones that would cause the project to exceed the agreed Total Cost are strictly prohibited unless the Total Cost is formally amended. Track Lancer enforces this structure to protect both parties from unexpected scope creep and billing surprises.
+            </p>
+          </TermsSection>
+
+          {/* 07 — Data */}
+          <TermsSection id="data" number="07" title="Data & Privacy">
             <p>
               We collect only what is necessary: your name, email address, and
               the project and milestone data you create. Passwords are hashed
@@ -265,8 +279,8 @@ export default function TermsPage() {
             </p>
           </TermsSection>
 
-          {/* 07 — IP */}
-          <TermsSection id="ip" number="07" title="Intellectual Property">
+          {/* 08 — IP */}
+          <TermsSection id="ip" number="08" title="Intellectual Property">
             <p>
               The Track Lancer codebase, design, copy, and brand elements are
               owned by Narendra Dubey(github - narendra-creates) and are
@@ -284,8 +298,8 @@ export default function TermsPage() {
             </p>
           </TermsSection>
 
-          {/* 08 — Disclaimers */}
-          <TermsSection id="disclaimer" number="08" title="Disclaimers">
+          {/* 09 — Disclaimers */}
+          <TermsSection id="disclaimer" number="09" title="Disclaimers">
             <p>
               The Service is provided "as is" and "as available" without
               warranty of any kind, express or implied. We do not guarantee
@@ -304,10 +318,10 @@ export default function TermsPage() {
             </p>
           </TermsSection>
 
-          {/* 09 — Liability */}
+          {/* 10 — Liability */}
           <TermsSection
             id="liability"
-            number="09"
+            number="10"
             title="Limitation of Liability"
           >
             <p>
@@ -323,8 +337,8 @@ export default function TermsPage() {
             </p>
           </TermsSection>
 
-          {/* 10 — Termination */}
-          <TermsSection id="termination" number="10" title="Termination">
+          {/* 11 — Termination */}
+          <TermsSection id="termination" number="11" title="Termination">
             <p>
               You may stop using the Service at any time and request account
               deletion by contacting us. We may suspend or terminate your access
@@ -339,8 +353,8 @@ export default function TermsPage() {
             </p>
           </TermsSection>
 
-          {/* 11 — Changes */}
-          <TermsSection id="changes" number="11" title="Changes to Terms">
+          {/* 12 — Changes */}
+          <TermsSection id="changes" number="12" title="Changes to Terms">
             <p>
               We may update these Terms from time to time. When we do, we will
               update the "Last updated" date at the top of this page. Material
@@ -352,8 +366,8 @@ export default function TermsPage() {
             </p>
           </TermsSection>
 
-          {/* 12 — Contact */}
-          <TermsSection id="contact" number="12" title="Contact">
+          {/* 13 — Contact */}
+          <TermsSection id="contact" number="13" title="Contact">
             <p>
               Questions about these Terms? Reach out directly — there is a real
               person on the other end.
