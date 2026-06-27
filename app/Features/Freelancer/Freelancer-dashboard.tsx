@@ -2,7 +2,7 @@
 import StatCardFreelancer from "@/app/components/Cards/StatCardFreelancer";
 import { Folder, Hourglass, Users, Wallet } from "lucide-react";
 import type { statcardprop } from "@/app/components/Cards/StatCardFreelancer";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Primarydashboardbutton,
   Seconddashboardbutton,
@@ -23,6 +23,7 @@ import RavenueChart from "@/app/components/FreelancerChart";
 import { FreelancerDashboardData } from "@/types/dashboard";
 import type { LoadMoreResult } from "@/types/dashboard";
 import { useState, useEffect } from "react";
+import ProjectCardSkeleton from "@/app/components/Cards/ProjectCardSkeleton";
 
 const FreelancerDashboard = ({
   data,
@@ -205,13 +206,27 @@ const FreelancerDashboard = ({
             {Projects &&
               Projects.map((project) => {
                 return (
-                  <motion.div variants={scaleIn}>
+                  <motion.div variants={scaleIn} key={project.id}>
                     <CurrentClientcard project={project} />
                   </motion.div>
                 );
               })}
+            <AnimatePresence>
+              {loading &&
+                [0, 1].map((i) => (
+                  <motion.div
+                    key={`skeleton-${i}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.25, delay: i * 0.07 }}
+                  >
+                    <ProjectCardSkeleton />
+                  </motion.div>
+                ))}
+            </AnimatePresence>
           </motion.div>
-          {cursor && (
+          {cursor && !loading && (
             <motion.div
               variants={fadeUp}
               whileInView="show"
@@ -222,13 +237,12 @@ const FreelancerDashboard = ({
               <button
                 type="button"
                 onClick={() => loadmoreclientfunction(cursor)}
-                disabled={loading}
-                className="group flex items-center gap-2 px-6 py-2.5 rounded-full border border-dash-border bg-dash-surface1 text-ink-muted text-[13px] font-sans transition-all duration-200 hover:border-brand-surface hover:text-ink hover:bg-dash-surface1/60 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group flex items-center gap-2 px-6 py-2.5 rounded-full border border-dash-border bg-dash-surface1 text-ink-muted text-[13px] font-sans transition-all duration-200 hover:border-brand-surface hover:text-ink hover:bg-dash-surface1/60 active:scale-95"
               >
                 <span className="transition-transform duration-200 group-hover:translate-y-0.5">
                   ↓
                 </span>
-                {loading ? "Loading..." : "Load more projects"}
+                Load more projects
               </button>
             </motion.div>
           )}
