@@ -22,7 +22,7 @@ import {
 import RavenueChart from "@/app/components/FreelancerChart";
 import { FreelancerDashboardData } from "@/types/dashboard";
 import type { LoadMoreResult } from "@/types/dashboard";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ProjectCardSkeleton from "@/app/components/Cards/ProjectCardSkeleton";
 
 const FreelancerDashboard = ({
@@ -34,7 +34,7 @@ const FreelancerDashboard = ({
     nextcursor: string,
   ) => Promise<{ projects: LoadMoreResult; nextCursor: string | null }>;
 }) => {
-  const [Projects, setProjects] = useState<LoadMoreResult>([]);
+  const [Projects, setProjects] = useState<LoadMoreResult>(data.projects ?? []);
   const [cursor, setcursor] = useState(data.nextCursor);
   const [loading, setloading] = useState(false);
 
@@ -100,13 +100,7 @@ const FreelancerDashboard = ({
     timeZone: "Asia/Kolkata",
   });
 
-  useEffect(() => {
-    if (Projects.length === 0) {
-      setcursor(data.nextCursor);
-    } else {
-      setcursor(data.nextCursor);
-    }
-  }, [Projects]);
+
 
   return (
     <motion.main className="bg-brand-bg">
@@ -191,26 +185,27 @@ const FreelancerDashboard = ({
               View all →
             </h4>
           </div>
-          <motion.div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
-            {data.projects &&
-              data.projects.map((item) => {
-                return (
-                  <motion.div variants={scaleIn} key={item.id}>
-                    <CurrentClientcard project={item} />
-                  </motion.div>
-                );
-              })}
-            <div className="w-full h-43">
-              <Dummycard />
-            </div>
+          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
             {Projects &&
-              Projects.map((project) => {
+              Projects.map((project, i) => {
                 return (
-                  <motion.div variants={scaleIn} key={project.id}>
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, scale: 0.94 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                      duration: 0.5,
+                      ease: "easeOut",
+                      delay: i * 0.07,
+                    }}
+                  >
                     <CurrentClientcard project={project} />
                   </motion.div>
                 );
               })}
+            <div className="w-full h-48">
+              <Dummycard />
+            </div>
             <AnimatePresence>
               {loading &&
                 [0, 1].map((i) => (
@@ -225,14 +220,14 @@ const FreelancerDashboard = ({
                   </motion.div>
                 ))}
             </AnimatePresence>
-          </motion.div>
+          </div>
           {cursor && !loading && (
             <motion.div
               variants={fadeUp}
               whileInView="show"
               initial="hidden"
               viewport={viewPort}
-              className="col-span-2 flex justify-center mt-2 mb-1"
+              className="col-span-2 flex justify-center mt-8 mb-1"
             >
               <button
                 type="button"
