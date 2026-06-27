@@ -10,9 +10,9 @@ const DashboardFreelancer = async () => {
     const result = await loadMoreProjects(nextcursor);
     if (!result.success) {
       console.log(result.error, result.status, "From loadmoreprojects");
-      return [];
+      return { projects: [], nextCursor: null };
     }
-    return result.projects ?? [];
+    return { projects: result.projects ?? [], nextCursor: result.nextcursor ?? null };
   };
 
   if (!result.success) {

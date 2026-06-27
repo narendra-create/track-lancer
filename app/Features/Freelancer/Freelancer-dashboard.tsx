@@ -22,16 +22,19 @@ import {
 import RavenueChart from "@/app/components/FreelancerChart";
 import { FreelancerDashboardData } from "@/types/dashboard";
 import type { LoadMoreResult } from "@/types/dashboard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const FreelancerDashboard = ({
   data,
   loadmore,
 }: {
   data: FreelancerDashboardData;
-  loadmore: (nextcursor: string) => Promise<LoadMoreResult>;
+  loadmore: (
+    nextcursor: string,
+  ) => Promise<{ projects: LoadMoreResult; nextCursor: string | null }>;
 }) => {
   const [Projects, setProjects] = useState<LoadMoreResult>([]);
+  const [cursor, setcursor] = useState(data.nextCursor);
   const [loading, setloading] = useState(false);
 
   const viewPort = {
@@ -43,7 +46,8 @@ const FreelancerDashboard = ({
     setloading(true);
     try {
       const result = await loadmore(nextcursor);
-      setProjects((prev) => [...prev, ...result]);
+      setProjects((prev) => [...prev, ...result.projects]);
+      setcursor(result.nextCursor);
     } catch (err) {
       console.log(err);
       return;
@@ -94,6 +98,14 @@ const FreelancerDashboard = ({
     year: "numeric",
     timeZone: "Asia/Kolkata",
   });
+
+  useEffect(() => {
+    if (Projects.length === 0) {
+      setcursor(data.nextCursor);
+    } else {
+      setcursor(data.nextCursor);
+    }
+  }, [Projects]);
 
   return (
     <motion.main className="bg-brand-bg">
@@ -190,25 +202,36 @@ const FreelancerDashboard = ({
             <div className="w-full h-43">
               <Dummycard />
             </div>
+            {Projects &&
+              Projects.map((project) => {
+                return (
+                  <motion.div variants={scaleIn}>
+                    <CurrentClientcard project={project} />
+                  </motion.div>
+                );
+              })}
           </motion.div>
-          {/* Load More button */}
-          <motion.div
-            variants={fadeUp}
-            whileInView="show"
-            initial="hidden"
-            viewport={viewPort}
-            className="col-span-2 flex justify-center mt-2 mb-1"
-          >
-            <button
-              type="button"
-              className="group flex items-center gap-2 px-6 py-2.5 rounded-full border border-dash-border bg-dash-surface1 text-ink-muted text-[13px] font-sans transition-all duration-200 hover:border-brand-surface hover:text-ink hover:bg-dash-surface1/60 active:scale-95"
+          {cursor && (
+            <motion.div
+              variants={fadeUp}
+              whileInView="show"
+              initial="hidden"
+              viewport={viewPort}
+              className="col-span-2 flex justify-center mt-2 mb-1"
             >
-              <span className="transition-transform duration-200 group-hover:translate-y-0.5">
-                ↓
-              </span>
-              Load more projects
-            </button>
-          </motion.div>
+              <button
+                type="button"
+                onClick={() => loadmoreclientfunction(cursor)}
+                disabled={loading}
+                className="group flex items-center gap-2 px-6 py-2.5 rounded-full border border-dash-border bg-dash-surface1 text-ink-muted text-[13px] font-sans transition-all duration-200 hover:border-brand-surface hover:text-ink hover:bg-dash-surface1/60 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span className="transition-transform duration-200 group-hover:translate-y-0.5">
+                  ↓
+                </span>
+                {loading ? "Loading..." : "Load more projects"}
+              </button>
+            </motion.div>
+          )}
         </div>
         <motion.div variants={fadeLeft} className="lg:w-[25%] mt-1">
           <FreelancerActivity />
