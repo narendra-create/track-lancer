@@ -117,7 +117,7 @@ const FreelancerDashboard = ({
           </div>
         </div>
         <div className="flex lg:items-center lg:justify-center gap-3 max-w-68 lg:max-w-none ml-3">
-          <Seconddashboardbutton href="/past-projects">
+          <Seconddashboardbutton href="/freelancer/past-projects">
             Past projects
           </Seconddashboardbutton>
           <Primarydashboardbutton href="/freelancer/new-project">
