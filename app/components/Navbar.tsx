@@ -37,6 +37,10 @@ const Navbar = () => {
     setmounted(true);
   }, []);
 
+  useEffect(() => {
+    setopen(false);
+  }, [pathname]);
+
   return (
     <>
       <nav
@@ -146,7 +150,7 @@ ${!session?.user && "md:hidden"}
 
       {/* Mobile Menu */}
       <div
-        className={` fixed left-0 right-0 top-[66px] z-40 bg-[#0f0f0f]/95 backdrop-blur-xl border-b border-[#2a2a2a] px-5 py-4 flex flex-col transition-all duration-200
+        className={` ${isdashboard && "hidden"} fixed left-0 right-0 top-[66px] z-40 bg-[#0f0f0f]/95 backdrop-blur-xl border-b border-[#2a2a2a] px-5 py-4 flex flex-col transition-all duration-200
 
           ${
             open
@@ -183,6 +187,7 @@ ${!session?.user && "md:hidden"}
         </button>
         <button
           onClick={() => {
+            setopen(false);
             router.push("/dashboard");
           }}
           className={`mt-4 py-3 border ${!session?.user} border-[#3d3d3d] font-mono
