@@ -130,6 +130,7 @@ model Project {
   clientId     String
   freelancerId String?
   status       Projectstatus
+  agreedCost   Int           @default(0)
 
   client     Userprofile @relation(fields: [clientId], references: [id])
   freelancer Freelancer? @relation(fields: [freelancerId], references: [id])
@@ -137,12 +138,34 @@ model Project {
   milestones Milestone[]
   payments   Payment[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  budgetRaiseRequests BudgetRaiseRequest[]
 
   @@index([freelancerId])
   @@index([clientId])
   @@index([createdAt])
+}
+
+model BudgetRaiseRequest {
+  id String @id @default(cuid())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  requestedById   String // freelancerId
+  currentBudget   Int
+  requestedBudget Int
+  reason          String
+
+  status BudgetRequestStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviewedAt DateTime?
+
+  @@index([status, createdAt, reviewedAt, requestedById])
 }
 
 enum Categorys {
@@ -175,4 +198,10 @@ enum Projectstatus {
   COMPLETED
   PENDING
   STOPPED
+}
+
+enum BudgetRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
