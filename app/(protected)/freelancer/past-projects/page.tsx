@@ -1,48 +1,37 @@
 import { PastProjects } from "@/app/components/PastProjects";
+import { getPastProjects } from "@/app/lib/controllers/ProjectController";
+import { getFreelancerProfile } from "@/app/lib/controllers/profileController";
+import { loadMorePastProjects } from "@/app/lib/actions/LoadMorePastProjects";
+import { requireRole } from "@/app/lib/require-role";
+import { redirect } from "next/navigation";
+import type { FreelancerPastProject, ClientPastProject } from "@/types/pastprojects";
 
-const PastProjectsPage = () => {
-  const dummyPastProjects = [
-    {
-      id: "proj_1",
-      title: "V The-Farmer Platform",
-      clientName: "AgriTech Solutions",
-      freelancerName: "John Doe",
-      paymentStatus: "PAID" as const,
-      completionDate: "12 Oct 2025",
-      cost: 28000,
-    },
-    {
-      id: "proj_2",
-      title: "E-Commerce Dashboard UI",
-      clientName: "Retail Corp",
-      freelancerName: "Jane Smith",
-      paymentStatus: "DUE" as const,
-      completionDate: new Date("2025-09-28"),
-      cost: 45000,
-    },
-    {
-      id: "proj_3",
-      title: "SEO Audit & Optimization",
-      clientName: "Local Bakery",
-      freelancerName: "Mike Johnson",
-      paymentStatus: "PENDING_VERIFICATION" as const,
-      completionDate: "05 Aug 2025",
-      cost: 15500,
-    },
-    {
-      id: "proj_4",
-      title: "Mobile App Wireframing",
-      clientName: "Startup Inc.",
-      freelancerName: "Sarah Williams",
-      paymentStatus: "PAID" as const,
-      completionDate: new Date("2025-07-14"),
-      cost: 32000,
-    },
-  ];
+const PastProjectsPage = async () => {
+  const { session, error } = await requireRole("freelancer");
+  if (!session && error) redirect("/login");
+
+  const { profile } = await getFreelancerProfile(session?.user.email!);
+  if (!profile?.Freelancer?.id) redirect("/unauthorized");
+
+  const pastprojects = await getPastProjects("FREELANCER", profile.Freelancer.id);
+
+  if (!pastprojects.success) redirect("/unauthorized");
+
+  const loadmore = async (nextcursor: string) => {
+    "use server";
+    const result = await loadMorePastProjects(nextcursor);
+    if (!result.success) return { projects: [] as FreelancerPastProject[] | ClientPastProject[], nextCursor: null };
+    return { projects: result.projects, nextCursor: result.nextCursor };
+  };
 
   return (
     <div className="mx-4 lg:pl-7 lg:pt-10">
-      <PastProjects role="freelancer" projects={dummyPastProjects} />
+      <PastProjects
+        role="FREELANCER"
+        projects={pastprojects.projects}
+        nextCursor={pastprojects.nextCursor}
+        loadmore={loadmore}
+      />
     </div>
   );
 };
