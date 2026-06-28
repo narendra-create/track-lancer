@@ -131,7 +131,7 @@ model Project {
   clientId     String
   freelancerId String?
   status       Projectstatus
-  agreedCost   Int           @default(0)
+  agreedCost   Int
 
   client     Userprofile @relation(fields: [clientId], references: [id])
   freelancer Freelancer? @relation(fields: [freelancerId], references: [id])
