@@ -91,11 +91,11 @@ export function FreelancerSidebar({
             isActive={activePath === "/freelancer/past-projects"}
           />
           <NavLink
-            href="/messages"
+            href="/freelancer/activity"
             icon={MessageSquare}
-            label="Messages"
+            label="Activitys"
             badge={2}
-            isActive={activePath === "/freelancer/messages"}
+            isActive={activePath === "/freelancer/activity"}
           />
           <NavLink
             href="/settings"
