@@ -93,3 +93,7 @@ export const getPastProjects = async (role: userrole, profileid: string, cursor?
     }
     return { success: false, error: "Invalid role", status: 403 }
 }
+
+export const createNewProject = async (profileid: string) => {
+
+}
