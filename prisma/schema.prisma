@@ -128,13 +128,17 @@ model Milestone {
 model Project {
   id           String        @id @default(cuid())
   title        String
-  clientId     String
+  clientId     String?
+  clientEmail  String?
   freelancerId String?
   status       Projectstatus
   agreedCost   Int
+  deadline     DateTime
+  description  String?
+  projectcode  String?       @unique
 
-  client     Userprofile @relation(fields: [clientId], references: [id])
-  freelancer Freelancer? @relation(fields: [freelancerId], references: [id])
+  client     Userprofile? @relation(fields: [clientId], references: [id])
+  freelancer Freelancer?  @relation(fields: [freelancerId], references: [id])
 
   milestones Milestone[]
   payments   Payment[]
