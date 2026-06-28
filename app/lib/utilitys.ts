@@ -6,6 +6,22 @@ export function getInitials(name: string) {
         .join("");
 }
 
+const categoryLabels: Record<string, string> = {
+    WEB_DEV: "Website Developer",
+    VIDEO_EDITOR: "Video Editor",
+    GRAPHIC_DESIGNER: "Graphic Designer",
+    WEB_DESIGNER: "Web Designer",
+    SEO: "SEO",
+};
+
+export function formatCategory(category: string): string {
+    if (categoryLabels[category]) return categoryLabels[category];
+    return category
+        .split("_")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ");
+}
+
 export function formatMoney(amount: number) {
     if (amount >= 10000000) {
         return (amount / 10000000).toFixed(1).replace(".0", "") + "Cr";
