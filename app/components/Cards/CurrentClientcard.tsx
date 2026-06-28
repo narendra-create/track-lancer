@@ -3,6 +3,7 @@ import { ClientProgressBar } from "../Currentclientprogressbar";
 import { AvatarInitials } from "../Initials";
 import type { DashboardProject } from "@/types/dashboard";
 import { formatMoney, getInitials } from "@/app/lib/utilitys";
+import { redirect } from "next/navigation";
 
 export const CurrentClientcard = ({
   project,
@@ -80,7 +81,10 @@ export const CurrentClientcard = ({
 
 export const Dummycard = () => {
   return (
-    <section className="bg-dash-surface1 hover:bg-dash-surface1/30 transition-all ease-in-out duration-200 hover:text-dash-ink4 flex flex-col border border-dashed border-dash-border text-ink-muted/60 h-full w-full items-center justify-center rounded-md p-5">
+    <section
+      onClick={() => redirect("/freelancer/new-project")}
+      className="bg-dash-surface1 hover:bg-dash-surface1/30 transition-all ease-in-out duration-200 hover:text-dash-ink4 flex flex-col border border-dashed border-dash-border text-ink-muted/60 h-full w-full items-center justify-center rounded-md p-5"
+    >
       <h3>+</h3>
       <h3>New Project</h3>
     </section>
