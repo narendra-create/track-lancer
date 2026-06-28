@@ -24,10 +24,14 @@ export async function proxy(req: NextRequest) {
   if (pathname.startsWith("/client") && user?.role !== "CLIENT") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
+  //if already logged in and trying to login again
+  if (pathname.startsWith("/login") || pathname.startsWith("/register") && user) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/freelancer/:path*", "/client/:path*"],
+  matcher: ["/dashboard/:path*", "/freelancer/:path*", "/client/:path*", "/login", "/register"],
 };
