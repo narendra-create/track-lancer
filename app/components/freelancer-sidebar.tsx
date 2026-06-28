@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Home,
   LayoutDashboard,
@@ -7,12 +8,22 @@ import {
   MessageSquare,
   Settings,
 } from "lucide-react";
+import Image from "next/image";
 
 interface SidebarProps {
-  activePath?: string;
+  name?: string;
+  skill?: string;
+  image?: string;
+  initials?: string;
 }
 
-export function FreelancerSidebar({ activePath = "/dashboard" }: SidebarProps) {
+export function FreelancerSidebar({
+  name,
+  skill,
+  initials,
+  image,
+}: SidebarProps) {
+  const activePath = usePathname();
   return (
     <>
       <aside
@@ -34,15 +45,24 @@ export function FreelancerSidebar({ activePath = "/dashboard" }: SidebarProps) {
 
         <div className="hidden md:flex items-center gap-2.5 border-b border-dash-border p-[14px_20px]">
           <div className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,var(--color-dash-gold-dim),var(--color-dash-gold))] font-sans text-[0.75rem] font-semibold text-[#0d0d0d]">
-            AK
+            {image ? (
+              <Image
+                height={10}
+                width={10}
+                src={image ?? ""}
+                alt="avtar"
+              ></Image>
+            ) : (
+              initials
+            )}
           </div>
           <div className="min-w-0">
-            <div className="text-[0.82rem] font-semibold text-dash-ink">
-              Arjun Kapoor
+            <div className="text-[0.96rem] font-semibold text-dash-ink">
+              {name}
             </div>
-            <div className="mt-0.5 font-mono text-[7.5px] uppercase tracking-[1.5px] text-dash-ink3">
+            <div className="mt-0.5 font-mono text-[7.5px] uppercase tracking-[1.5px] text-dash-ink2 flex items-center">
               <span className="mr-1 inline-block h-[5px] w-[5px] align-middle rounded-full bg-dash-green"></span>
-              Full-Stack Dev
+              {skill}
             </div>
           </div>
         </div>
