@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 export function getInitials(name: string) {
     return name
         .trim()
@@ -37,8 +39,8 @@ export function formatMoney(amount: number) {
 
     return amount.toString();
 }
-type DateInput = Date | string | number | null | undefined;
 
+type DateInput = Date | string | number | null | undefined;
 export function formatDate(
     date: DateInput,
     options: Intl.DateTimeFormatOptions = {
@@ -57,4 +59,15 @@ export function formatDate(
     }
 
     return new Intl.DateTimeFormat(locale, options).format(parsedDate);
+}
+
+//Generating 8 digit alphabet + number code 
+const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+export function generateCode(length = 8) {
+    let code = "";
+    const bytes = crypto.randomBytes(length);
+    for (let i = 0; i < length; i++) {
+        code += chars[bytes[i] % chars.length];
+    }
+    return code;
 }
