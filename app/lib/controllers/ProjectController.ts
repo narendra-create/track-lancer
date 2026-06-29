@@ -22,7 +22,8 @@ export const getPastProjects = async (role: userrole, profileid: string, cursor?
                     },
                     payments: { select: { paid_amount: true, payment_status: true, total_cost: true } },
                     title: true,
-                    updatedAt: true
+                    updatedAt: true,
+                    createdAt: true
                 },
                 orderBy: { createdAt: "desc" }
             });
@@ -39,7 +40,8 @@ export const getPastProjects = async (role: userrole, profileid: string, cursor?
                     clientName: project.client?.user?.name ?? "Unknown",
                     clientEmail: project.client?.user?.email ?? "",
                     paidAmount: totalpaid,
-                    completionDate: formatDate(project.updatedAt)
+                    completionDate: formatDate(project.updatedAt),
+                    createdAt: formatDate(project.createdAt)
                 };
             });
             const nextCursor = returnobject.length === 10 ? returnobject[returnobject.length - 1].id : null;
@@ -63,7 +65,8 @@ export const getPastProjects = async (role: userrole, profileid: string, cursor?
                     freelancer: { select: { user: { select: { name: true, email: true } } } },
                     payments: { select: { paid_amount: true, payment_status: true, total_cost: true } },
                     title: true,
-                    updatedAt: true
+                    updatedAt: true,
+                    createdAt: true
                 },
                 orderBy: { createdAt: "desc" }
             });
@@ -80,7 +83,8 @@ export const getPastProjects = async (role: userrole, profileid: string, cursor?
                     freelancerName: project.freelancer?.user?.name ?? "Unknown",
                     freelancerEmail: project.freelancer?.user?.email ?? "",
                     paidAmount: totalpaid,
-                    completionDate: formatDate(project.updatedAt)
+                    completionDate: formatDate(project.updatedAt),
+                    createdAt: formatDate(project.createdAt)
                 };
             });
             const nextCursor = returnobject.length === 10 ? returnobject[returnobject.length - 1].id : null;
