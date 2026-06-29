@@ -10,6 +10,7 @@ export type FreelancerPastProject = {
     clientEmail: string;
     paidAmount: number;
     completionDate: string;
+    createdAt: string;
 };
 
 // Client branch — single project item
@@ -21,6 +22,7 @@ export type ClientPastProject = {
     freelancerEmail: string;
     paidAmount: number;
     completionDate: string;
+    createdAt: string;
 };
 
 // Success responses
