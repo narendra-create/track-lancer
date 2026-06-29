@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import type {
   ClientPastProject,
   FreelancerPastProject,
@@ -27,6 +27,31 @@ export function PastProjects({
   const [projects, setProjects] = useState(initialProjects);
   const [cursor, setCursor] = useState(initialCursor ?? null);
   const [loading, setLoading] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("createdAt-desc");
+
+  const sortedProjects = useMemo(() => {
+    return [...projects].sort((a, b) => {
+      if (sortBy === "createdAt-desc") {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+      if (sortBy === "createdAt-asc") {
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+      if (sortBy === "updatedAt-desc") {
+        return new Date(b.completionDate).getTime() - new Date(a.completionDate).getTime();
+      }
+      if (sortBy === "updatedAt-asc") {
+        return new Date(a.completionDate).getTime() - new Date(b.completionDate).getTime();
+      }
+      if (sortBy === "money-desc") {
+        return b.paidAmount - a.paidAmount;
+      }
+      if (sortBy === "money-asc") {
+        return a.paidAmount - b.paidAmount;
+      }
+      return 0;
+    });
+  }, [projects, sortBy]);
 
   const handleLoadMore = async () => {
     if (!cursor) return;
@@ -46,20 +71,38 @@ export function PastProjects({
     // CONTAINER
     <div className="w-full flex flex-col">
       {/* HEADER SECTION */}
-      <div className="mb-6">
-        <h1 className="text-[var(--color-dash-gold)] font-serif text-[28px] font-bold mb-1">
-          Past Projects
-        </h1>
-        <p className="text-[var(--color-dash-ink3)] font-mono text-[10px] tracking-[2px] uppercase mb-4">
-          COMPLETED
-        </p>
-        <div className="w-full h-[1px] bg-[var(--color-dash-border)]" />
+      <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-[var(--color-dash-gold)] font-serif text-[28px] font-bold mb-1">
+            Past Projects
+          </h1>
+          <p className="text-[var(--color-dash-ink3)] font-mono text-[10px] tracking-[2px] uppercase mb-4">
+            COMPLETED
+          </p>
+        </div>
+
+        {/* FILTER UI SECTION */}
+        <div className="mb-4 md:mb-4">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="bg-dash-surface3 border border-dash-border text-ink-dim text-sm rounded-md px-3 py-2 outline-none focus:border-brand-surface transition-colors font-sans"
+          >
+            <option value="createdAt-desc">Newest Created</option>
+            <option value="createdAt-asc">Oldest Created</option>
+            <option value="updatedAt-desc">Most Recently Updated</option>
+            <option value="updatedAt-asc">Least Recently Updated</option>
+            <option value="money-desc">Highest Paid</option>
+            <option value="money-asc">Lowest Paid</option>
+          </select>
+        </div>
       </div>
+      <div className="w-full h-[1px] bg-[var(--color-dash-border)] mb-6" />
 
       {/* PROJECTS LIST */}
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-3 lg:px-4 px-2 gap-4 w-full">
-        {projects && projects.length > 0 ? (
-          projects.map((project) => (
+        {sortedProjects && sortedProjects.length > 0 ? (
+          sortedProjects.map((project) => (
             <PastProjectCard key={project.id} {...project} role={role} />
           ))
         ) : (
