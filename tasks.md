@@ -33,3 +33,4 @@
 - [x] UI: Add pagination or "Load More" functionality to Past Projects list
 - [x] UI: Implement filtering or sorting options for Past Projects (e.g., by date or cost)
 - [x] VALIDATION: Make validation file for creating projects
+- [ ] make controller for deleting projects, only unverified projects
