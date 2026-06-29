@@ -34,3 +34,6 @@
 - [x] UI: Implement filtering or sorting options for Past Projects (e.g., by date or cost)
 - [x] VALIDATION: Make validation file for creating projects
 - [ ] make controller for deleting projects, only unverified projects
+- [ ] make a controller for stopping the project
+- [ ] make a page to see unverified projects for freelancer
+- [ ] connect create project feature with controller
