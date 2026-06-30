@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { Copy, Check, X } from "lucide-react";
 import type { NewProjectType } from "../(protected)/freelancer/new-project/page";
+import { useToast } from "./ToastProvider";
 
 interface NewProjectFormProps {
-  handleCreate: (form: NewProjectType) => Promise<{ projectCode?: string } | void>;
+  handleCreate: (form: NewProjectType) => Promise<{ projectCode?: string; error?: string } | void>;
 }
 
 export function NewProjectForm({ handleCreate }: NewProjectFormProps) {
+  const { addToast } = useToast();
   const [form, setForm] = useState({
     title: "",
     agreedcost: "",
@@ -31,15 +33,50 @@ export function NewProjectForm({ handleCreate }: NewProjectFormProps) {
     setLoading(true);
     const result = await handleCreate(form);
     setLoading(false);
+
+    if (result && result.error) {
+      addToast({
+        title: "Error",
+        message: result.error,
+        type: "error"
+      });
+      return;
+    }
+
     if (result && result.projectCode) {
       setProjectCode(result.projectCode);
+      setForm({
+        title: "",
+        agreedcost: "",
+        deadline: "",
+        description: "",
+      });
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(projectCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyToClipboard = async () => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(projectCode);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = projectCode;
+        textArea.style.position = "absolute";
+        textArea.style.left = "-999999px";
+        document.body.prepend(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      addToast({
+        title: "Copy Failed",
+        message: "Failed to copy code to clipboard.",
+        type: "error"
+      });
+    }
   };
 
   return (
