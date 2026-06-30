@@ -128,7 +128,7 @@ export const createNewProject = async (input: newProjectInput) => {
     catch {
         return { success: false, error: "Failed to create project", status: 500 }
     }
-}
+};
 
 export const acceptProject = async (clientEmail: string, projectCode: string) => {
     const clientProfile = await prisma.userprofile.findFirst({
@@ -166,6 +166,82 @@ export const acceptProject = async (clientEmail: string, projectCode: string) =>
         });
 
         return { success: true, Project: acceptedProject, status: 200 };
+    }
+    catch (err: any) {
+        if (err.error) {
+            return { success: false, error: err.error, status: err.status }
+        }
+        console.log(err, "From acceptProject")
+        return { success: false, error: "Server Error", status: 500 }
+    }
+}
+
+export const getUnverifiedProjects = async (freelancerId: string) => {
+    try {
+        const foundFreelancer = await prisma.freelancer.findUnique({ where: { id: freelancerId } });
+        if (!foundFreelancer) return { success: false, error: "Freelancer Not found", status: 404 };
+        const foundProjects = await prisma.project.findMany({
+            where: { freelancerId: freelancerId, status: "PENDING" },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                deadline: true,
+                createdAt: true,
+                agreedCost: true
+            }
+        });
+        return { success: true, status: 200, projects: foundProjects }
+    }
+    catch (err: any) {
+        if (err.error) {
+            return { success: false, error: err.error, status: err.status }
+        }
+        console.log(err, "From getUnverifiedProjects")
+        return { success: false, error: "Server Error", status: 500 }
+    }
+};
+
+export const deleteProject = async (freelancerid: string, projectId: string) => {
+    try {
+        const freelancerfound = await prisma.freelancer.findFirst({
+            where: { id: freelancerid },
+            select: { id: true }
+        });
+        const projectfound = await prisma.project.findUnique({
+            where: { id: projectId, freelancerId: freelancerfound?.id },
+            include: {
+                _count: {
+                    select: {
+                        milestones: true,
+                        payments: true
+                    }
+                }
+            }
+        });
+
+        if (!projectfound) {
+            return {
+                success: false,
+                error: "Project id/Freelancer id not valid or project not found",
+                status: 404
+            };
+        }
+        // 2. Check if it contains milestones or payments
+        if (projectfound._count.milestones > 0 || projectfound._count.payments > 0) {
+            return {
+                success: false,
+                error: "Cannot delete project. It already has milestones or payments.",
+                status: 400
+            };
+        };
+
+        //IF it passes all tests - Delete
+        await prisma.project.delete({
+            where: { id: projectfound.id }
+        });
+
+        return { success: true, status: 204 };
     }
     catch (err: any) {
         if (err.error) {
