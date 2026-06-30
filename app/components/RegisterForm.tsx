@@ -104,7 +104,6 @@ export function RegisterForm() {
             email,
             password,
             name,
-            // @ts-expect-error Custom additional field configured in auth.ts.
             role: role.toUpperCase(),
           });
 

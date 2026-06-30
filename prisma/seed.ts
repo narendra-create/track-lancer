@@ -407,6 +407,7 @@ async function main() {
         freelancerId: freelancer.id,
         status: seed.status,
         agreedCost: seed.agreedCost,
+        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     });
 

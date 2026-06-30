@@ -82,7 +82,17 @@ export const getCurrentProjects = async (freelancerid: string, cursor?: string) 
         return {
             id: project.id,
             title: project.title,
-            client: project.client,
+            client: project.client ? {
+                user: {
+                    name: project.client.user.name,
+                    image: project.client.user.image
+                }
+            } : {
+                user: {
+                    name: "Unknown",
+                    image: null
+                }
+            },
             money: {
                 totalAmount,
                 received,
