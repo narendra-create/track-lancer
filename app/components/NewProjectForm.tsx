@@ -1,35 +1,89 @@
 "use client";
 import { useState } from "react";
+import { Copy, Check, X } from "lucide-react";
+import type { NewProjectType } from "../(protected)/freelancer/new-project/page";
 
-export function NewProjectForm() {
+interface NewProjectFormProps {
+  handleCreate: (form: NewProjectType) => Promise<{ projectCode?: string } | void>;
+}
+
+export function NewProjectForm({ handleCreate }: NewProjectFormProps) {
   const [form, setForm] = useState({
     title: "",
-    clientEmail: "",
-    totalAmount: "",
+    agreedcost: "",
     deadline: "",
     description: "",
   });
-
+  const [projectCode, setProjectCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
+    if (name === "title" && value.length > 40) return;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Form submitted:", form);
-      setLoading(false);
-    }, 1000);
+    const result = await handleCreate(form);
+    setLoading(false);
+    if (result && result.projectCode) {
+      setProjectCode(result.projectCode);
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(projectCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full max-w-2xl relative">
+      {/* Project Code Modal */}
+      {projectCode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-[#1e1e1e] border border-[#2a2a2a] rounded-xl p-8 max-w-md w-full shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setProjectCode("")}
+              className="absolute top-4 right-4 text-[#7a7570] hover:text-white transition-colors"
+            >
+              <X size={20} />
+            </button>
+            
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 bg-[#2a2a2a] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#3a3a3a]">
+                <Check className="text-green-500" size={24} />
+              </div>
+              <h2 className="font-serif text-2xl text-white mb-2">Project Created</h2>
+              <p className="font-sans text-sm text-[#7a7570]">
+                Share this code with your client. They need it to accept the project.
+              </p>
+              <p className="font-sans text-xs text-amber-500/80 mt-3 font-medium bg-amber-500/10 py-2 px-3 rounded-md inline-block">
+                ⚠️ This code is only shown once. Please save it now.
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3 bg-black/40 border border-[#2a2a2a] rounded-lg p-3 mt-4">
+              <code className="flex-1 font-mono text-xl text-center text-white tracking-wider">
+                {projectCode}
+              </code>
+              <button
+                onClick={copyToClipboard}
+                className="p-2 hover:bg-[#2a2a2a] rounded-md transition-colors text-[#7a7570] hover:text-white"
+                title="Copy code"
+              >
+                {copied ? <Check size={20} className="text-green-500" /> : <Copy size={20} />}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-10">
         <h1 className="font-serif text-3xl lg:text-4xl text-[#e8dfce] mb-2 flex items-center gap-2">
           <span className="text-white">New</span> Project
@@ -44,12 +98,17 @@ export function NewProjectForm() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         {/* Project Title */}
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="title"
-            className="font-mono text-[10px] tracking-[1.5px] uppercase text-[#7a7570]"
-          >
-            Project Title
-          </label>
+          <div className="flex justify-between items-end">
+            <label
+              htmlFor="title"
+              className="font-mono text-[10px] tracking-[1.5px] uppercase text-[#7a7570]"
+            >
+              Project Title
+            </label>
+            <span className="font-sans text-[10px] text-[#5a5652]">
+              {form.title.length}/40
+            </span>
+          </div>
           <input
             id="title"
             name="title"
@@ -57,77 +116,60 @@ export function NewProjectForm() {
             placeholder="e.g. E-commerce Platform"
             value={form.title}
             onChange={handleChange}
+            maxLength={40}
+            required
             className="w-full bg-[#1e1e1e] border border-[#2a2a2a] rounded-md px-4 py-3
               font-sans text-[14px] text-white placeholder:text-[#4a4642]
               focus:outline-none focus:border-[#7a7570] duration-200"
           />
         </div>
 
-        {/* 2 Column Row: Email and Amount */}
+        {/* 2 Column Row: Amount and Deadline */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-2">
             <label
-              htmlFor="clientEmail"
+              htmlFor="agreedcost"
               className="font-mono text-[10px] tracking-[1.5px] uppercase text-[#7a7570]"
             >
-              Client Email (Optional)
+              Agreed Amount (₹)
             </label>
             <input
-              id="clientEmail"
-              name="clientEmail"
-              type="email"
-              placeholder="client@example.com"
-              value={form.clientEmail}
-              onChange={handleChange}
-              className="w-full bg-[#1e1e1e] border border-[#2a2a2a] rounded-md px-4 py-3
-                font-sans text-[14px] text-white placeholder:text-[#4a4642]
-                focus:outline-none focus:border-[#7a7570] duration-200"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="totalAmount"
-              className="font-mono text-[10px] tracking-[1.5px] uppercase text-[#7a7570]"
-            >
-              Total Amount (₹)
-            </label>
-            <input
-              id="totalAmount"
-              name="totalAmount"
+              id="agreedcost"
+              name="agreedcost"
               type="number"
               placeholder="85,000"
-              value={form.totalAmount}
+              value={form.agreedcost}
               onChange={handleChange}
+              required
               className="w-full bg-[#1e1e1e] border border-[#2a2a2a] rounded-md px-4 py-3
                 font-sans text-[14px] text-white placeholder:text-[#4a4642]
                 focus:outline-none focus:border-[#7a7570] duration-200"
             />
             <p className="font-sans text-[10px] text-[#5a5652] leading-snug mt-1">
-              Milestones created later cannot exceed this agreed-upon total budget.
+              Milestones created later cannot exceed this budget.
             </p>
           </div>
-        </div>
 
-        {/* Deadline */}
-        <div className="flex flex-col gap-2 w-full md:w-[calc(50%-12px)]">
-          <label
-            htmlFor="deadline"
-            className="font-mono text-[10px] tracking-[1.5px] uppercase text-[#7a7570]"
-          >
-            Deadline
-          </label>
-          <input
-            id="deadline"
-            name="deadline"
-            type="date"
-            placeholder="YYYY-MM-DD"
-            value={form.deadline}
-            onChange={handleChange}
-            className="w-full bg-[#1e1e1e] border border-[#2a2a2a] rounded-md px-4 py-3
-              font-sans text-[14px] text-white placeholder:text-[#4a4642]
-              focus:outline-none focus:border-[#7a7570] duration-200 [color-scheme:dark]"
-          />
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="deadline"
+              className="font-mono text-[10px] tracking-[1.5px] uppercase text-[#7a7570]"
+            >
+              Deadline
+            </label>
+            <input
+              id="deadline"
+              name="deadline"
+              type="date"
+              placeholder="YYYY-MM-DD"
+              value={form.deadline}
+              onChange={handleChange}
+              required
+              className="w-full bg-[#1e1e1e] border border-[#2a2a2a] rounded-md px-4 py-3
+                font-sans text-[14px] text-white placeholder:text-[#4a4642]
+                focus:outline-none focus:border-[#7a7570] duration-200 [color-scheme:dark]"
+            />
+          </div>
         </div>
 
         {/* Brief Description */}
@@ -154,7 +196,8 @@ export function NewProjectForm() {
         {/* Submit Button */}
         <div className="mt-4">
           <p className="font-sans text-[11px] text-[#5a5652] mb-5">
-            By creating this project, you agree that all subsequent milestone costs will not exceed the stated total amount.
+            By creating this project, you agree that all subsequent milestone
+            costs will not exceed the stated total amount.
           </p>
           <button
             type="submit"
