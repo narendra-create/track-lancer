@@ -17,16 +17,14 @@ const NewProject = () => {
     "use server";
     const { session, error } = await requireRole("freelancer");
     if (error) {
-      alert(`Error creating project - ${error}`);
-      return;
+      return { error: `Error creating project - ${error}` };
     }
     if (!session?.user) {
-      alert("User is logged out");
-      return;
+      return { error: "User is logged out" };
     }
     const profile = await getFreelancerProfile(session?.user.email);
     if (!profile.profile?.Freelancer) {
-      return alert("Can't Find freelancer account");
+      return { error: "Can't Find freelancer account" };
     }
 
     const payload: newProjectInput = {
@@ -37,11 +35,13 @@ const NewProject = () => {
       freelancerId: profile.profile?.Freelancer?.id,
     };
 
-    const parsed = newProjectSchema.parse(payload);
-    const result = await createNewProject(parsed);
+    const parsed = newProjectSchema.safeParse(payload);
+    if (!parsed.success) {
+      return { error: parsed.error.issues[0].message };
+    }
+    const result = await createNewProject(parsed.data);
     if (!result.success) {
-      alert(`Can't create project - ${result.status}, cause - ${result.error}`);
-      return;
+      return { error: `Can't create project - ${result.status}, cause - ${result.error}` };
     }
     return { projectCode: result.projectCode };
   };
