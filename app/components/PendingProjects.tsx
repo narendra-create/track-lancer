@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Copy, Check, X, RefreshCw, Trash2, AlertTriangle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
 
 export type PendingProject = {
   id: string;
@@ -17,6 +19,7 @@ interface PendingProjectsProps {
 }
 
 export function PendingProjects({ projects, handleRegenerateCode, handleDelete }: PendingProjectsProps) {
+  const router = useRouter();
   const [projectCode, setProjectCode] = useState("");
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -37,12 +40,28 @@ export function PendingProjects({ projects, handleRegenerateCode, handleDelete }
     await handleDelete(id);
     setDeletingId(null);
     setDeleteConfirmId(null);
+    router.refresh();
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(projectCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyToClipboard = async () => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(projectCode);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = projectCode;
+        textArea.style.position = "absolute";
+        textArea.style.left = "-999999px";
+        document.body.prepend(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy", error);
+    }
   };
 
   return (
@@ -142,8 +161,17 @@ export function PendingProjects({ projects, handleRegenerateCode, handleDelete }
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {projects.map((project) => (
-            <div key={project.id} className="bg-[#1e1e1e] border border-[#2a2a2a] rounded-xl p-6 hover:border-[#3a3a3a] transition-colors duration-200 flex flex-col">
+          <AnimatePresence>
+            {projects.map((project) => (
+              <motion.div 
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+                key={project.id} 
+                className="bg-[#1e1e1e] border border-[#2a2a2a] rounded-xl p-6 hover:border-[#3a3a3a] transition-colors duration-200 flex flex-col"
+              >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
                 <div>
                   <h3 className="font-serif text-xl text-white mb-2">{project.title}</h3>
@@ -173,14 +201,15 @@ export function PendingProjects({ projects, handleRegenerateCode, handleDelete }
               </div>
 
               {project.description && (
-                <div className="bg-black/20 border border-[#2a2a2a] rounded-lg p-4 mt-auto">
-                  <p className="font-sans text-[13px] text-[#a09b96] leading-relaxed">
+                <div className="bg-black/20 border border-[#2a2a2a] rounded-lg p-4 mt-auto overflow-hidden">
+                  <p className="font-sans text-[13px] text-[#a09b96] leading-relaxed break-words whitespace-pre-wrap">
                     {project.description}
                   </p>
                 </div>
               )}
-            </div>
-          ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
     </div>
