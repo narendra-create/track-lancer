@@ -90,6 +90,7 @@ export function FreelancerSidebar({
             icon={History}
             label="Past Projects"
             isActive={activePath === "/freelancer/past-projects"}
+            hideOnMobile
           />
           <NavLink
             href="/freelancer/unverified-projects"
@@ -122,19 +123,22 @@ function NavLink({
   label,
   badge,
   isActive,
+  hideOnMobile,
 }: {
   href: string;
   icon: React.ElementType;
   label: string;
   badge?: number;
   isActive: boolean;
+  hideOnMobile?: boolean;
 }) {
   return (
     <Link
       href={href}
-      className={`relative flex cursor-pointer transition-colors duration-150
-        h-[75px] flex-1 flex-col items-center justify-center gap-1.5 text-[11px] font-medium
+      className={`relative cursor-pointer transition-colors duration-150
+        h-[75px] flex-col items-center justify-center gap-1 font-medium
         md:mb-0.5 md:h-auto md:flex-none md:flex-row md:justify-start md:gap-2.5 md:rounded md:p-[9px_10px] md:text-[0.82rem]
+        ${hideOnMobile ? "hidden md:flex" : "flex flex-1"}
         ${
           isActive
             ? "text-dash-gold bg-dash-gold-glow/40 md:bg-dash-gold-glow"
@@ -159,7 +163,7 @@ function NavLink({
           </span>
         )}
       </div>
-      <span className="whitespace-nowrap">{label}</span>
+      <span className="text-center text-[9px] leading-[1.2] px-1 md:px-0 md:text-[0.82rem] md:text-left whitespace-normal md:whitespace-nowrap">{label}</span>
 
       {/* Desktop Badge */}
       {badge !== undefined && (
