@@ -147,6 +147,7 @@ model Project {
 
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
+  stoppedAt           DateTime?
   budgetRaiseRequests BudgetRaiseRequest[]
 
   @@index([freelancerId])
@@ -187,6 +188,7 @@ enum Categorys {
 enum Milestonestatus {
   PENDING_PAYEMENT
   COMPLETED
+  NOT_STARTED
   IN_PROGRESS
   STOPPED
 }
