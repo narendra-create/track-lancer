@@ -1,30 +1,47 @@
 export type AllProjectStatus = "ACTIVE" | "STOPPED" | "CANCELLED";
 
+export const SECTION_ORDER: AllProjectStatus[] = ["ACTIVE", "STOPPED", "CANCELLED"];
+
+export type AllProjectClient = {
+  user: {
+    name: string;
+    image: string | null;
+  };
+  email: string | null;
+};
+
+export type AllProjectMoney = {
+  totalAmount: number;
+  received: number;
+  remaining: number;
+};
+
+export type AllProjectStats = {
+  totalMilestones: number;
+  completedMilestones: number;
+  progress: number;
+  projectDeadline: Date | undefined;
+};
+
 export type AllProject = {
   id: string;
   title: string;
-  clientName: string;
-  clientEmail: string;
-  totalAmount: number;
-  received: number;
-  totalMilestones: number;
-  completedMilestones: number;
-  deadline: string | null;
+  client: AllProjectClient;
+  money: AllProjectMoney;
   status: AllProjectStatus;
-  createdAt: string;
+  stats: AllProjectStats;
 };
 
-export type AllProjectsSection = {
+type GetAllProjectsSuccess = {
+  success: true;
   projects: AllProject[];
   nextCursor: string | null;
 };
 
-export type AllProjectsData = {
-  active: AllProjectsSection;
-  stopped: AllProjectsSection;
-  cancelled: AllProjectsSection;
+type GetAllProjectsError = {
+  success: false;
+  error: string;
+  status?: number;
 };
 
-export type LoadMoreAllProjectsResponse =
-  | { success: true; projects: AllProject[]; nextCursor: string | null }
-  | { success: false; error: string };
+export type GetAllProjectsResponse = GetAllProjectsSuccess | GetAllProjectsError;

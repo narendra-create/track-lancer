@@ -3,136 +3,22 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, AlertTriangle, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import type {
-  AllProject,
-  AllProjectsData,
-  LoadMoreAllProjectsResponse,
-} from "@/types/allprojects";
+import type { AllProject, GetAllProjectsResponse, AllProjectStatus } from "@/types/allprojects";
+import { SECTION_ORDER } from "@/types/allprojects";
+import { useToast } from "./ToastProvider";
 
-// ─── TYPES ───────────────────────────────────────────────────────────────────
+// ─── PROPS ────────────────────────────────────────────────────────────────────
 
 interface FreelancerAllProjectsProps {
-  initialData: AllProjectsData;
-  loadMoreActive: (cursor: string) => Promise<LoadMoreAllProjectsResponse>;
-  loadMoreStopped: (cursor: string) => Promise<LoadMoreAllProjectsResponse>;
-  loadMoreCancelled: (cursor: string) => Promise<LoadMoreAllProjectsResponse>;
-  handleDelete: (id: string) => Promise<{ success: boolean; error?: string }>;
+  initialProjects: AllProject[];
+  initialNextCursor: string | null;
+  loadMore: (cursor: string) => Promise<GetAllProjectsResponse>;
+  handleDelete: (id: string) => Promise<{ success: boolean; error?: string } | void>;
 }
-
-// ─── DUMMY DATA ───────────────────────────────────────────────────────────────
-
-const DUMMY_DATA: AllProjectsData = {
-  active: {
-    projects: [
-      {
-        id: "a1",
-        title: "Adhyatma Coaching Platform",
-        clientName: "Rahul Mehta",
-        clientEmail: "rahul@adhyatma.in",
-        totalAmount: 45000,
-        received: 20000,
-        totalMilestones: 5,
-        completedMilestones: 2,
-        deadline: "15 Jan 2026",
-        status: "ACTIVE",
-        createdAt: "1 Nov 2025",
-      },
-      {
-        id: "a2",
-        title: "FitLife Mobile App",
-        clientName: "Priya Sharma",
-        clientEmail: "priya@fitlife.co",
-        totalAmount: 60000,
-        received: 30000,
-        totalMilestones: 6,
-        completedMilestones: 3,
-        deadline: "20 Feb 2026",
-        status: "ACTIVE",
-        createdAt: "10 Oct 2025",
-      },
-      {
-        id: "a3",
-        title: "TechMart E-Commerce",
-        clientName: "Suresh Kumar",
-        clientEmail: "suresh@techmart.io",
-        totalAmount: 80000,
-        received: 40000,
-        totalMilestones: 8,
-        completedMilestones: 4,
-        deadline: "5 Mar 2026",
-        status: "ACTIVE",
-        createdAt: "5 Sep 2025",
-      },
-    ],
-    nextCursor: null,
-  },
-  stopped: {
-    projects: [
-      {
-        id: "s1",
-        title: "EduTech Portal",
-        clientName: "Anita Verma",
-        clientEmail: "anita@edutech.com",
-        totalAmount: 35000,
-        received: 15000,
-        totalMilestones: 4,
-        completedMilestones: 1,
-        deadline: "10 Dec 2025",
-        status: "STOPPED",
-        createdAt: "1 Aug 2025",
-      },
-      {
-        id: "s2",
-        title: "LearnWave Dashboard",
-        clientName: "Kiran Patel",
-        clientEmail: "kiran@learnwave.in",
-        totalAmount: 25000,
-        received: 10000,
-        totalMilestones: 3,
-        completedMilestones: 1,
-        deadline: "30 Nov 2025",
-        status: "STOPPED",
-        createdAt: "15 Jul 2025",
-      },
-    ],
-    nextCursor: null,
-  },
-  cancelled: {
-    projects: [
-      {
-        id: "c1",
-        title: "HealthSync Wearable App",
-        clientName: "Dev Nair",
-        clientEmail: "dev@healthsync.io",
-        totalAmount: 50000,
-        received: 0,
-        totalMilestones: 5,
-        completedMilestones: 0,
-        deadline: null,
-        status: "CANCELLED",
-        createdAt: "20 Jun 2025",
-      },
-      {
-        id: "c2",
-        title: "Retail POS System",
-        clientName: "Meera Joshi",
-        clientEmail: "meera@retailpos.com",
-        totalAmount: 30000,
-        received: 5000,
-        totalMilestones: 4,
-        completedMilestones: 0,
-        deadline: null,
-        status: "CANCELLED",
-        createdAt: "1 Jun 2025",
-      },
-    ],
-    nextCursor: null,
-  },
-};
 
 // ─── STATUS CONFIG ────────────────────────────────────────────────────────────
 
-const STATUS_STYLE = {
+const STATUS_STYLE: Record<string, { dot: string; text: string; bg: string }> = {
   ACTIVE: {
     dot: "bg-[var(--color-dash-green)]",
     text: "text-[var(--color-dash-green)]",
@@ -150,7 +36,51 @@ const STATUS_STYLE = {
   },
 };
 
-// ─── DELETE CONFIRM MODAL ─────────────────────────────────────────────────────
+const SECTION_ACCENT: Record<AllProjectStatus, string> = {
+  ACTIVE: "bg-[var(--color-dash-green)]",
+  STOPPED: "bg-[var(--color-dash-amber)]",
+  CANCELLED: "bg-[var(--color-dash-red)]",
+};
+
+// ─── SKELETON CARD ────────────────────────────────────────────────────────────
+
+function AllProjectCardSkeleton() {
+  return (
+    <div className="bg-[var(--color-dash-surface1)] border border-[var(--color-dash-border)] rounded-xl p-5">
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-[7px] h-[7px] rounded-full bg-[var(--color-dash-surface3)] animate-pulse shrink-0" />
+            <div className="h-4 w-40 rounded bg-[var(--color-dash-surface3)] animate-pulse" />
+          </div>
+          <div className="h-3 w-28 rounded bg-[var(--color-dash-surface3)] animate-pulse" />
+        </div>
+        <div className="h-5 w-16 rounded-sm bg-[var(--color-dash-surface3)] animate-pulse shrink-0" />
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex flex-col gap-1.5">
+            <div className="h-2.5 w-12 rounded bg-[var(--color-dash-surface3)] animate-pulse" />
+            <div className="h-4 w-16 rounded bg-[var(--color-dash-surface3)] animate-pulse" />
+          </div>
+        ))}
+      </div>
+
+      <div className="mb-3">
+        <div className="flex justify-between mb-1.5">
+          <div className="h-2.5 w-24 rounded bg-[var(--color-dash-surface3)] animate-pulse" />
+          <div className="h-2.5 w-8 rounded bg-[var(--color-dash-surface3)] animate-pulse" />
+        </div>
+        <div className="w-full h-[3px] rounded-full bg-[var(--color-dash-surface3)] animate-pulse" />
+      </div>
+
+      <div className="h-3 w-32 rounded bg-[var(--color-dash-surface3)] animate-pulse" />
+    </div>
+  );
+}
+
+// ─── DELETE MODAL ─────────────────────────────────────────────────────────────
 
 function DeleteModal({
   onConfirm,
@@ -217,12 +147,14 @@ function ProjectCard({
   onDelete?: (id: string) => void;
 }) {
   const router = useRouter();
-  const style = STATUS_STYLE[project.status];
-  const progress =
-    project.totalMilestones > 0
-      ? Math.round((project.completedMilestones / project.totalMilestones) * 100)
-      : 0;
-  const remaining = project.totalAmount - project.received;
+  const style = STATUS_STYLE[project.status] ?? STATUS_STYLE.ACTIVE;
+  const { totalMilestones, completedMilestones, progress, projectDeadline } = project.stats;
+
+  const formattedDeadline = projectDeadline
+    ? new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(
+        new Date(projectDeadline),
+      )
+    : null;
 
   const handleClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest("[data-no-nav]")) return;
@@ -247,8 +179,10 @@ function ProjectCard({
             </h3>
           </div>
           <p className="font-mono text-[10px] tracking-[1px] text-[var(--color-dash-ink3)] truncate">
-            {project.clientName}
-            <span className="text-[var(--color-dash-ink4)]"> · {project.clientEmail}</span>
+            {project.client.user.name}
+            {project.client.email && (
+              <span className="text-[var(--color-dash-ink4)]"> · {project.client.email}</span>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -259,7 +193,7 @@ function ProjectCard({
           </span>
           {project.status === "CANCELLED" && onDelete && (
             <button
-              data-no-nav
+              data-no-nav=""
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(project.id);
@@ -278,7 +212,7 @@ function ProjectCard({
             Value
           </p>
           <p className="font-serif text-[14px] text-[var(--color-dash-ink)]">
-            ₹{project.totalAmount.toLocaleString()}
+            ₹{project.money.totalAmount.toLocaleString()}
           </p>
         </div>
         <div>
@@ -286,7 +220,7 @@ function ProjectCard({
             Received
           </p>
           <p className="font-serif text-[14px] text-[var(--color-dash-green)]">
-            ₹{project.received.toLocaleString()}
+            ₹{project.money.received.toLocaleString()}
           </p>
         </div>
         <div>
@@ -294,7 +228,7 @@ function ProjectCard({
             Remaining
           </p>
           <p className="font-serif text-[14px] text-[var(--color-dash-amber)]">
-            ₹{remaining.toLocaleString()}
+            ₹{project.money.remaining.toLocaleString()}
           </p>
         </div>
       </div>
@@ -302,7 +236,7 @@ function ProjectCard({
       <div className="mb-3">
         <div className="flex justify-between items-center mb-1.5">
           <span className="font-mono text-[9px] tracking-[1px] uppercase text-[var(--color-dash-ink4)]">
-            {project.completedMilestones}/{project.totalMilestones} milestones
+            {completedMilestones}/{totalMilestones} milestones
           </span>
           <span className="font-mono text-[9px] text-[var(--color-dash-ink3)]">{progress}%</span>
         </div>
@@ -312,8 +246,8 @@ function ProjectCard({
               project.status === "ACTIVE"
                 ? "bg-[var(--color-dash-green)]"
                 : project.status === "STOPPED"
-                ? "bg-[var(--color-dash-amber)]"
-                : "bg-[var(--color-dash-border-hover)]"
+                  ? "bg-[var(--color-dash-amber)]"
+                  : "bg-[var(--color-dash-border-hover)]"
             }`}
             style={{ width: `${progress}%` }}
           />
@@ -321,12 +255,13 @@ function ProjectCard({
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 font-mono text-[10px] tracking-[0.5px] text-[var(--color-dash-ink4)]">
-          {project.deadline && (
-            <span>Due: <span className="text-[var(--color-dash-ink3)]">{project.deadline}</span></span>
-          )}
-          <span>Since: <span className="text-[var(--color-dash-ink3)]">{project.createdAt}</span></span>
-        </div>
+        {formattedDeadline ? (
+          <span className="font-mono text-[10px] tracking-[0.5px] text-[var(--color-dash-ink4)]">
+            Due: <span className="text-[var(--color-dash-ink3)]">{formattedDeadline}</span>
+          </span>
+        ) : (
+          <span />
+        )}
         <ChevronRight
           size={14}
           className="text-[var(--color-dash-ink4)] group-hover:text-[var(--color-dash-ink3)] group-hover:translate-x-0.5 transition-all duration-150"
@@ -339,34 +274,26 @@ function ProjectCard({
 // ─── SECTION BLOCK ────────────────────────────────────────────────────────────
 
 function SectionBlock({
-  title,
-  accent,
+  status,
   projects,
-  nextCursor,
-  onLoadMore,
   onDelete,
-  loadingMore,
 }: {
-  title: string;
-  accent: string;
+  status: AllProjectStatus;
   projects: AllProject[];
-  nextCursor: string | null;
-  onLoadMore: () => void;
   onDelete?: (id: string) => void;
-  loadingMore: boolean;
 }) {
   if (projects.length === 0) return null;
+  const label = status.charAt(0) + status.slice(1).toLowerCase();
 
   return (
     <div className="mb-10">
       <div className="flex items-center gap-3 mb-5">
-        <span className={`w-[6px] h-[6px] rounded-full shrink-0 ${accent}`} />
-        <h2 className="font-serif text-[18px] text-white">{title}</h2>
+        <span className={`w-[6px] h-[6px] rounded-full shrink-0 ${SECTION_ACCENT[status]}`} />
+        <h2 className="font-serif text-[18px] text-white">{label}</h2>
         <span className="font-mono text-[10px] tracking-[2px] text-[var(--color-dash-ink4)]">
           {projects.length}
         </span>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         <AnimatePresence mode="popLayout">
           {projects.map((p, i) => (
@@ -374,21 +301,6 @@ function SectionBlock({
           ))}
         </AnimatePresence>
       </div>
-
-      {nextCursor && (
-        <div className="flex justify-center mt-5">
-          <button
-            onClick={onLoadMore}
-            disabled={loadingMore}
-            className="group flex items-center gap-2 px-6 py-2.5 border border-[var(--color-dash-border)] bg-[var(--color-dash-surface1)] text-[var(--color-dash-ink3)] font-sans text-[13px] rounded-full transition-all duration-200 hover:border-[var(--color-dash-border-hover)] hover:text-[var(--color-dash-ink)] disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span className={`transition-transform duration-200 ${loadingMore ? "animate-spin" : "group-hover:translate-y-0.5"}`}>
-              {loadingMore ? "◌" : "↓"}
-            </span>
-            {loadingMore ? "Loading..." : "Load more"}
-          </button>
-        </div>
-      )}
     </div>
   );
 }
@@ -396,56 +308,55 @@ function SectionBlock({
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 export function FreelancerAllProjects({
-  initialData = DUMMY_DATA,
-  loadMoreActive,
-  loadMoreStopped,
-  loadMoreCancelled,
+  initialProjects,
+  initialNextCursor,
+  loadMore,
   handleDelete,
-}: Partial<FreelancerAllProjectsProps> & { initialData?: AllProjectsData }) {
-  const [active, setActive] = useState(initialData.active.projects);
-  const [stopped, setStopped] = useState(initialData.stopped.projects);
-  const [cancelled, setCancelled] = useState(initialData.cancelled.projects);
-
-  const [activeCursor, setActiveCursor] = useState(initialData.active.nextCursor);
-  const [stoppedCursor, setStoppedCursor] = useState(initialData.stopped.nextCursor);
-  const [cancelledCursor, setCancelledCursor] = useState(initialData.cancelled.nextCursor);
-
-  const [loadingActive, setLoadingActive] = useState(false);
-  const [loadingStopped, setLoadingStopped] = useState(false);
-  const [loadingCancelled, setLoadingCancelled] = useState(false);
-
+}: FreelancerAllProjectsProps) {
+  const { addToast } = useToast();
+  const [projects, setProjects] = useState<AllProject[]>(initialProjects);
+  const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const onLoadMore = async (
-    cursor: string,
-    fetcher: ((c: string) => Promise<LoadMoreAllProjectsResponse>) | undefined,
-    setter: React.Dispatch<React.SetStateAction<AllProject[]>>,
-    setCursor: React.Dispatch<React.SetStateAction<string | null>>,
-    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  ) => {
-    if (!fetcher) return;
-    setLoading(true);
-    const result = await fetcher(cursor);
-    setLoading(false);
+  const grouped = SECTION_ORDER.reduce<Record<string, AllProject[]>>((acc, status) => {
+    acc[status] = projects.filter((p) => p.status === status);
+    return acc;
+  }, {});
+
+  const onLoadMore = async () => {
+    if (!nextCursor) return;
+    setLoadingMore(true);
+    const result = await loadMore(nextCursor);
+    setLoadingMore(false);
     if (result.success) {
-      setter((prev) => [...prev, ...result.projects]);
-      setCursor(result.nextCursor);
+      setProjects((prev) => [...prev, ...result.projects]);
+      setNextCursor(result.nextCursor);
+    } else {
+      addToast({ title: "Failed to load", message: result.error, type: "error" });
     }
   };
 
   const confirmDelete = async () => {
-    if (!deleteTargetId || !handleDelete) return;
+    if (!deleteTargetId) return;
     setDeleting(true);
     const result = await handleDelete(deleteTargetId);
     setDeleting(false);
+    if (!result) {
+      setDeleteTargetId(null);
+      return;
+    }
     if (result.success) {
-      setCancelled((prev) => prev.filter((p) => p.id !== deleteTargetId));
+      setProjects((prev) => prev.filter((p) => p.id !== deleteTargetId));
+      addToast({ title: "Deleted", message: "Project removed successfully.", type: "success" });
+    } else {
+      addToast({ title: "Delete failed", message: result.error ?? "Something went wrong.", type: "error" });
     }
     setDeleteTargetId(null);
   };
 
-  const totalCount = active.length + stopped.length + cancelled.length;
+  const total = projects.length;
 
   return (
     <div className="w-full">
@@ -465,13 +376,13 @@ export function FreelancerAllProjects({
           All Projects
         </h1>
         <p className="font-mono text-[10px] tracking-[2px] uppercase text-[var(--color-dash-ink3)]">
-          {totalCount} project{totalCount !== 1 ? "s" : ""} total
+          {total} project{total !== 1 ? "s" : ""} total
         </p>
       </div>
 
       <div className="w-full h-px bg-[var(--color-dash-border)] mb-8" />
 
-      {totalCount === 0 ? (
+      {total === 0 ? (
         <div className="text-center py-16 border border-[var(--color-dash-border)] rounded-xl bg-[var(--color-dash-surface1)]">
           <p className="font-mono text-[12px] tracking-[2px] uppercase text-[var(--color-dash-ink4)]">
             No projects found
@@ -479,42 +390,41 @@ export function FreelancerAllProjects({
         </div>
       ) : (
         <>
-          <SectionBlock
-            title="Active"
-            accent="bg-[var(--color-dash-green)]"
-            projects={active}
-            nextCursor={activeCursor}
-            loadingMore={loadingActive}
-            onLoadMore={() =>
-              activeCursor &&
-              onLoadMore(activeCursor, loadMoreActive, setActive, setActiveCursor, setLoadingActive)
-            }
-          />
+          {SECTION_ORDER.map((status) => (
+            <SectionBlock
+              key={status}
+              status={status}
+              projects={grouped[status]}
+              onDelete={status === "CANCELLED" ? (id) => setDeleteTargetId(id) : undefined}
+            />
+          ))}
 
-          <SectionBlock
-            title="Stopped"
-            accent="bg-[var(--color-dash-amber)]"
-            projects={stopped}
-            nextCursor={stoppedCursor}
-            loadingMore={loadingStopped}
-            onLoadMore={() =>
-              stoppedCursor &&
-              onLoadMore(stoppedCursor, loadMoreStopped, setStopped, setStoppedCursor, setLoadingStopped)
-            }
-          />
+          {nextCursor && (
+            <div className="flex justify-center mt-2 mb-4">
+              <button
+                onClick={onLoadMore}
+                disabled={loadingMore}
+                className="group flex items-center gap-2 px-6 py-2.5 border border-[var(--color-dash-border)] bg-[var(--color-dash-surface1)] text-[var(--color-dash-ink3)] font-sans text-[13px] rounded-full transition-all duration-200 hover:border-[var(--color-dash-border-hover)] hover:text-[var(--color-dash-ink)] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span
+                  className={`transition-transform duration-200 ${
+                    loadingMore ? "animate-spin" : "group-hover:translate-y-0.5"
+                  }`}
+                >
+                  {loadingMore ? "◌" : "↓"}
+                </span>
+                {loadingMore ? "Loading..." : "Load more"}
+              </button>
+            </div>
+          )}
 
-          <SectionBlock
-            title="Cancelled"
-            accent="bg-[var(--color-dash-red)]"
-            projects={cancelled}
-            nextCursor={cancelledCursor}
-            loadingMore={loadingCancelled}
-            onDelete={(id) => setDeleteTargetId(id)}
-            onLoadMore={() =>
-              cancelledCursor &&
-              onLoadMore(cancelledCursor, loadMoreCancelled, setCancelled, setCancelledCursor, setLoadingCancelled)
-            }
-          />
+          {loadingMore && (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
+              {[0, 1, 2].map((i) => (
+                <AllProjectCardSkeleton key={i} />
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>
