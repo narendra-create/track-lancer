@@ -75,6 +75,7 @@ type PaymentSeed = {
   payment_status: "DUE" | "PENDING_VERIFICATION" | "PAID";
   due_date: Date;
   createdAt: Date;
+  completedAt?: Date;
 };
 
 type ProjectSeed = {
@@ -436,6 +437,7 @@ async function main() {
           payment_status: p.payment_status,
           due_date: p.due_date,
           createdAt: p.createdAt,
+          completedAt: p.completedAt ?? (p.payment_status === "PAID" ? p.due_date : null),
         },
       });
     }
