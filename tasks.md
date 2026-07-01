@@ -43,3 +43,4 @@
 - [ ] add extra buttons in settings page
 - [ ] Payment history page ui
 - [ ] Approve payments feature with txn beside it
+- [ ] make controllers for id based milestones and make one controller to return all projects
