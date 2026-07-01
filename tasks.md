@@ -5,7 +5,7 @@
 - [x] CONTROLLER: Implement logic for Client onboarding and profile creation
 - [x] CONTROLLER: Add controller for creating new Projects and assigning them to Clients/Freelancers
 - [x] CONTROLLER: Add logic for Freelancers to propose Projects
-- [ ] CONTROLLER: Implement Milestone creation, updates workflows
+- [x] CONTROLLER: Implement Milestone creation, updates workflows
 - [ ] CONTROLLER: Handle Budget Raise Requests (creation, approval, rejection)
 - [x] API/REALDATA: Fetch paginated list of projects for Freelancer dashboard
 - [ ] API/REALDATA: Fetch paginated list of projects for Client dashboard
@@ -35,7 +35,7 @@
 - [x] VALIDATION: Make validation file for creating projects
 - [x] make controller for deleting projects, only unverified projects
 - [ ] make a function to archive projects from freelancer or from client side
-- [ ] make a controller for stopping the project
+- [x] make a controller for stopping the project
 - [x] make a page to see unverified projects for freelancer
 - [x] connect create project feature with controller
 - [x] Make milestones ui
