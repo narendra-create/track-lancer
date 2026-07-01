@@ -106,7 +106,7 @@ export function FreelancerSidebar({
             isActive={activePath === "/freelancer/activity"}
           />
           <NavLink
-            href="/settings"
+            href="/freelancer/settings"
             icon={Settings}
             label="Settings"
             isActive={activePath === "/freelancer/settings"}
