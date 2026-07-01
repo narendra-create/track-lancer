@@ -113,7 +113,6 @@ model Milestone {
   milestonecost Int
   description   String?
   status        Milestonestatus
-  badge         String?
   deadline      DateTime
   delay         Boolean?
   delayreason   String?
@@ -183,10 +182,10 @@ enum Categorys {
 }
 
 enum Milestonestatus {
-  approved
-  pending_payment
-  not_started
-  stopped
+  PENDING_PAYEMENT
+  COMPLETED
+  IN_PROGRESS
+  STOPPED
 }
 
 enum Paymentstatus {

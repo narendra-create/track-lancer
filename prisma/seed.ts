@@ -63,7 +63,7 @@ type MilestoneSeed = {
   subtitle?: string;
   description?: string;
   milestonecost: number;
-  status: "approved" | "pending_payment" | "not_started" | "stopped";
+  status: "COMPLETED" | "PENDING_PAYEMENT" | "IN_PROGRESS" | "STOPPED";
   deadline: Date;
   delay?: boolean;
   delayreason?: string;
@@ -80,7 +80,7 @@ type PaymentSeed = {
 type ProjectSeed = {
   title: string;
   clientIndex: number;
-  status: "PENDING" | "COMPLETED" | "STOPPED";
+  status: "PENDING" | "COMPLETED" | "STOPPED" | "ACTIVE" | "CANCELLED";
   agreedCost: number;
   completedAt?: Date;
   milestones: MilestoneSeed[];
@@ -144,10 +144,10 @@ async function main() {
       agreedCost: 80000,
       completedAt: monthsAgo(2, 20),
       milestones: [
-        { title: "Design & Wireframes", subtitle: "UI/UX mockups", description: "Figma designs and clickable prototypes for all pages.", milestonecost: 15000, status: "approved", deadline: monthsAgo(5) },
-        { title: "Frontend Development", subtitle: "Next.js + Tailwind", description: "Responsive storefront with cart and checkout flows.", milestonecost: 25000, status: "approved", deadline: monthsAgo(4) },
-        { title: "Backend & Payments", subtitle: "Node + Razorpay", description: "REST API, auth, and payment gateway integration.", milestonecost: 30000, status: "approved", deadline: monthsAgo(3) },
-        { title: "Launch & Handoff", subtitle: "Deploy + docs", description: "Deployed to Vercel, handed over with full documentation.", milestonecost: 10000, status: "approved", deadline: monthsAgo(2) },
+        { title: "Design & Wireframes", subtitle: "UI/UX mockups", description: "Figma designs and clickable prototypes for all pages.", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(5) },
+        { title: "Frontend Development", subtitle: "Next.js + Tailwind", description: "Responsive storefront with cart and checkout flows.", milestonecost: 25000, status: "COMPLETED", deadline: monthsAgo(4) },
+        { title: "Backend & Payments", subtitle: "Node + Razorpay", description: "REST API, auth, and payment gateway integration.", milestonecost: 30000, status: "COMPLETED", deadline: monthsAgo(3) },
+        { title: "Launch & Handoff", subtitle: "Deploy + docs", description: "Deployed to Vercel, handed over with full documentation.", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(2) },
       ],
       payments: [
         { total_cost: 30000, paid_amount: 30000, payment_status: "PAID", due_date: monthsAgo(4), createdAt: monthsAgo(5) },
@@ -161,10 +161,10 @@ async function main() {
       agreedCost: 55000,
       completedAt: monthsAgo(3, 10),
       milestones: [
-        { title: "UX Research & Audit", description: "Analysed existing app flows and identified friction points.", milestonecost: 10000, status: "approved", deadline: monthsAgo(6) },
-        { title: "UI Design", subtitle: "Figma components", description: "Full design system and all app screens in Figma.", milestonecost: 20000, status: "approved", deadline: monthsAgo(5) },
-        { title: "Dev Implementation", subtitle: "React Native", description: "Shipped redesigned app screens into the existing codebase.", milestonecost: 20000, status: "approved", deadline: monthsAgo(4) },
-        { title: "QA & Handoff", milestonecost: 5000, status: "approved", deadline: monthsAgo(3) },
+        { title: "UX Research & Audit", description: "Analysed existing app flows and identified friction points.", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(6) },
+        { title: "UI Design", subtitle: "Figma components", description: "Full design system and all app screens in Figma.", milestonecost: 20000, status: "COMPLETED", deadline: monthsAgo(5) },
+        { title: "Dev Implementation", subtitle: "React Native", description: "Shipped redesigned app screens into the existing codebase.", milestonecost: 20000, status: "COMPLETED", deadline: monthsAgo(4) },
+        { title: "QA & Handoff", milestonecost: 5000, status: "COMPLETED", deadline: monthsAgo(3) },
       ],
       payments: [
         { total_cost: 25000, paid_amount: 25000, payment_status: "PAID", due_date: monthsAgo(5), createdAt: monthsAgo(6) },
@@ -178,9 +178,9 @@ async function main() {
       agreedCost: 32000,
       completedAt: monthsAgo(1, 5),
       milestones: [
-        { title: "Technical SEO Audit", description: "Full crawl, Core Web Vitals, and issue report.", milestonecost: 8000, status: "approved", deadline: monthsAgo(4) },
-        { title: "On-Page Optimisation", description: "Meta tags, content structure, schema markup.", milestonecost: 12000, status: "approved", deadline: monthsAgo(3) },
-        { title: "Reporting & Strategy", description: "GA4 setup, final report, and 6-month roadmap.", milestonecost: 12000, status: "approved", deadline: monthsAgo(1) },
+        { title: "Technical SEO Audit", description: "Full crawl, Core Web Vitals, and issue report.", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(4) },
+        { title: "On-Page Optimisation", description: "Meta tags, content structure, schema markup.", milestonecost: 12000, status: "COMPLETED", deadline: monthsAgo(3) },
+        { title: "Reporting & Strategy", description: "GA4 setup, final report, and 6-month roadmap.", milestonecost: 12000, status: "COMPLETED", deadline: monthsAgo(1) },
       ],
       payments: [
         { total_cost: 32000, paid_amount: 20000, payment_status: "DUE", due_date: monthsAgo(1), createdAt: monthsAgo(4, 20) },
@@ -193,10 +193,10 @@ async function main() {
       agreedCost: 90000,
       completedAt: monthsAgo(4, 8),
       milestones: [
-        { title: "Architecture & Spec", description: "Tech stack decision, DB schema, and API design.", milestonecost: 15000, status: "approved", deadline: monthsAgo(9) },
-        { title: "Core Screens", subtitle: "Onboarding + home + workout tracker", milestonecost: 35000, status: "approved", deadline: monthsAgo(7) },
-        { title: "API Integration", description: "Wearables sync, push notifications, and user data.", milestonecost: 25000, status: "approved", deadline: monthsAgo(5) },
-        { title: "App Store Release", description: "iOS & Android builds, App Store and Play Store listings.", milestonecost: 15000, status: "approved", deadline: monthsAgo(4) },
+        { title: "Architecture & Spec", description: "Tech stack decision, DB schema, and API design.", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(9) },
+        { title: "Core Screens", subtitle: "Onboarding + home + workout tracker", milestonecost: 35000, status: "COMPLETED", deadline: monthsAgo(7) },
+        { title: "API Integration", description: "Wearables sync, push notifications, and user data.", milestonecost: 25000, status: "COMPLETED", deadline: monthsAgo(5) },
+        { title: "App Store Release", description: "iOS & Android builds, App Store and Play Store listings.", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(4) },
       ],
       payments: [
         { total_cost: 40000, paid_amount: 40000, payment_status: "PAID", due_date: monthsAgo(8), createdAt: monthsAgo(9) },
@@ -210,9 +210,9 @@ async function main() {
       agreedCost: 38000,
       completedAt: monthsAgo(1, 22),
       milestones: [
-        { title: "Audit & Migration Plan", description: "Page inventory, content mapping, and redirect strategy.", milestonecost: 8000, status: "approved", deadline: monthsAgo(3) },
-        { title: "Build & Migrate", subtitle: "Next.js + Contentlayer", description: "Rebuilt all pages in Next.js with CMS integration.", milestonecost: 20000, status: "approved", deadline: monthsAgo(2) },
-        { title: "SEO & Deployment", description: "Verified redirects, sitemaps, and deployed to Vercel.", milestonecost: 10000, status: "approved", deadline: monthsAgo(1) },
+        { title: "Audit & Migration Plan", description: "Page inventory, content mapping, and redirect strategy.", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(3) },
+        { title: "Build & Migrate", subtitle: "Next.js + Contentlayer", description: "Rebuilt all pages in Next.js with CMS integration.", milestonecost: 20000, status: "COMPLETED", deadline: monthsAgo(2) },
+        { title: "SEO & Deployment", description: "Verified redirects, sitemaps, and deployed to Vercel.", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(1) },
       ],
       payments: [
         { total_cost: 38000, paid_amount: 28000, payment_status: "DUE", due_date: monthsAgo(1), createdAt: monthsAgo(3, 5) },
@@ -225,9 +225,9 @@ async function main() {
       agreedCost: 25000,
       completedAt: monthsAgo(6, 12),
       milestones: [
-        { title: "Script & Storyboard", milestonecost: 5000, status: "approved", deadline: monthsAgo(8) },
-        { title: "Shoot & Production", milestonecost: 12000, status: "approved", deadline: monthsAgo(7) },
-        { title: "Editing & Delivery", subtitle: "3 formats: Reel, Story, YT", milestonecost: 8000, status: "approved", deadline: monthsAgo(6) },
+        { title: "Script & Storyboard", milestonecost: 5000, status: "COMPLETED", deadline: monthsAgo(8) },
+        { title: "Shoot & Production", milestonecost: 12000, status: "COMPLETED", deadline: monthsAgo(7) },
+        { title: "Editing & Delivery", subtitle: "3 formats: Reel, Story, YT", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(6) },
       ],
       payments: [
         { total_cost: 25000, paid_amount: 25000, payment_status: "PAID", due_date: monthsAgo(6), createdAt: monthsAgo(6, 12) },
@@ -240,10 +240,10 @@ async function main() {
       agreedCost: 60000,
       completedAt: monthsAgo(5, 3),
       milestones: [
-        { title: "Architecture & DB Schema", milestonecost: 10000, status: "approved", deadline: monthsAgo(9) },
-        { title: "CRUD Modules", description: "Shipments, drivers, and warehouse management interfaces.", milestonecost: 25000, status: "approved", deadline: monthsAgo(7) },
-        { title: "Auth & Role Management", subtitle: "Admin / Manager / Driver roles", milestonecost: 15000, status: "approved", deadline: monthsAgo(6) },
-        { title: "Deployment & Docs", milestonecost: 10000, status: "approved", deadline: monthsAgo(5) },
+        { title: "Architecture & DB Schema", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(9) },
+        { title: "CRUD Modules", description: "Shipments, drivers, and warehouse management interfaces.", milestonecost: 25000, status: "COMPLETED", deadline: monthsAgo(7) },
+        { title: "Auth & Role Management", subtitle: "Admin / Manager / Driver roles", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(6) },
+        { title: "Deployment & Docs", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(5) },
       ],
       payments: [
         { total_cost: 30000, paid_amount: 30000, payment_status: "PAID", due_date: monthsAgo(8), createdAt: monthsAgo(9) },
@@ -257,9 +257,9 @@ async function main() {
       agreedCost: 22000,
       completedAt: monthsAgo(8, 18),
       milestones: [
-        { title: "Design", subtitle: "Figma mockup", milestonecost: 7000, status: "approved", deadline: monthsAgo(10) },
-        { title: "Development", subtitle: "Next.js + Sanity CMS", description: "Menu, gallery, reservations form, and blog.", milestonecost: 12000, status: "approved", deadline: monthsAgo(9) },
-        { title: "Launch", milestonecost: 3000, status: "approved", deadline: monthsAgo(8) },
+        { title: "Design", subtitle: "Figma mockup", milestonecost: 7000, status: "COMPLETED", deadline: monthsAgo(10) },
+        { title: "Development", subtitle: "Next.js + Sanity CMS", description: "Menu, gallery, reservations form, and blog.", milestonecost: 12000, status: "COMPLETED", deadline: monthsAgo(9) },
+        { title: "Launch", milestonecost: 3000, status: "COMPLETED", deadline: monthsAgo(8) },
       ],
       payments: [
         { total_cost: 22000, paid_amount: 22000, payment_status: "PAID", due_date: monthsAgo(8), createdAt: monthsAgo(8, 18) },
@@ -272,9 +272,9 @@ async function main() {
       agreedCost: 18000,
       completedAt: monthsAgo(1, 28),
       milestones: [
-        { title: "Copywriting", description: "Conversion-focused copy for hero, features, and pricing.", milestonecost: 4000, status: "approved", deadline: monthsAgo(3) },
-        { title: "Design", milestonecost: 8000, status: "approved", deadline: monthsAgo(2) },
-        { title: "Development & Animation", subtitle: "Framer Motion", milestonecost: 6000, status: "approved", deadline: monthsAgo(1) },
+        { title: "Copywriting", description: "Conversion-focused copy for hero, features, and pricing.", milestonecost: 4000, status: "COMPLETED", deadline: monthsAgo(3) },
+        { title: "Design", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(2) },
+        { title: "Development & Animation", subtitle: "Framer Motion", milestonecost: 6000, status: "COMPLETED", deadline: monthsAgo(1) },
       ],
       payments: [
         { total_cost: 18000, paid_amount: 10000, payment_status: "DUE", due_date: daysFromNow(7), createdAt: monthsAgo(3, 2) },
@@ -287,10 +287,10 @@ async function main() {
       agreedCost: 45000,
       completedAt: monthsAgo(7, 6),
       milestones: [
-        { title: "Brand Discovery", description: "Workshop to define positioning, values, and audience.", milestonecost: 8000, status: "approved", deadline: monthsAgo(10) },
-        { title: "Logo Design", subtitle: "5 concepts → 1 chosen", milestonecost: 12000, status: "approved", deadline: monthsAgo(9) },
-        { title: "Brand Guidelines", description: "Typography, colour, usage rules — full PDF.", milestonecost: 15000, status: "approved", deadline: monthsAgo(8) },
-        { title: "Stationery & Collaterals", description: "Business cards, letterhead, email signature, social kit.", milestonecost: 10000, status: "approved", deadline: monthsAgo(7) },
+        { title: "Brand Discovery", description: "Workshop to define positioning, values, and audience.", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(10) },
+        { title: "Logo Design", subtitle: "5 concepts → 1 chosen", milestonecost: 12000, status: "COMPLETED", deadline: monthsAgo(9) },
+        { title: "Brand Guidelines", description: "Typography, colour, usage rules — full PDF.", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(8) },
+        { title: "Stationery & Collaterals", description: "Business cards, letterhead, email signature, social kit.", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(7) },
       ],
       payments: [
         { total_cost: 20000, paid_amount: 20000, payment_status: "PAID", due_date: monthsAgo(9), createdAt: monthsAgo(10) },
@@ -304,9 +304,9 @@ async function main() {
       agreedCost: 35000,
       completedAt: monthsAgo(10, 14),
       milestones: [
-        { title: "Spec & Architecture", description: "Chrome API design, permissions model, and data flow.", milestonecost: 10000, status: "approved", deadline: monthsAgo(13) },
-        { title: "Core Features", subtitle: "Tab manager + focus timer + notes", description: "Main extension popup and background service worker.", milestonecost: 18000, status: "approved", deadline: monthsAgo(11) },
-        { title: "Polish & Chrome Store Publish", description: "Keyboard shortcuts, settings sync, and store listing.", milestonecost: 7000, status: "approved", deadline: monthsAgo(10) },
+        { title: "Spec & Architecture", description: "Chrome API design, permissions model, and data flow.", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(13) },
+        { title: "Core Features", subtitle: "Tab manager + focus timer + notes", description: "Main extension popup and background service worker.", milestonecost: 18000, status: "COMPLETED", deadline: monthsAgo(11) },
+        { title: "Polish & Chrome Store Publish", description: "Keyboard shortcuts, settings sync, and store listing.", milestonecost: 7000, status: "COMPLETED", deadline: monthsAgo(10) },
       ],
       payments: [
         { total_cost: 15000, paid_amount: 15000, payment_status: "PAID", due_date: monthsAgo(12), createdAt: monthsAgo(13) },
@@ -321,13 +321,13 @@ async function main() {
     {
       title: "Portfolio Website",
       clientIndex: 1,
-      status: "PENDING",
+      status: "ACTIVE",
       agreedCost: 30000,
       milestones: [
-        { title: "Brand Discovery", subtitle: "Colour palette & fonts", description: "Define visual language and brand personality.", milestonecost: 5000, status: "approved", deadline: monthsAgo(2) },
-        { title: "Design System", subtitle: "Components library", description: "Reusable Figma components.", milestonecost: 8000, status: "approved", deadline: monthsAgo(1) },
-        { title: "Development", subtitle: "Next.js + Framer Motion", description: "Animated portfolio with case studies.", milestonecost: 12000, status: "pending_payment", deadline: daysFromNow(14) },
-        { title: "SEO & Go-Live", subtitle: "Optimisation + deploy", description: "On-page SEO, sitemap, and final deployment.", milestonecost: 5000, status: "not_started", deadline: daysFromNow(30) },
+        { title: "Brand Discovery", subtitle: "Colour palette & fonts", description: "Define visual language and brand personality.", milestonecost: 5000, status: "COMPLETED", deadline: monthsAgo(2) },
+        { title: "Design System", subtitle: "Components library", description: "Reusable Figma components.", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(1) },
+        { title: "Development", subtitle: "Next.js + Framer Motion", description: "Animated portfolio with case studies.", milestonecost: 12000, status: "PENDING_PAYEMENT", deadline: daysFromNow(14) },
+        { title: "SEO & Go-Live", subtitle: "Optimisation + deploy", description: "On-page SEO, sitemap, and final deployment.", milestonecost: 5000, status: "IN_PROGRESS", deadline: daysFromNow(30) },
       ],
       payments: [
         { total_cost: 30000, paid_amount: 13000, payment_status: "DUE", due_date: daysFromNow(10), createdAt: monthsAgo(1, 5) },
@@ -336,14 +336,14 @@ async function main() {
     {
       title: "SaaS Analytics Dashboard",
       clientIndex: 2,
-      status: "PENDING",
+      status: "ACTIVE",
       agreedCost: 75000,
       milestones: [
-        { title: "Requirements & Architecture", subtitle: "System design doc", milestonecost: 10000, status: "approved", deadline: monthsAgo(3) },
-        { title: "Auth & User Management", subtitle: "Better-Auth integration", milestonecost: 15000, status: "approved", deadline: monthsAgo(2) },
-        { title: "Analytics Module", subtitle: "Charts & KPIs", description: "Recharts-powered dashboard with real-time data.", milestonecost: 20000, status: "approved", deadline: monthsAgo(1) },
-        { title: "Billing & Subscriptions", subtitle: "Stripe integration", milestonecost: 20000, status: "pending_payment", deadline: daysFromNow(21) },
-        { title: "Testing & Launch", subtitle: "QA + deploy", milestonecost: 10000, status: "not_started", deadline: daysFromNow(45) },
+        { title: "Requirements & Architecture", subtitle: "System design doc", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(3) },
+        { title: "Auth & User Management", subtitle: "Better-Auth integration", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(2) },
+        { title: "Analytics Module", subtitle: "Charts & KPIs", description: "Recharts-powered dashboard with real-time data.", milestonecost: 20000, status: "COMPLETED", deadline: monthsAgo(1) },
+        { title: "Billing & Subscriptions", subtitle: "Stripe integration", milestonecost: 20000, status: "PENDING_PAYEMENT", deadline: daysFromNow(21) },
+        { title: "Testing & Launch", subtitle: "QA + deploy", milestonecost: 10000, status: "IN_PROGRESS", deadline: daysFromNow(45) },
       ],
       payments: [
         { total_cost: 75000, paid_amount: 45000, payment_status: "PENDING_VERIFICATION", due_date: daysFromNow(5), createdAt: monthsAgo(3, 10) },
@@ -355,9 +355,9 @@ async function main() {
       status: "STOPPED",
       agreedCost: 48000,
       milestones: [
-        { title: "App Concept & Flow", milestonecost: 8000, status: "approved", deadline: monthsAgo(6) },
-        { title: "UI Screens", subtitle: "React Native", milestonecost: 18000, status: "stopped", deadline: monthsAgo(4), delay: true, delayreason: "Client requested scope change mid-development." },
-        { title: "API Integration", milestonecost: 22000, status: "not_started", deadline: monthsAgo(2) },
+        { title: "App Concept & Flow", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(6) },
+        { title: "UI Screens", subtitle: "React Native", milestonecost: 18000, status: "STOPPED", deadline: monthsAgo(4), delay: true, delayreason: "Client requested scope change mid-development." },
+        { title: "API Integration", milestonecost: 22000, status: "IN_PROGRESS", deadline: monthsAgo(2) },
       ],
       payments: [
         { total_cost: 48000, paid_amount: 26000, payment_status: "DUE", due_date: monthsAgo(3), createdAt: monthsAgo(6, 20) },
@@ -366,13 +366,13 @@ async function main() {
     {
       title: "Corporate Website Revamp",
       clientIndex: 4,
-      status: "PENDING",
+      status: "ACTIVE",
       agreedCost: 45000,
       milestones: [
-        { title: "Discovery & Audit", subtitle: "Existing site analysis", milestonecost: 7000, status: "approved", deadline: monthsAgo(1) },
-        { title: "New Design", subtitle: "Figma prototypes", milestonecost: 12000, status: "pending_payment", deadline: daysFromNow(7) },
-        { title: "Development", subtitle: "Next.js static export", milestonecost: 18000, status: "not_started", deadline: daysFromNow(35) },
-        { title: "Content Migration & SEO", milestonecost: 8000, status: "not_started", deadline: daysFromNow(50) },
+        { title: "Discovery & Audit", subtitle: "Existing site analysis", milestonecost: 7000, status: "COMPLETED", deadline: monthsAgo(1) },
+        { title: "New Design", subtitle: "Figma prototypes", milestonecost: 12000, status: "PENDING_PAYEMENT", deadline: daysFromNow(7) },
+        { title: "Development", subtitle: "Next.js static export", milestonecost: 18000, status: "IN_PROGRESS", deadline: daysFromNow(35) },
+        { title: "Content Migration & SEO", milestonecost: 8000, status: "IN_PROGRESS", deadline: daysFromNow(50) },
       ],
       payments: [
         { total_cost: 45000, paid_amount: 7000, payment_status: "DUE", due_date: daysFromNow(30), createdAt: monthsAgo(1, 10) },
@@ -381,13 +381,13 @@ async function main() {
     {
       title: "Internal Admin Panel",
       clientIndex: 0,
-      status: "PENDING",
+      status: "ACTIVE",
       agreedCost: 40000,
       milestones: [
-        { title: "Schema & API Design", milestonecost: 8000, status: "approved", deadline: monthsAgo(2) },
-        { title: "CRUD Interfaces", milestonecost: 14000, status: "approved", deadline: monthsAgo(1) },
-        { title: "Role-Based Auth", milestonecost: 10000, status: "pending_payment", deadline: daysFromNow(8) },
-        { title: "Deployment & Docs", milestonecost: 8000, status: "not_started", deadline: daysFromNow(30) },
+        { title: "Schema & API Design", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(2) },
+        { title: "CRUD Interfaces", milestonecost: 14000, status: "COMPLETED", deadline: monthsAgo(1) },
+        { title: "Role-Based Auth", milestonecost: 10000, status: "PENDING_PAYEMENT", deadline: daysFromNow(8) },
+        { title: "Deployment & Docs", milestonecost: 8000, status: "IN_PROGRESS", deadline: daysFromNow(30) },
       ],
       payments: [
         { total_cost: 40000, paid_amount: 22000, payment_status: "PENDING_VERIFICATION", due_date: daysFromNow(8), createdAt: monthsAgo(2, 5) },
