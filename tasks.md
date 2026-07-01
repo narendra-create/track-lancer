@@ -38,7 +38,7 @@
 - [ ] make a controller for stopping the project
 - [x] make a page to see unverified projects for freelancer
 - [x] connect create project feature with controller
-- [ ] Make milestones ui
+- [x] Make milestones ui
 - [ ] make budget raise request ui
 - [ ] add extra buttons in settings page
 - [ ] Payment history page ui
