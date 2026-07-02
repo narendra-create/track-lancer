@@ -1,27 +1,38 @@
-import type { Milestonestatus } from "@/app/generated/prisma/enums";
+import type { Milestonestatus, Projectstatus } from "@/app/generated/prisma/enums";
 
-export type Milestone = {
+export type MilestoneItem = {
     id: string;
     title: string;
     subtitle: string | null;
     description: string | null;
-    deadline: string;
+    deadline: Date;
     delay: boolean | null;
     delayreason: string | null;
-    createdAt: string;
+    createdAt: Date;
+    updatedAt: Date;
     milestonecost: number;
     status: Milestonestatus;
 };
 
+export type ProjectWithMilestones = {
+    id: string;
+    title: string;
+    projectcode: string | null;
+    agreedCost: number;
+    createdAt: Date;
+    deadline: Date;
+    status: Projectstatus;
+    milestones: MilestoneItem[];
+};
 
 export type GetAllMilestonesResponse =
     | {
         success: true;
-        milestones: Milestone[];
+        project: ProjectWithMilestones;
         status: 200;
     }
     | {
         success: false;
         error: string;
-        status: 400 | 500;
+        status?: 400 | 500;
     };
