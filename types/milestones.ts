@@ -23,7 +23,7 @@ export type ProjectWithMilestones = {
     deadline: Date;
     status: Projectstatus;
     milestones: MilestoneItem[];
-    payment: { paid_amount: number | null } | null;
+    payments: { paid_amount: number | null }[];
 };
 
 export type GetAllMilestonesResponse =

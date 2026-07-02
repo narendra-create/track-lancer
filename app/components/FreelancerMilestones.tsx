@@ -252,12 +252,16 @@ export function FreelancerMilestones({
   const [showFlagModal, setShowFlagModal] = useState(false);
   const [showStopModal, setShowStopModal] = useState(false);
 
-  const totalEarned = project.payment?.paid_amount ?? 0;
+  const totalEarned =
+    project.payments?.reduce((acc, p) => acc + (p.paid_amount || 0), 0) ?? 0;
 
   const totalCost = project.agreedCost;
   const remaining = totalCost - totalEarned;
-  
-  const costUsed = project.milestones.reduce((acc, m) => acc + (m.milestonecost || 0), 0);
+
+  const costUsed = project.milestones.reduce(
+    (acc, m) => acc + (m.milestonecost || 0),
+    0,
+  );
   const costUsedPct =
     totalCost > 0 ? Math.round((costUsed / totalCost) * 100) : 0;
 
@@ -368,6 +372,24 @@ export function FreelancerMilestones({
               <span>₹{costUsed.toLocaleString("en-IN")} used</span>
               <span>₹{totalCost.toLocaleString("en-IN")} total</span>
             </div>
+            {costUsed >= totalCost && (
+              <div className="mt-4 pt-4 border-t border-[var(--color-dash-border)] flex flex-col gap-3">
+                <p className="font-sans text-[12px] text-[var(--color-dash-amber)] leading-relaxed">
+                  {role === "FREELANCER"
+                    ? "You used your cost - you need budget raise request to raise the cost."
+                    : "budget limit riched - see budget raise requests"}
+                </p>
+                {role === "FREELANCER" ? (
+                  <button className="w-full py-2 bg-[var(--color-dash-amber-bg)] border border-[rgba(200,120,64,0.3)] rounded-md text-[var(--color-dash-amber)] font-mono text-[10px] uppercase tracking-[1px] hover:bg-[rgba(200,120,64,0.15)] transition-all duration-200">
+                    Raise Budget
+                  </button>
+                ) : (
+                  <button className="w-full py-2 bg-[var(--color-dash-amber-bg)] border border-[rgba(200,120,64,0.3)] rounded-md text-[var(--color-dash-amber)] font-mono text-[10px] uppercase tracking-[1px] hover:bg-[rgba(200,120,64,0.15)] transition-all duration-200">
+                    See Budget Requests
+                  </button>
+                )}
+              </div>
+            )}
           </motion.div>
 
           <motion.div
