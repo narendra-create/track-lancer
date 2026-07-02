@@ -3,6 +3,7 @@ import StatCardFreelancer from "@/app/components/Cards/StatCardFreelancer";
 import { Folder, Hourglass, Users, Wallet } from "lucide-react";
 import type { statcardprop } from "@/app/components/Cards/StatCardFreelancer";
 import { motion, AnimatePresence } from "motion/react";
+import Link from "next/link";
 import {
   Primarydashboardbutton,
   Seconddashboardbutton,
@@ -100,8 +101,6 @@ const FreelancerDashboard = ({
     timeZone: "Asia/Kolkata",
   });
 
-
-
   return (
     <motion.main className="bg-brand-bg">
       <section className="mx-2 flex flex-col lg:flex-row gap-4 mb-6 lg:justify-between">
@@ -189,18 +188,24 @@ const FreelancerDashboard = ({
             {Projects &&
               Projects.map((project, i) => {
                 return (
-                  <motion.div
+                  <Link
                     key={project.id}
-                    initial={{ opacity: 0, scale: 0.94 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                      duration: 0.5,
-                      ease: "easeOut",
-                      delay: i * 0.07,
-                    }}
+                    href={`/freelancer/milestones/${project.id}`}
+                    className="block"
                   >
-                    <CurrentClientcard project={project} />
-                  </motion.div>
+                    <motion.div
+                      key={project.id}
+                      initial={{ opacity: 0, scale: 0.94 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{
+                        duration: 0.5,
+                        ease: "easeOut",
+                        delay: i * 0.07,
+                      }}
+                    >
+                      <CurrentClientcard project={project} />
+                    </motion.div>
+                  </Link>
                 );
               })}
             <div className="w-full h-48">
