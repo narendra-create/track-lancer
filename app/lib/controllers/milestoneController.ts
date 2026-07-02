@@ -68,6 +68,8 @@ export const getAllMilestones = async (projectId: string, profileId: string, rol
                 : { id: projectId, clientId: profileId },
             select: {
                 id: true,
+                title: true,
+                projectcode: true,
                 agreedCost: true,
                 createdAt: true,
                 deadline: true,
