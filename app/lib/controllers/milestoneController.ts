@@ -17,7 +17,7 @@ export const createMilestone = async (input: createMilestoneInput) => {
         return { success: false, error: "Profile Not found", status: 404 }
     }
 
-    const project = await prisma.project.findUnique({
+    const project = await prisma.project.findFirst({
         where: { id: input.projectId, freelancerId: profile.profile?.Freelancer?.id },
     })
     //If freelancer is trying to add milestone in someone else's project
@@ -45,11 +45,11 @@ export const createMilestone = async (input: createMilestoneInput) => {
 
         return { success: true, milestone: createdMilestone, status: 201 };
     }
-    catch (err: any) {
-        if (err.error) {
-            return { success: false, error: err.error, status: 500 }
+    catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
         }
-        console.log(err, "From creatMilestone");
+        console.error("From creatMilestone", error);
         return { success: false, error: "Server Error", status: 500 };
     }
 };
@@ -98,11 +98,11 @@ export const getAllMilestones = async (projectId: string, profileId: string, rol
 
         return { success: true, project: findproject, status: 200 };
     }
-    catch (err: any) {
-        if (err.error) {
-            return { success: false, error: err.error, status: 500 }
+    catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
         }
-        console.log(err, "From getAllmilestones ");
+        console.error("From getAllmilestones", error);
         return { success: false, error: "Server Error", status: 500 };
     }
 }
@@ -120,7 +120,7 @@ export const stopProject = async (projectId: string) => {
         return { success: false, error: "Profile Not found", status: 404 }
     };
 
-    const findproject = await prisma.project.findUnique({
+    const findproject = await prisma.project.findFirst({
         where: { id: projectId, clientId: profile.profile?.id }
     });
     if (!findproject) {
@@ -136,7 +136,7 @@ export const stopProject = async (projectId: string) => {
                 where: { id: projectId },
                 data: {
                     status: "STOPPED",
-                    stoppedAt: new Date(Date.now())
+                    stoppedAt: new Date()
                 }
             })
             await tx.milestone.updateMany({
@@ -149,11 +149,11 @@ export const stopProject = async (projectId: string) => {
 
         return { success: true, status: 200 };
     }
-    catch (err: any) {
-        if (err.error) {
-            return { sucess: false, error: err.error, status: 500 }
+    catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
         };
-        console.log(err, "From stopProject");
+        console.error("From stopProject", error);
         return { success: false, error: "Server Error", status: 500 }
     }
 }
