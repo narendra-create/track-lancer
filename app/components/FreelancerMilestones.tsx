@@ -256,8 +256,10 @@ export function FreelancerMilestones({
 
   const totalCost = project.agreedCost;
   const remaining = totalCost - totalEarned;
-  const completedPct =
-    totalCost > 0 ? Math.round((totalEarned / totalCost) * 100) : 0;
+  
+  const costUsed = project.milestones.reduce((acc, m) => acc + (m.milestonecost || 0), 0);
+  const costUsedPct =
+    totalCost > 0 ? Math.round((costUsed / totalCost) * 100) : 0;
 
   const completedCount = project.milestones.filter(
     (m) => m.status === "COMPLETED",
@@ -351,19 +353,19 @@ export function FreelancerMilestones({
                 Cost Used
               </p>
               <span className="font-serif font-semibold text-[13px] lg:text-[16px] text-[var(--color-dash-green)]">
-                {completedPct}%
+                {costUsedPct}%
               </span>
             </div>
             <div className="h-[6px] bg-[var(--color-dash-surface2)] rounded-full overflow-hidden mb-2">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${completedPct}%` }}
+                animate={{ width: `${costUsedPct}%` }}
                 transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
                 className="h-full bg-[var(--color-dash-green)] rounded-full"
               />
             </div>
             <div className="flex justify-between font-mono text-[9px] lg:text-[10px] tracking-[1px] text-dash-ink2/90">
-              <span>₹{totalEarned.toLocaleString("en-IN")} earned</span>
+              <span>₹{costUsed.toLocaleString("en-IN")} used</span>
               <span>₹{totalCost.toLocaleString("en-IN")} total</span>
             </div>
           </motion.div>
