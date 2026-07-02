@@ -358,7 +358,7 @@ async function main() {
       milestones: [
         { title: "App Concept & Flow", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(6) },
         { title: "UI Screens", subtitle: "React Native", milestonecost: 18000, status: "STOPPED", deadline: monthsAgo(4), delay: true, delayreason: "Client requested scope change mid-development." },
-        { title: "API Integration", milestonecost: 22000, status: "IN_PROGRESS", deadline: monthsAgo(2) },
+        { title: "API Integration", milestonecost: 22000, status: "STOPPED", deadline: monthsAgo(2) },
       ],
       payments: [
         { total_cost: 48000, paid_amount: 26000, payment_status: "DUE", due_date: monthsAgo(3), createdAt: monthsAgo(6, 20) },
@@ -373,7 +373,7 @@ async function main() {
         { title: "Discovery & Audit", subtitle: "Existing site analysis", milestonecost: 7000, status: "COMPLETED", deadline: monthsAgo(1) },
         { title: "New Design", subtitle: "Figma prototypes", milestonecost: 12000, status: "PENDING_PAYEMENT", deadline: daysFromNow(7) },
         { title: "Development", subtitle: "Next.js static export", milestonecost: 18000, status: "IN_PROGRESS", deadline: daysFromNow(35) },
-        { title: "Content Migration & SEO", milestonecost: 8000, status: "IN_PROGRESS", deadline: daysFromNow(50) },
+        { title: "Content Migration & SEO", milestonecost: 8000, status: "NOT_STARTED", deadline: daysFromNow(50) },
       ],
       payments: [
         { total_cost: 45000, paid_amount: 7000, payment_status: "DUE", due_date: daysFromNow(30), createdAt: monthsAgo(1, 10) },
