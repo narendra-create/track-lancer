@@ -4,6 +4,7 @@ import { AvatarInitials } from "../Initials";
 import type { DashboardProject } from "@/types/dashboard";
 import { formatMoney, getInitials } from "@/app/lib/utilitys";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export const CurrentClientcard = ({
   project,
@@ -33,15 +34,17 @@ export const CurrentClientcard = ({
             </p>
           </div>
         </div>
-        <div className={`gap-1.5 font-sans font-semibold text-[12px] rounded-full flex items-center justify-center px-3 h-6 ${
-          project.status === "ACTIVE"
-            ? "bg-dash-green-bg text-dash-green/70"
-            : project.status === "STOPPED"
-            ? "bg-dash-amber-bg text-dash-amber/70"
-            : project.status === "CANCELLED"
-            ? "bg-dash-red-bg text-dash-red/70"
-            : "bg-[var(--color-dash-surface3)] text-dash-ink3"
-        }`}>
+        <div
+          className={`gap-1.5 font-sans font-semibold text-[12px] rounded-full flex items-center justify-center px-3 h-6 ${
+            project.status === "ACTIVE"
+              ? "bg-dash-green-bg text-dash-green/70"
+              : project.status === "STOPPED"
+                ? "bg-dash-amber-bg text-dash-amber/70"
+                : project.status === "CANCELLED"
+                  ? "bg-dash-red-bg text-dash-red/70"
+                  : "bg-[var(--color-dash-surface3)] text-dash-ink3"
+          }`}
+        >
           <span className="font-bold text-lg">•</span>
           <span>{project.status.toUpperCase()}</span>
         </div>
@@ -89,12 +92,14 @@ export const CurrentClientcard = ({
 
 export const Dummycard = () => {
   return (
-    <section
-      onClick={() => redirect("/freelancer/new-project")}
-      className="bg-dash-surface1 hover:bg-dash-surface1/30 transition-all ease-in-out duration-200 hover:text-dash-ink4 flex flex-col border border-dashed border-dash-border text-ink-muted/60 h-full w-full items-center justify-center rounded-md p-5"
-    >
-      <h3>+</h3>
-      <h3>New Project</h3>
-    </section>
+    <Link href={`/freelancer/new-project`}>
+      <section
+        onClick={() => redirect("/freelancer/new-project")}
+        className="bg-dash-surface1 hover:bg-dash-surface1/30 transition-all ease-in-out duration-200 hover:text-dash-ink4 flex flex-col border border-dashed border-dash-border text-ink-muted/60 h-full w-full items-center justify-center rounded-md p-5"
+      >
+        <h3>+</h3>
+        <h3>New Project</h3>
+      </section>
+    </Link>
   );
 };
