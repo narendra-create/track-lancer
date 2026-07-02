@@ -20,7 +20,7 @@ const STATUS_CONFIG: Record<
     dotColor: "bg-[var(--color-dash-green)]",
     badgeBg: "bg-[var(--color-status-paid-bg)]",
     badgeBorder: "border-[var(--color-status-paid-border)]",
-    badgeText: "text-[var(--color-status-paid-text)]",
+    badgeText: "text-dash-green",
   },
   PENDING_PAYEMENT: {
     label: "PENDING PAYMENT",
@@ -39,9 +39,9 @@ const STATUS_CONFIG: Record<
   NOT_STARTED: {
     label: "NOT STARTED",
     dotColor: "bg-[var(--color-dash-border-hover)]",
-    badgeBg: "bg-[var(--color-status-upcoming-bg)]",
-    badgeBorder: "border-[var(--color-status-upcoming-border)]",
-    badgeText: "text-[var(--color-status-upcoming-text)]",
+    badgeBg: "bg-dash-surface3",
+    badgeBorder: "border-border",
+    badgeText: "text-dash-ink2",
   },
   STOPPED: {
     label: "STOPPED",
@@ -123,30 +123,30 @@ export function MilestoneCard({
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <h3 className="font-serif text-[15px] text-white leading-snug">
+              <h3 className="font-serif text-[15px] lg:text-[22px] text-white leading-snug">
                 {milestone.title}
               </h3>
               {milestone.subtitle && (
-                <span className="font-mono text-[9px] tracking-[1px] text-[var(--color-dash-ink3)] uppercase">
+                <span className="font-mono text-[9px] tracking-[1px] text-dash-ink2/90 font-semibold uppercase">
                   · {milestone.subtitle}
                 </span>
               )}
             </div>
             <span
-              className={`inline-flex items-center gap-1 px-2 py-[3px] rounded-sm border font-mono text-[9px] tracking-[1.5px] uppercase ${cfg.badgeBg} ${cfg.badgeBorder} ${cfg.badgeText}`}
+              className={`inline-flex lg:my-1.5 lg:py-2 items-center gap-1 px-2 py-[3px] rounded-sm border font-mono text-[9px] lg:text-[11px] font-semibold tracking-[1.5px] uppercase ${cfg.badgeBg} ${cfg.badgeBorder} ${cfg.badgeText}`}
             >
               {STATUS_ICON[milestone.status]}
               {cfg.label}
             </span>
           </div>
           <span
-            className={`font-serif text-[16px] shrink-0 tabular-nums ${isPendingPayment ? "text-[var(--color-dash-gold)]" : "text-[var(--color-dash-gold)]"}`}
+            className={`font-serif text-[16px] lg:text-[22px] shrink-0 tabular-nums ${isPendingPayment ? "text-[var(--color-dash-gold)]" : "text-[var(--color-dash-gold)]"}`}
           >
             ₹{milestone.milestonecost.toLocaleString("en-IN")}
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] tracking-[1px] text-[var(--color-dash-ink3)] mb-3">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] tracking-[1px] text-dash-ink2/70 mb-3">
           <span>
             DEADLINE:{" "}
             <span className="text-[var(--color-dash-ink2)]">

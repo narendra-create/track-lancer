@@ -91,6 +91,11 @@ export const getAllMilestones = async (projectId: string, profileId: string, rol
                     orderBy: {
                         deadline: "asc"
                     }
+                },
+                payments: {
+                    select: {
+                        paid_amount: true
+                    }
                 }
             }
         });

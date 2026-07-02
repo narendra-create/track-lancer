@@ -44,7 +44,7 @@ const Milestones = async ({ params }: Props) => {
       <FreelancerMilestones
         project={result.project}
         projectTitle={result.project.title}
-        projectCode={result.project.projectcode ?? projectid.slice(0, 8).toUpperCase()}
+        projectStatus={result.project.status}
         role="FREELANCER"
       />
     </main>

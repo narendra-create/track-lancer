@@ -62,7 +62,7 @@ export const getCurrentProjects = async (freelancerid: string, cursor?: string) 
         const totalMilestones = project.milestones.length;
         const completedMilestones =
             project.milestones.filter(
-                milestone => milestone.status === "approved"
+                milestone => milestone.status === "COMPLETED"
             ).length;
 
         const progress =
