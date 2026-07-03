@@ -45,7 +45,13 @@
 - [ ] Approve payments feature with txn beside it
 - [x] make controllers for projectid based milestones
 - [x] make one controller to return all projects
-# for tomorrow
-- [ ] make a function to add milestones
+# for 02/07/2026
+- [ ] wire up: make a function to add milestones
 - [x] make a function to delay the milestone
-- [ ] work on budget raise request and payment history
+- [ ] work on budget raise request
+- [x] payment history ui
+# for 03/07/2006
+- [ ] payement history controllers
+- [ ] budget raise request ui
+- [ ] verify payments page ui
+- [ ] verify payments controller
