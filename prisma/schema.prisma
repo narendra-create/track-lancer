@@ -74,19 +74,37 @@ model Verification {
 }
 
 model Payment {
-  id             String        @id @default(cuid())
-  total_cost     Int
-  paid_amount    Int
-  payment_status Paymentstatus
-  due_date       DateTime
-  projectId      String?
-  project        Project?      @relation(fields: [projectId], references: [id])
-  createdAt      DateTime      @default(now())
-  completedAt    DateTime?
+  id                   String                @id @default(cuid())
+  total_cost           Int
+  paid_amount          Int
+  payment_status       Paymentstatus
+  txn_number           String?
+  due_date             DateTime
+  projectId            String?
+  project              Project?              @relation(fields: [projectId], references: [id])
+  createdAt            DateTime              @default(now())
+  completedAt          DateTime?
+  paymentverifications Paymentverification[]
 
   @@index([projectId])
   @@index([createdAt])
   @@index([payment_status])
+}
+
+model Paymentverification {
+  id           String  @id @default(cuid())
+  txn_number   String
+  paymentid    String
+  paid_amount  Int
+  imageurl     String?
+  freelancerId String
+  clientId     String
+
+  client     Userprofile @relation(fields: [clientId], references: [id])
+  freelancer Freelancer  @relation(fields: [freelancerId], references: [id])
+  Payment    Payment     @relation(fields: [paymentid], references: [id])
+
+  @@index([txn_number, freelancerId, clientId])
 }
 
 model Freelancer {
@@ -94,17 +112,19 @@ model Freelancer {
   userId   String    @unique
   category Categorys
 
-  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projects            Project[]
-  budgetRaiseRequests BudgetRaiseRequest[]
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects             Project[]
+  budgetRaiseRequests  BudgetRaiseRequest[]
+  paymentverifications Paymentverification[]
 }
 
 model Userprofile {
   id     String @id @default(cuid())
   userId String @unique
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projects Project[]
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects             Project[]
+  paymentverifications Paymentverification[]
 }
 
 model Milestone {
