@@ -3,7 +3,14 @@ import { getSession } from "@/app/lib/session";
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import { FreelancerMilestones } from "@/app/components/FreelancerMilestones";
-import { getAllMilestones } from "@/app/lib/controllers/milestoneController";
+import {
+  createMilestone,
+  getAllMilestones,
+} from "@/app/lib/controllers/milestoneController";
+import {
+  createMilestoneInput,
+  createMilestoneSchema,
+} from "@/app/lib/validations/MilestoneValidation";
 
 type Props = {
   params: Promise<{
@@ -18,19 +25,16 @@ const Milestones = async ({ params }: Props) => {
   }
   const session = await getSession();
   if (!session) return redirect("/login");
-  if (session.user.role.toLowerCase() !== "freelancer") return redirect("/unauthorized");
+  if (session.user.role.toLowerCase() !== "freelancer")
+    return redirect("/unauthorized");
 
   const freelancer = await prisma.freelancer.findUnique({
     where: { userId: session.user.id },
-    select: { id: true }
+    select: { id: true },
   });
   if (!freelancer) return redirect("/unauthorized");
 
-  const result = await getAllMilestones(
-    projectid,
-    freelancer.id,
-    "FREELANCER",
-  );
+  const result = await getAllMilestones(projectid, freelancer.id, "FREELANCER");
 
   if (!result.success) {
     return redirect("/freelancer/dashboard");
@@ -40,9 +44,21 @@ const Milestones = async ({ params }: Props) => {
     return redirect("/freelancer/dashboard");
   }
 
+  const handleCreate = async (data: createMilestoneInput) => {
+    "use server";
+    const parsed = createMilestoneSchema.parse(data);
+    const result = await createMilestone(parsed);
+    if (!result.success) {
+      return { error: `${result.error} - ${result.status}` };
+    }
+
+    return parsed;
+  };
+
   return (
     <main>
       <FreelancerMilestones
+        onCreate={handleCreate}
         project={result.project}
         projectTitle={result.project.title}
         projectStatus={result.project.status}

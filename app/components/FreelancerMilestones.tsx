@@ -21,9 +21,11 @@ import {
   Projectstatus,
   type Milestonestatus,
 } from "@/app/generated/prisma/enums";
+import type { createMilestoneInput } from "@/app/lib/validations/MilestoneValidation";
 import { MilestoneCard } from "@/app/components/Cards/MilestoneCard";
 import { formatDate } from "@/app/lib/utilitys";
 import { AddMilestoneModal } from "@/app/components/AddMilestoneModal";
+import { useToast } from "@/app/components/ToastProvider";
 
 const STATUS_CONFIG: Record<
   Milestonestatus,
@@ -240,17 +242,20 @@ interface FreelancerMilestonesProps {
   projectTitle: string;
   projectStatus: string;
   role: "CLIENT" | "FREELANCER";
+  onCreate: (data: createMilestoneInput) => Promise<any>;
 }
 
 export function FreelancerMilestones({
   project,
   projectTitle,
   projectStatus,
+  onCreate,
   role,
 }: FreelancerMilestonesProps) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showFlagModal, setShowFlagModal] = useState(false);
   const [showStopModal, setShowStopModal] = useState(false);
+  const { addToast } = useToast();
 
   const totalEarned =
     project.payments?.reduce((acc, p) => acc + (p.paid_amount || 0), 0) ?? 0;
@@ -292,9 +297,21 @@ export function FreelancerMilestones({
             productId={project.id}
             onClose={() => setShowAddModal(false)}
             handleSubmit={async (data) => {
-              // User handles backend here
-              console.log(data);
-              setShowAddModal(false);
+              const result = await onCreate(data);
+              if (result?.error) {
+                addToast({
+                  title: "Error",
+                  message: result.error,
+                  type: "error",
+                });
+              } else {
+                addToast({
+                  title: "Success",
+                  message: "Milestone added successfully",
+                  type: "success",
+                });
+                setShowAddModal(false);
+              }
             }}
           />
         )}
