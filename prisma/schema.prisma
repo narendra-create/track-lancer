@@ -116,7 +116,7 @@ model Milestone {
   status        Milestonestatus
   deadline      DateTime
   delay         Boolean?
-  delayreason   String?
+  delayreason   String? //latest delay only
 
   project         Project?         @relation(fields: [projectId], references: [id])
   projectId       String?
@@ -129,7 +129,7 @@ model Milestone {
 }
 
 model Milestonedelay {
-  id          String      @id @default(cuid())
+  id          String   @id @default(cuid())
   milestoneId String
   newDeadline DateTime
   oldDeadline DateTime

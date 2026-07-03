@@ -158,3 +158,91 @@ export const stopProject = async (projectId: string) => {
         return { success: false, error: "Server Error", status: 500 }
     }
 };
+
+export const delayMilestone = async (input: delayMilestoneInput) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
+
+    const findFreelancer = await prisma.freelancer.findFirst({
+        where: { userId: session.user.id },
+        select: {
+            id: true
+        }
+    });
+    if (!findFreelancer) return { success: false, error: "Profile Not found", status: 404 };
+
+    const findMilestone = await prisma.milestone.findFirst({
+        where: { id: input.milestoneId, project: { freelancerId: findFreelancer.id } }
+    });
+
+    if (!findMilestone) {
+        return { success: false, error: "Your account is not linked with this milestone", status: 403 }
+    };
+    if (findMilestone.status !== "IN_PROGRESS") {
+        return {
+            success: false,
+            error: "Only active milestones can be delayed.",
+            status: 400
+        }
+    };
+    if (input.newDeadline <= findMilestone.deadline) {
+        return {
+            success: false,
+            error: "New deadline must be after the current deadline.",
+            status: 400
+        };
+    }
+    const lastDelay = await prisma.milestonedelay.findFirst({
+        where: { milestoneId: input.milestoneId },
+        orderBy: { createdAt: "desc" }
+    });
+
+    if (
+        lastDelay &&
+        Date.now() - lastDelay.createdAt.getTime() < 5 * 60 * 1000
+    ) {
+        return {
+            success: false,
+            error: "You can delay this milestone only once every 5 minutes.",
+            status: 429
+        };
+    };
+
+    if (input.newDeadline.getTime() === findMilestone.deadline.getTime()) {
+        return {
+            success: false,
+            error: "Deadline is already set to this date.",
+            status: 400
+        };
+    };
+
+    try {
+        const updated = await prisma.$transaction(async (tx) => {
+            await tx.milestonedelay.create({
+                data: {
+                    newDeadline: input.newDeadline,
+                    oldDeadline: findMilestone.deadline,
+                    milestoneId: findMilestone.id
+                }
+            });
+            return await tx.milestone.update({
+                where: { id: input.milestoneId },
+                data: {
+                    delay: true,
+                    delayreason: input.delayReason,
+                    deadline: input.newDeadline
+                }
+            });
+        });
+
+        return { success: true, updatedMilestone: updated, status: 200 };
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
+        };
+        console.error("From delayProject", error);
+        return { success: false, error: "Server Error", status: 500 }
+    }
+}
