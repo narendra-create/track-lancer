@@ -47,5 +47,5 @@
 - [x] make one controller to return all projects
 # for tomorrow
 - [ ] make a function to add milestones
-- [ ] make a function to delay the project
+- [x] make a function to delay the milestone
 - [ ] work on budget raise request and payment history
