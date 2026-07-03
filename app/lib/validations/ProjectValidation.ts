@@ -5,7 +5,6 @@ export const newProjectSchema = z.object({
     agreedcost: z.number().positive("Amount must be positive").max(1000000000, "Amount exceeds maximum limit"),
     deadline: z.date(),
     description: z.string().optional(),
-    freelancerId: z.string(),
 });
 
 export type newProjectInput = z.infer<typeof newProjectSchema>;

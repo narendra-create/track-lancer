@@ -1,14 +1,11 @@
-import { auth } from "@/auth";
 import { addprofile } from "@/app/lib/controllers/profileController";
 import type { Categorys } from "@/app/generated/prisma/enums";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/app/lib/session";
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getSession();
 
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

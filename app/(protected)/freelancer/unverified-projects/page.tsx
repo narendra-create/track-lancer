@@ -1,32 +1,33 @@
 import { PendingProjects } from "@/app/components/PendingProjects";
-import { requireRole } from "@/app/lib/require-role";
+import { getSession } from "@/app/lib/session";
+import { prisma } from "@/app/lib/prisma";
 import {
   getUnverifiedProjects,
   deleteProject,
   regenerateCode,
 } from "@/app/lib/controllers/ProjectController";
-import { getFreelancerProfile } from "@/app/lib/controllers/profileController";
 import { formatDate } from "@/app/lib/utilitys";
 
 const UnverifiedProjects = async () => {
-  const { session, error, status } = await requireRole("freelancer");
-  
-  if (error) {
-    return <div className="p-4 text-red-500">Error in auth - {error} - {status}</div>;
-  }
-  
+  const session = await getSession();
+
   if (!session?.user?.email) {
     return <div className="p-4 text-red-500">Please login again</div>;
   }
-  
-  const freelancer = await getFreelancerProfile(session.user.email);
-  if (!freelancer.success || !freelancer.profile?.Freelancer?.id) {
+  if (session.user.role.toLowerCase() !== "freelancer") {
+    return <div className="p-4 text-red-500">Error in auth - Forbidden - 403</div>;
+  }
+
+  const freelancer = await prisma.freelancer.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true }
+  });
+  if (!freelancer) {
     return <div className="p-4 text-red-500">Freelancer profile not found</div>;
   }
 
-  const freelancerId = freelancer.profile.Freelancer.id;
-  const projectsRes = await getUnverifiedProjects(freelancerId);
-  
+  const projectsRes = await getUnverifiedProjects(freelancer.id);
+
   if (!projectsRes.success) {
     return <div className="p-4 text-red-500">{projectsRes.error}</div>;
   }
@@ -41,7 +42,14 @@ const UnverifiedProjects = async () => {
 
   const handleRegenerateCode = async (id: string) => {
     "use server";
-    const result = await regenerateCode(freelancerId, id);
+    const session = await getSession();
+    if (!session) return;
+    const freelancer = await prisma.freelancer.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true }
+    });
+    if (!freelancer) return;
+    const result = await regenerateCode(freelancer.id, id);
     if (!result.success) {
       console.error(`${result.error} - ${result.status}`);
       return;
@@ -51,7 +59,14 @@ const UnverifiedProjects = async () => {
 
   const handleDelete = async (id: string) => {
     "use server";
-    const result = await deleteProject(freelancerId, id);
+    const session = await getSession();
+    if (!session) return;
+    const freelancer = await prisma.freelancer.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true }
+    });
+    if (!freelancer) return;
+    const result = await deleteProject(freelancer.id, id);
     if (!result.success) {
       console.error(`${result.error} - ${result.status}`);
       return;

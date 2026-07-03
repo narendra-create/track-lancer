@@ -1,24 +1,21 @@
 "use server";
+import { prisma } from "@/app/lib/prisma";
 import { getCurrentProjects } from "../controllers/clientController";
-import { requireRole } from "../require-role";
-import { getFreelancerProfile } from "../controllers/profileController";
+import { getSession } from "../session";
 
 export const loadMoreProjects = async (nextcursor: string) => {
-    const { session, error, status } = await requireRole("freelancer");
-    if (!session && error) {
-        return {
-            success: false,
-            error: error,
-            status: status
-        }
-    };
-    const { profile } = await getFreelancerProfile(session?.user.email!);
-    const freelancerId = profile?.Freelancer?.id;
-    if (!freelancerId) {
-        return { success: false, error: "Freelancer profile not found", status: 404 };
-    };
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
+
+    const freelancer = await prisma.freelancer.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true }
+    });
+    if (!freelancer) return { success: false, error: "Freelancer profile not found", status: 404 };
+
     try {
-        const result = await getCurrentProjects(freelancerId, nextcursor);
+        const result = await getCurrentProjects(freelancer.id, nextcursor);
         if (!result.success) {
             return {
                 success: false,

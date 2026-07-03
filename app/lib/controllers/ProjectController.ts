@@ -3,7 +3,7 @@ import type { userrole } from "@/app/generated/prisma/enums";
 import { formatDate, generateCode } from "../utilitys";
 import type { FreelancerPastProjectsResponse, ClientPastProjectsResponse, PastProjectPaymentStatus } from "@/types/pastprojects";
 import type { newProjectInput } from "../validations/ProjectValidation";
-import { requireRole } from "../require-role";
+import { getSession } from "../session";
 
 export const getPastProjects = async (role: userrole, profileid: string, cursor?: string): Promise<FreelancerPastProjectsResponse | ClientPastProjectsResponse> => {
     if (!profileid) {
@@ -101,15 +101,16 @@ export const getPastProjects = async (role: userrole, profileid: string, cursor?
 }
 
 export const createNewProject = async (input: newProjectInput) => {
-    const { error, status } = await requireRole("freelancer");
-    if (error) {
-        return { success: false, error: error, status: status }
-    };
-    const freelancerProfile = await prisma.freelancer.findUnique({
-        where: { id: input.freelancerId }
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
+
+    const freelancer = await prisma.freelancer.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true }
     });
-    if (!freelancerProfile) return { success: false, error: "Freelancer Not found", status: 404 };
-    //creating project
+    if (!freelancer) return { success: false, error: "Freelancer Not found", status: 404 };
+
     try {
         const generatedCode = generateCode(8);
         await prisma.project.create({
@@ -120,7 +121,7 @@ export const createNewProject = async (input: newProjectInput) => {
                 status: "PENDING",
                 title: input.title,
                 description: input.description,
-                freelancerId: input.freelancerId
+                freelancerId: freelancer.id
             }
         });
         return { success: true, status: 201, projectCode: generatedCode };

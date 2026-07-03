@@ -1,6 +1,6 @@
 import { FreelancerAllProjects } from "@/app/components/FreelancerAllProjects";
-import { getFreelancerProfile } from "@/app/lib/controllers/profileController";
-import { requireRole } from "@/app/lib/require-role";
+import { getSession } from "@/app/lib/session";
+import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import type { AllProject, GetAllProjectsResponse } from "@/types/allprojects";
 import {
@@ -9,27 +9,43 @@ import {
 } from "@/app/lib/controllers/ProjectController";
 
 const SeeProjectsPage = async () => {
-  const { session, error } = await requireRole("freelancer");
-  if (!session && error) redirect("/login");
+  const session = await getSession();
+  if (!session) redirect("/login");
+  if (session.user.role.toLowerCase() !== "freelancer") redirect("/unauthorized");
 
-  const { profile } = await getFreelancerProfile(session?.user.email!);
-  if (!profile?.Freelancer?.id) redirect("/unauthorized");
+  const freelancer = await prisma.freelancer.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true }
+  });
+  if (!freelancer) redirect("/unauthorized");
 
-  const projects = await getAllProjects(profile.Freelancer.id, "FREELANCER");
+  const projects = await getAllProjects(freelancer.id, "FREELANCER");
 
   if (!projects.success) redirect("/unauthorized");
 
   const loadmore = async (nextcursor: string) => {
     "use server";
-    const { profile } = await getFreelancerProfile(session?.user.email!);
-    if (!profile?.Freelancer?.id)
+    const session = await getSession();
+    if (!session || session.user.role.toLowerCase() !== "freelancer")
       return { success: false as const, error: "Unauthorized", status: 401 };
-    return await getAllProjects(profile.Freelancer.id, "FREELANCER", nextcursor) as GetAllProjectsResponse;
+    const freelancer = await prisma.freelancer.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true }
+    });
+    if (!freelancer) return { success: false as const, error: "Unauthorized", status: 401 };
+    return await getAllProjects(freelancer.id, "FREELANCER", nextcursor) as GetAllProjectsResponse;
   };
 
   const handleDelete = async (id: string) => {
     "use server";
-    const result = await deleteProject(profile.Freelancer?.id!, id);
+    const session = await getSession();
+    if (!session) return { success: false as const, error: "Unauthorized" };
+    const freelancer = await prisma.freelancer.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true }
+    });
+    if (!freelancer) return { success: false as const, error: "Unauthorized" };
+    const result = await deleteProject(freelancer.id, id);
     if (!result.success) {
       return { success: false as const, error: result.error };
     }

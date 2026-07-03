@@ -1,26 +1,22 @@
 import { prisma } from "@/app/lib/prisma";
-import { requireRole } from "../require-role";
-import { getClientProfile, getFreelancerProfile } from "./profileController";
+import { getSession } from "../session";
 import type { createMilestoneInput, delayMilestoneInput } from "../validations/MilestoneValidation";
 import { userrole } from "@/app/generated/prisma/enums";
 
 export const createMilestone = async (input: createMilestoneInput) => {
-    const { session, error, status } = await requireRole("freelancer");
-    if (error) {
-        return { success: false, error: error, status: status }
-    };
-    if (!session?.user) {
-        return { success: false, error: "You are logged out", status: 401 };
-    }
-    const profile = await getFreelancerProfile(session?.user.email);
-    if (!profile) {
-        return { success: false, error: "Profile Not found", status: 404 }
-    }
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
+
+    const freelancer = await prisma.freelancer.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true }
+    });
+    if (!freelancer) return { success: false, error: "Profile Not found", status: 404 };
 
     const project = await prisma.project.findFirst({
-        where: { id: input.projectId, freelancerId: profile.profile?.Freelancer?.id },
-    })
-    //If freelancer is trying to add milestone in someone else's project
+        where: { id: input.projectId, freelancerId: freelancer.id },
+    });
     if (!project) {
         return { success: false, error: "This project is not associated with your account", status: 403 };
     };
@@ -115,20 +111,18 @@ export const getAllMilestones = async (projectId: string, profileId: string, rol
 }
 
 export const stopProject = async (projectId: string) => {
-    const { session, error, status } = await requireRole("client");
-    if (error) {
-        return { success: false, error: error, status: status }
-    };
-    if (!session?.user) {
-        return { success: false, error: "You are logged out", status: 401 };
-    }
-    const profile = await getClientProfile(session.user.email);
-    if (!profile) {
-        return { success: false, error: "Profile Not found", status: 404 }
-    };
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "client") return { success: false, error: "Forbidden", status: 403 };
+
+    const client = await prisma.userprofile.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true }
+    });
+    if (!client) return { success: false, error: "Profile Not found", status: 404 };
 
     const findproject = await prisma.project.findFirst({
-        where: { id: projectId, clientId: profile.profile?.id }
+        where: { id: projectId, clientId: client.id }
     });
     if (!findproject) {
         return { success: false, error: "You can only edit your projects", status: 403 }
@@ -147,7 +141,7 @@ export const stopProject = async (projectId: string) => {
                 }
             })
             await tx.milestone.updateMany({
-                where: { projectId: projectId, project: { clientId: profile.profile?.id }, status: "NOT_STARTED" },
+                where: { projectId: projectId, project: { clientId: client.id }, status: "NOT_STARTED" },
                 data: {
                     status: "STOPPED"
                 }

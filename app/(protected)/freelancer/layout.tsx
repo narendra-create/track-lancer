@@ -1,10 +1,9 @@
 import { FreelancerSidebar } from "@/app/components/freelancer-sidebar";
 import { ReactNode } from "react";
-import { auth } from "@/auth";
-import { headers } from "next/headers";
 import { getFreelancerProfile } from "@/app/lib/controllers/profileController";
 import { getInitials, formatCategory } from "@/app/lib/utilitys";
 import { redirect } from "next/navigation";
+import { getSession } from "@/app/lib/session";
 
 export default async function Freelancerlayout({
   children,
@@ -12,15 +11,13 @@ export default async function Freelancerlayout({
   children: ReactNode;
 }) {
   const loadprofiledetails = async () => {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getSession();
     if (!session?.user) {
       redirect("/login");
     }
     const result = await getFreelancerProfile(session.user.email);
     if (!result.profile) {
-      redirect("/unauthorized"); // authenticated but no freelancer record
+      redirect("/unauthorized");
     }
 
     return result.profile;

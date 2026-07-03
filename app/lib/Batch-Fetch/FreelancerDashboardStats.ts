@@ -1,40 +1,38 @@
 "use server";
-import { getFreelancerProfile } from "../controllers/profileController";
+import { prisma } from "@/app/lib/prisma";
 import { getCurrentProjects, getClientStat, getMoneyStats, getRavnuechartStats } from "../controllers/clientController";
-//getclientstat for getting number of clients serving or served, getprofile for getting freelancer id
-import { requireRole } from "../require-role";
+import { getSession } from "../session";
 import type { DashboardStatsResponse } from "@/types/dashboard";
 
 export const getDashboardStats = async (): Promise<DashboardStatsResponse> => {
-    const { session, error, status } = await requireRole("freelancer");
-    if (!session && error) {
-        return {
-            success: false,
-            error: error,
-            status: status
-        }
-    };
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
 
-    const { profile } = await getFreelancerProfile(session?.user.email!);
-    const freelancerId = profile?.Freelancer?.id;
-    if (!freelancerId) {
-        return { success: false, error: "Freelancer profile not found", status: 404 };
-    };
+    const freelancer = await prisma.freelancer.findUnique({
+        where: { userId: session.user.id },
+        select: {
+            id: true,
+            category: true,
+            user: { select: { name: true, image: true } }
+        }
+    });
+    if (!freelancer) return { success: false, error: "Freelancer profile not found", status: 404 };
 
     try {
         const [clientCount, projectsResult, moneyresult, ravenuedata] = await Promise.all([
-            getClientStat(freelancerId),
-            getCurrentProjects(freelancerId),
-            getMoneyStats(freelancerId),
-            getRavnuechartStats(freelancerId)
+            getClientStat(freelancer.id),
+            getCurrentProjects(freelancer.id),
+            getMoneyStats(freelancer.id),
+            getRavnuechartStats(freelancer.id)
         ]);
 
         return {
             success: true,
             data: {
-                name: profile.name,
-                image: profile.image,
-                skill: profile.Freelancer?.category,
+                name: freelancer.user.name,
+                image: freelancer.user.image,
+                skill: freelancer.category,
                 clientCount,
                 moneyStats: {
                     activeprojects: moneyresult.stats?.activeprojects!,

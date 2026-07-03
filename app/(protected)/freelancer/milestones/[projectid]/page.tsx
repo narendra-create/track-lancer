@@ -1,6 +1,6 @@
 import React from "react";
-import { requireRole } from "@/app/lib/require-role";
-import { getFreelancerProfile } from "@/app/lib/controllers/profileController";
+import { getSession } from "@/app/lib/session";
+import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import { FreelancerMilestones } from "@/app/components/FreelancerMilestones";
 import { getAllMilestones } from "@/app/lib/controllers/milestoneController";
@@ -16,18 +16,19 @@ const Milestones = async ({ params }: Props) => {
   if (!projectid) {
     return redirect("/dashboard");
   }
-  const { session, error } = await requireRole("freelancer");
-  if (error) {
-    return redirect("/unauthorized");
-  }
-  if (!session?.user) {
-    return redirect("/login");
-  }
-  const freelancer = await getFreelancerProfile(session.user.email);
+  const session = await getSession();
+  if (!session) return redirect("/login");
+  if (session.user.role.toLowerCase() !== "freelancer") return redirect("/unauthorized");
+
+  const freelancer = await prisma.freelancer.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true }
+  });
+  if (!freelancer) return redirect("/unauthorized");
 
   const result = await getAllMilestones(
     projectid,
-    freelancer.profile?.Freelancer?.id!,
+    freelancer.id,
     "FREELANCER",
   );
 

@@ -1,22 +1,22 @@
 "use server";
-import { requireRole } from "../require-role";
-import { getFreelancerProfile } from "../controllers/profileController";
+import { prisma } from "@/app/lib/prisma";
+import { getSession } from "../session";
 import { getCurrentProjects } from "../controllers/clientController";
 import { getPastProjects } from "../controllers/ProjectController";
 
 export type LoadMoreType = "currentProjects" | "pastProjects";
 
 const resolveFreelancerContext = async () => {
-    const { session, error, status } = await requireRole("freelancer");
-    if (!session && error) {
-        return { success: false as const, error, status };
-    }
-    const { profile } = await getFreelancerProfile(session?.user.email!);
-    const freelancerId = profile?.Freelancer?.id;
-    if (!freelancerId) {
-        return { success: false as const, error: "Freelancer profile not found", status: 404 };
-    }
-    return { success: true as const, freelancerId };
+    const session = await getSession();
+    if (!session) return { success: false as const, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false as const, error: "Forbidden", status: 403 };
+
+    const freelancer = await prisma.freelancer.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true }
+    });
+    if (!freelancer) return { success: false as const, error: "Freelancer profile not found", status: 404 };
+    return { success: true as const, freelancerId: freelancer.id };
 };
 
 export const loadMore = async (type: LoadMoreType, nextcursor: string) => {

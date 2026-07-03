@@ -1,13 +1,8 @@
-import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { getSession } from "@/app/lib/session";
 
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  // console.log("Dashboard session user:", session?.user);
+  const session = await getSession();
 
   if (session?.user.role === "FREELANCER") {
     redirect("/freelancer/dashboard");

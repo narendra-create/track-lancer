@@ -1,19 +1,23 @@
 import { PastProjects } from "@/app/components/PastProjects";
 import { getPastProjects } from "@/app/lib/controllers/ProjectController";
-import { getFreelancerProfile } from "@/app/lib/controllers/profileController";
+import { getSession } from "@/app/lib/session";
+import { prisma } from "@/app/lib/prisma";
 import { loadMorePastProjects } from "@/app/lib/actions/LoadMorePastProjects";
-import { requireRole } from "@/app/lib/require-role";
 import { redirect } from "next/navigation";
 import type { FreelancerPastProject, ClientPastProject } from "@/types/pastprojects";
 
 const PastProjectsPage = async () => {
-  const { session, error } = await requireRole("freelancer");
-  if (!session && error) redirect("/login");
+  const session = await getSession();
+  if (!session) redirect("/login");
+  if (session.user.role.toLowerCase() !== "freelancer") redirect("/unauthorized");
 
-  const { profile } = await getFreelancerProfile(session?.user.email!);
-  if (!profile?.Freelancer?.id) redirect("/unauthorized");
+  const freelancer = await prisma.freelancer.findUnique({
+    where: { userId: session.user.id },
+    select: { id: true }
+  });
+  if (!freelancer) redirect("/unauthorized");
 
-  const pastprojects = await getPastProjects("FREELANCER", profile.Freelancer.id);
+  const pastprojects = await getPastProjects("FREELANCER", freelancer.id);
 
   if (!pastprojects.success) redirect("/unauthorized");
 
