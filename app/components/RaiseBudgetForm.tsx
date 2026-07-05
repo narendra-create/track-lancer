@@ -2,17 +2,21 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, TrendingUp, IndianRupee, FileText } from "lucide-react";
+import { useToast } from "@/app/components/ToastProvider";
 
 // PROPS
 interface RaiseBudgetFormProps {
   projectId: string;
   currentBudget: number;
   onClose: () => void;
-  onSubmit: (data: {
-    projectId: string;
-    extraAmount: number;
-    reason: string | null;
-  }) => Promise<void>;
+  onSubmit: (
+    data: {
+      projectId: string;
+      requestedAmount: number;
+      reason: string | undefined;
+    },
+    projectId: string,
+  ) => Promise<any>;
 }
 
 export function RaiseBudgetForm({
@@ -25,6 +29,7 @@ export function RaiseBudgetForm({
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   // DERIVED VALUES
   const parsedExtra = Number(extraAmount);
@@ -55,12 +60,22 @@ export function RaiseBudgetForm({
 
     setLoading(true);
     try {
-      await onSubmit({
+      const data = {
         projectId,
-        extraAmount: parsedExtra,
-        reason: reason.trim() || null,
-      });
-      onClose();
+        requestedAmount: parsedExtra,
+        reason: reason.trim() || undefined,
+      };
+      const result = await onSubmit(data, projectId);
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        addToast({
+          title: "Success",
+          message: "Budget raise request submitted successfully.",
+          type: "success",
+        });
+        onClose();
+      }
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -80,21 +95,21 @@ export function RaiseBudgetForm({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 24 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="bg-[var(--color-dash-surface1)] border border-[var(--color-dash-border)] border-b-0 sm:border-b w-full sm:max-w-md max-h-[92vh] overflow-y-auto custom-scrollbar"
+        className="bg-[var(--color-dash-surface1)] border rounded-lg  border-[var(--color-dash-border)] border-b-0 sm:border-b w-full sm:max-w-md max-h-[92vh] overflow-y-auto custom-scrollbar"
       >
         {/* HEADER */}
         <div className="flex items-start justify-between p-6 border-b border-[var(--color-dash-border)]">
           <div>
-            <h2 className="font-serif text-[20px] text-white leading-snug">
+            <h2 className="font-serif text-[20px] lg:text-[23px] text-white leading-snug">
               Raise Budget
             </h2>
-            <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)] mt-1">
+            <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-dash-ink2/60 font-semibold lg:text-[11px] mt-1">
               Submit a budget increase request
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-[var(--color-dash-ink3)] hover:text-white transition-colors duration-200 mt-0.5"
+            className="text-dash-ink2/60 font-semibold lg:text-[11px] hover:text-white transition-colors duration-200 mt-0.5"
           >
             <X size={16} />
           </button>
@@ -104,19 +119,19 @@ export function RaiseBudgetForm({
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-6">
           {/* CURRENT BUDGET — READ ONLY */}
           <div className="flex flex-col gap-2">
-            <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+            <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-dash-ink2/60 font-semibold lg:text-[11px]">
               Current Budget
             </label>
-            <div className="flex items-center gap-3 px-4 py-3 bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] opacity-70 cursor-not-allowed">
+            <div className="flex rounded-md items-center gap-3 px-4 py-3 bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] opacity-70 cursor-not-allowed">
               <IndianRupee
                 size={13}
                 strokeWidth={1.8}
-                className="text-[var(--color-dash-ink3)] shrink-0"
+                className="text-dash-ink2/60 font-semibold lg:text-[11px] shrink-0"
               />
               <span className="font-serif text-[16px] text-[var(--color-dash-ink2)] tabular-nums">
                 {formatRupees(currentBudget)}
               </span>
-              <span className="ml-auto font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)]">
+              <span className="ml-auto font-mono text-[9px] tracking-[1.5px] uppercase text-dash-ink-3/40">
                 Autofilled
               </span>
             </div>
@@ -125,11 +140,11 @@ export function RaiseBudgetForm({
           {/* EXTRA AMOUNT */}
           <div className="flex flex-col gap-2">
             <div className="flex items-baseline justify-between gap-2">
-              <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+              <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-dash-ink2/60 font-semibold lg:text-[11px]">
                 Extra Amount{" "}
                 <span className="text-[var(--color-dash-red)]">*</span>
               </label>
-              <span className="font-mono text-[9px] text-[var(--color-dash-ink4)] normal-case tracking-normal">
+              <span className="font-sans text-[9px] text-dash-ink-3/40 normal-case tracking-normal">
                 How much extra do you need?
               </span>
             </div>
@@ -146,7 +161,7 @@ export function RaiseBudgetForm({
                 className={`shrink-0 transition-colors duration-200 ${
                   isValid
                     ? "text-[var(--color-dash-green)]"
-                    : "text-[var(--color-dash-ink3)]"
+                    : "text-dash-ink2/60 font-semibold lg:text-[11px]"
                 }`}
               />
               <input
@@ -160,12 +175,12 @@ export function RaiseBudgetForm({
                   setError(null);
                 }}
                 required
-                className="flex-1 bg-transparent font-serif text-[16px] text-white placeholder:text-[var(--color-dash-ink4)] placeholder:font-sans placeholder:text-[12px] focus:outline-none tabular-nums min-w-0"
+                className="flex-1 bg-transparent font-serif text-[16px] text-white placeholder:text-dash-ink-3/40 placeholder:font-sans placeholder:text-[12px] rounded-md focus:outline-none tabular-nums min-w-0"
               />
             </div>
 
             {/* HINT */}
-            <p className="font-mono text-[9px] tracking-[0.5px] text-[var(--color-dash-ink4)]">
+            <p className="font-sans text-[9px] tracking-[0.5px] text-dash-ink-3/40">
               Enter only the additional amount — not your new total.
             </p>
 
@@ -186,11 +201,11 @@ export function RaiseBudgetForm({
                         strokeWidth={2}
                         className="text-[var(--color-dash-green)] shrink-0"
                       />
-                      <span className="font-mono text-[10px] tracking-[1px] text-[var(--color-dash-ink3)]">
+                      <span className="font-mono text-[10px] tracking-[1px] text-dash-ink2/60 font-semibold lg:text-[11px]">
                         +{percentIncrease}% increase
                       </span>
                     </div>
-                    <span className="font-mono text-[10px] tracking-[1px] text-[var(--color-dash-ink3)]">
+                    <span className="font-mono text-[10px] tracking-[1px] text-dash-ink2/60 font-semibold lg:text-[11px]">
                       New total{" "}
                       <span className="text-[var(--color-dash-green)]">
                         {formatRupees(newTotal)}
@@ -205,13 +220,13 @@ export function RaiseBudgetForm({
           {/* REASON — OPTIONAL */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+              <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-dash-ink2/60 font-semibold lg:text-[11px]">
                 Reason{" "}
                 <span className="opacity-50 normal-case tracking-normal font-sans text-[10px]">
                   (optional)
                 </span>
               </label>
-              <span className="font-mono text-[9px] text-[var(--color-dash-ink4)]">
+              <span className="font-sans rounded-md text-[9px] text-dash-ink-3/40">
                 {reason.length}/300
               </span>
             </div>
@@ -219,7 +234,7 @@ export function RaiseBudgetForm({
               <FileText
                 size={13}
                 strokeWidth={1.8}
-                className="absolute left-4 top-3.5 text-[var(--color-dash-ink3)] pointer-events-none"
+                className="absolute left-4 top-3.5 text-dash-ink2/60 font-semibold lg:text-[11px] pointer-events-none"
               />
               <textarea
                 rows={4}
@@ -227,7 +242,7 @@ export function RaiseBudgetForm({
                 placeholder="Explain why you need a budget increase..."
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] focus:border-[var(--color-dash-border-hover)] font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none transition-colors duration-200 resize-none leading-relaxed"
+                className="w-full pl-10 pr-4 py-3 bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] focus:border-[var(--color-dash-border-hover)] font-sans text-[13px] text-white placeholder:text-dash-ink-3/40 focus:outline-none transition-colors duration-200 resize-none leading-relaxed"
               />
             </div>
           </div>
@@ -252,7 +267,7 @@ export function RaiseBudgetForm({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 bg-transparent border border-[var(--color-dash-border)] font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)] hover:border-[var(--color-dash-border-hover)] hover:text-[var(--color-dash-ink2)] transition-all duration-200"
+              className="flex-1 py-3 bg-transparent border border-[var(--color-dash-border)] font-mono text-[10px] tracking-[1.5px] uppercase text-dash-ink2/60 font-semibold lg:text-[11px] hover:border-[var(--color-dash-border-hover)] hover:text-[var(--color-dash-ink2)] transition-all duration-200"
             >
               Cancel
             </button>
