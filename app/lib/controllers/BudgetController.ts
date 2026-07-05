@@ -61,3 +61,77 @@ export const raiseBudgetRequest = async (input: createBudgetInput) => {
         };
     }
 }
+
+// export const approveRequest = async (budgetId: string) => {
+
+// }
+
+export const getBudgetRequests = async () => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    const role = session.user.role.toLowerCase();
+    if (role !== "freelancer" && role !== "client") return { success: false, error: "Forbidden", status: 403 };
+
+    let where;
+
+    if (role === "client") {
+        const profile = await prisma.userprofile.findUnique({
+            where: {
+                userId: session.user.id,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        if (!profile)
+            return {
+                success: false,
+                error: "Profile not found",
+                status: 404,
+            };
+
+        where = {
+            project: {
+                clientId: profile.id,
+            },
+        };
+    } else {
+        const profile = await prisma.freelancer.findUnique({
+            where: {
+                userId: session.user.id,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        if (!profile)
+            return {
+                success: false,
+                error: "Profile not found",
+                status: 404,
+            };
+
+        where = {
+            requestedById: profile.id,
+        };
+    };
+
+    const requests = await prisma.budgetRaiseRequest.findMany({
+        where,
+        include: {
+            project: {
+                select: {
+                    id: true,
+                    title: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
+    });
+
+    return { success: true, requests: requests, status: 200 }
+};
