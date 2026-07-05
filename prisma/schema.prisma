@@ -197,7 +197,7 @@ model BudgetRaiseRequest {
   requestedby     Freelancer @relation(fields: [requestedById], references: [id])
   currentBudget   Int
   requestedBudget Int
-  reason          String
+  reason          String?
 
   status BudgetRequestStatus @default(PENDING)
 
