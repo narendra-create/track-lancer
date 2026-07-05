@@ -315,6 +315,21 @@ async function main() {
         { total_cost: 20000, paid_amount: 20000, payment_status: "PAID", due_date: monthsAgo(10), createdAt: monthsAgo(10, 14) },
       ],
     },
+    {
+      title: "Social Media App Backend", clientIndex: 0, status: "COMPLETED", agreedCost: 40000, completedAt: monthsAgo(1, 15),
+      milestones: [{ title: "API Design", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(3) }, { title: "Database & Auth", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(2) }, { title: "Deployment", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(1) }],
+      payments: [{ total_cost: 40000, paid_amount: 40000, payment_status: "PAID", due_date: monthsAgo(1), createdAt: monthsAgo(3) }]
+    },
+    {
+      title: "Health Dashboard UI", clientIndex: 1, status: "COMPLETED", agreedCost: 25000, completedAt: monthsAgo(2, 5),
+      milestones: [{ title: "Wireframes", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(4) }, { title: "High Fidelity UI", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(3) }],
+      payments: [{ total_cost: 25000, paid_amount: 25000, payment_status: "PAID", due_date: monthsAgo(2), createdAt: monthsAgo(4) }]
+    },
+    {
+      title: "CRM Integration", clientIndex: 2, status: "CANCELLED", agreedCost: 30000, completedAt: monthsAgo(1),
+      milestones: [{ title: "Planning", milestonecost: 5000, status: "COMPLETED", deadline: monthsAgo(2) }, { title: "API Integration", milestonecost: 25000, status: "STOPPED", deadline: monthsAgo(1) }],
+      payments: [{ total_cost: 5000, paid_amount: 5000, payment_status: "PAID", due_date: monthsAgo(1), createdAt: monthsAgo(2) }]
+    }
   ];
 
   // ─── ACTIVE (5) ───────────────────────────────────────────────────────────────
@@ -379,22 +394,7 @@ async function main() {
       payments: [
         { total_cost: 45000, paid_amount: 7000, payment_status: "DUE", due_date: daysFromNow(30), createdAt: monthsAgo(1, 10) },
       ],
-    },
-    {
-      title: "Internal Admin Panel",
-      clientIndex: 0,
-      status: "ACTIVE",
-      agreedCost: 40000,
-      milestones: [
-        { title: "Schema & API Design", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(2) },
-        { title: "CRUD Interfaces", milestonecost: 14000, status: "COMPLETED", deadline: monthsAgo(1) },
-        { title: "Role-Based Auth", milestonecost: 10000, status: "PENDING_PAYMENT", deadline: daysFromNow(8) },
-        { title: "Deployment & Docs", milestonecost: 8000, status: "IN_PROGRESS", deadline: daysFromNow(30) },
-      ],
-      payments: [
-        { total_cost: 40000, paid_amount: 22000, payment_status: "PENDING_VERIFICATION", due_date: daysFromNow(8), createdAt: monthsAgo(2, 5) },
-      ],
-    },
+    }
   ];
 
   const allProjects = [...completedProjects, ...activeProjects];
@@ -455,7 +455,8 @@ async function main() {
   console.log("\n💰  Creating budget raise requests...");
 
   const saasProject = await prisma.project.findFirst({ where: { title: "SaaS Analytics Dashboard" } });
-  const adminProject = await prisma.project.findFirst({ where: { title: "Internal Admin Panel" } });
+  const portfolioProject = await prisma.project.findFirst({ where: { title: "Portfolio Website" } });
+  const corporateProject = await prisma.project.findFirst({ where: { title: "Corporate Website Revamp" } });
 
   if (saasProject) {
     await prisma.budgetRaiseRequest.create({
@@ -472,20 +473,61 @@ async function main() {
     console.log("  ↳ Budget raise request created for SaaS Analytics Dashboard");
   }
 
-  if (adminProject) {
+  if (portfolioProject) {
     await prisma.budgetRaiseRequest.create({
       data: {
-        projectId: adminProject.id,
+        projectId: portfolioProject.id,
         requestedById: freelancer.id,
-        currentBudget: 40000,
-        requestedBudget: 52000,
-        reason: "Role-based auth expanded to include SSO and 2FA which were not in the original spec.",
+        currentBudget: 30000,
+        requestedBudget: 35000,
+        reason: "Additional animations required on homepage.",
         status: "APPROVED",
         createdAt: monthsAgo(1, 8),
         reviewedAt: monthsAgo(1, 6),
       },
     });
-    console.log("  ↳ Budget raise request created for Internal Admin Panel");
+    console.log("  ↳ Budget raise request created for Portfolio Website");
+  }
+
+  if (corporateProject) {
+    await prisma.budgetRaiseRequest.create({
+      data: {
+        projectId: corporateProject.id,
+        requestedById: freelancer.id,
+        currentBudget: 45000,
+        requestedBudget: 55000,
+        reason: "Adding multi-language support (i18n).",
+        status: "REJECTED",
+        createdAt: monthsAgo(0, 5),
+        reviewedAt: monthsAgo(0, 4),
+      },
+    });
+    console.log("  ↳ Budget raise request created for Corporate Website Revamp");
+  }
+
+  // ── Extra Records ────────────────────────────────────────────────────────────
+  console.log("\n🔗  Creating additional relation records (Delays, Verifications)...");
+  const delayedMilestone = await prisma.milestone.findFirst({ where: { delay: true } });
+  if (delayedMilestone) {
+    await prisma.milestonedelay.create({
+      data: {
+        milestoneId: delayedMilestone.id,
+        newDeadline: delayedMilestone.deadline,
+        oldDeadline: monthsAgo(4, 5)
+      }
+    });
+  }
+  const paymentToVerify = await prisma.payment.findFirst({ where: { payment_status: "PENDING_VERIFICATION" }, include: { project: true } });
+  if (paymentToVerify && paymentToVerify.project && paymentToVerify.project.clientId) {
+    await prisma.paymentverification.create({
+      data: {
+        txn_number: "TXN123456789",
+        paymentid: paymentToVerify.id,
+        paid_amount: paymentToVerify.paid_amount,
+        freelancerId: freelancer.id,
+        clientId: paymentToVerify.project.clientId,
+      }
+    });
   }
 
   // ── Summary ──────────────────────────────────────────────────────────────────
