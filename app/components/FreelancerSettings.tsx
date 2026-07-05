@@ -19,12 +19,12 @@ function SectionNav({
   onChange: (s: SettingsSection) => void;
 }) {
   return (
-    <nav className="flex flex-row lg:flex-col gap-1">
+    <nav className="flex flex-row overflow-x-auto lg:overflow-visible lg:flex-col gap-2 lg:gap-1 pb-2 lg:pb-0 scrollbar-hide">
       {SECTIONS.map(({ id, label, icon: Icon }) => (
         <button
           key={id}
           onClick={() => onChange(id)}
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-left transition-all duration-150 font-sans text-[13px] w-full
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-left transition-all duration-150 font-sans text-[13px] shrink-0 w-auto lg:w-full
             ${
               active === id
                 ? "bg-[var(--color-dash-gold-glow)] border border-[rgba(200,169,110,0.2)] text-[var(--color-dash-gold)]"
@@ -36,18 +36,26 @@ function SectionNav({
             strokeWidth={1.6}
             className={active === id ? "text-[var(--color-dash-gold)]" : ""}
           />
-          <span className="hidden sm:block">{label}</span>
+          <span className="block whitespace-nowrap">{label}</span>
         </button>
       ))}
 
-      <div className="hidden lg:block w-full h-px bg-[var(--color-dash-border)] my-2" />
+      <div className="hidden lg:block w-full h-px bg-[var(--color-dash-border)] my-2 shrink-0" />
+      <div className="block lg:hidden w-px h-6 bg-[var(--color-dash-border)] my-auto mx-1 shrink-0" />
 
       <Link
         href="/freelancer/see-projects"
-        className="hidden lg:flex items-center gap-3 px-3 py-2.5 rounded-md text-[var(--color-dash-ink3)] hover:bg-[var(--color-dash-surface2)] hover:text-[var(--color-dash-ink2)] border border-transparent transition-all duration-150 font-sans text-[13px] w-full"
+        className="flex items-center gap-3 px-3 py-2.5 rounded-md text-[var(--color-dash-ink3)] hover:bg-[var(--color-dash-surface2)] hover:text-[var(--color-dash-ink2)] border border-transparent transition-all duration-150 font-sans text-[13px] shrink-0 w-auto lg:w-full"
       >
         <ExternalLink size={14} strokeWidth={1.6} />
-        <span>See Projects</span>
+        <span className="whitespace-nowrap">See Projects</span>
+      </Link>
+      <Link
+        href="/freelancer/Budget-requests"
+        className="flex items-center gap-3 px-3 py-2.5 rounded-md text-[var(--color-dash-ink3)] hover:bg-[var(--color-dash-surface2)] hover:text-[var(--color-dash-ink2)] border border-transparent transition-all duration-150 font-sans text-[13px] shrink-0 w-auto lg:w-full"
+      >
+        <ExternalLink size={14} strokeWidth={1.6} />
+        <span className="whitespace-nowrap">Budget Requests</span>
       </Link>
     </nav>
   );
