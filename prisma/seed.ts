@@ -63,7 +63,7 @@ type MilestoneSeed = {
   subtitle?: string;
   description?: string;
   milestonecost: number;
-  status: "COMPLETED" | "PENDING_PAYEMENT" | "IN_PROGRESS" | "STOPPED";
+  status: "COMPLETED" | "PENDING_PAYMENT" | "IN_PROGRESS" | "STOPPED";
   deadline: Date;
   delay?: boolean;
   delayreason?: string;
@@ -327,7 +327,7 @@ async function main() {
       milestones: [
         { title: "Brand Discovery", subtitle: "Colour palette & fonts", description: "Define visual language and brand personality.", milestonecost: 5000, status: "COMPLETED", deadline: monthsAgo(2) },
         { title: "Design System", subtitle: "Components library", description: "Reusable Figma components.", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(1) },
-        { title: "Development", subtitle: "Next.js + Framer Motion", description: "Animated portfolio with case studies.", milestonecost: 12000, status: "PENDING_PAYEMENT", deadline: daysFromNow(14) },
+        { title: "Development", subtitle: "Next.js + Framer Motion", description: "Animated portfolio with case studies.", milestonecost: 12000, status: "PENDING_PAYMENT", deadline: daysFromNow(14) },
         { title: "SEO & Go-Live", subtitle: "Optimisation + deploy", description: "On-page SEO, sitemap, and final deployment.", milestonecost: 5000, status: "IN_PROGRESS", deadline: daysFromNow(30) },
       ],
       payments: [
@@ -343,7 +343,7 @@ async function main() {
         { title: "Requirements & Architecture", subtitle: "System design doc", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(3) },
         { title: "Auth & User Management", subtitle: "Better-Auth integration", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(2) },
         { title: "Analytics Module", subtitle: "Charts & KPIs", description: "Recharts-powered dashboard with real-time data.", milestonecost: 20000, status: "COMPLETED", deadline: monthsAgo(1) },
-        { title: "Billing & Subscriptions", subtitle: "Stripe integration", milestonecost: 20000, status: "PENDING_PAYEMENT", deadline: daysFromNow(21) },
+        { title: "Billing & Subscriptions", subtitle: "Stripe integration", milestonecost: 20000, status: "PENDING_PAYMENT", deadline: daysFromNow(21) },
         { title: "Testing & Launch", subtitle: "QA + deploy", milestonecost: 10000, status: "IN_PROGRESS", deadline: daysFromNow(45) },
       ],
       payments: [
@@ -371,7 +371,7 @@ async function main() {
       agreedCost: 45000,
       milestones: [
         { title: "Discovery & Audit", subtitle: "Existing site analysis", milestonecost: 7000, status: "COMPLETED", deadline: monthsAgo(1) },
-        { title: "New Design", subtitle: "Figma prototypes", milestonecost: 12000, status: "PENDING_PAYEMENT", deadline: daysFromNow(7) },
+        { title: "New Design", subtitle: "Figma prototypes", milestonecost: 12000, status: "PENDING_PAYMENT", deadline: daysFromNow(7) },
         { title: "Development", subtitle: "Next.js static export", milestonecost: 18000, status: "IN_PROGRESS", deadline: daysFromNow(35) },
         { title: "Content Migration & SEO", milestonecost: 8000, status: "NOT_STARTED", deadline: daysFromNow(50) },
       ],
@@ -387,7 +387,7 @@ async function main() {
       milestones: [
         { title: "Schema & API Design", milestonecost: 8000, status: "COMPLETED", deadline: monthsAgo(2) },
         { title: "CRUD Interfaces", milestonecost: 14000, status: "COMPLETED", deadline: monthsAgo(1) },
-        { title: "Role-Based Auth", milestonecost: 10000, status: "PENDING_PAYEMENT", deadline: daysFromNow(8) },
+        { title: "Role-Based Auth", milestonecost: 10000, status: "PENDING_PAYMENT", deadline: daysFromNow(8) },
         { title: "Deployment & Docs", milestonecost: 8000, status: "IN_PROGRESS", deadline: daysFromNow(30) },
       ],
       payments: [
