@@ -16,6 +16,9 @@ export const createMilestone = async (input: createMilestoneInput) => {
 
     const project = await prisma.project.findFirst({
         where: { id: input.projectId, freelancerId: freelancer.id },
+        include: {
+            milestones: true
+        }
     });
     if (!project) {
         return { success: false, error: "This project is not associated with your account", status: 403 };
@@ -23,7 +26,36 @@ export const createMilestone = async (input: createMilestoneInput) => {
 
     if (project.status !== "ACTIVE") {
         return { success: false, error: "Milestones can only be created for active projects", status: 422 };
+    };
+
+    const sumOfMilestones = project.milestones.reduce((sum, p) => sum + p.milestonecost, 0);
+    if (sumOfMilestones >= project.agreedCost) {
+        return { success: false, error: "Budget Reached - Make a budget raise request to continue", status: 400 }
+    };
+    const RemainingCost = project.agreedCost - sumOfMilestones;
+    if (input.cost > RemainingCost) {
+        return { success: false, error: `Remaining Cost is - ${RemainingCost}, Please enter an amount under it`, status: 400 }
     }
+    const hasActiveMilestone = project.milestones.some(
+        (m) => m.status === "IN_PROGRESS"
+    );
+    const last = await prisma.milestone.findFirst({
+        where: {
+            projectId: input.projectId
+        },
+        orderBy: {
+            position: "desc"
+        },
+        select: {
+            position: true
+        }
+    });
+
+    const position = last ? last.position + 1 : 1;
+
+    const status = hasActiveMilestone
+        ? "NOT_STARTED"
+        : "IN_PROGRESS";
 
     try {
         const createdMilestone = await prisma.milestone.create({
@@ -33,9 +65,10 @@ export const createMilestone = async (input: createMilestoneInput) => {
                 subtitle: input.subtitle ?? null,
                 milestonecost: input.cost,
                 description: input.description ?? null,
-                status: "IN_PROGRESS",
+                status,
                 delay: false,
-                deadline: new Date(input.deadline)
+                deadline: new Date(input.deadline),
+                position: position
             }
         });
 
@@ -85,7 +118,7 @@ export const getAllMilestones = async (projectId: string, profileId: string, rol
                         updatedAt: true
                     },
                     orderBy: {
-                        deadline: "asc"
+                        position: "asc"
                     }
                 },
                 payments: {
@@ -244,5 +277,104 @@ export const delayMilestone = async (input: delayMilestoneInput) => {
         };
         console.error("From delayProject", error);
         return { success: false, error: "Server Error", status: 500 }
+    }
+}
+
+export const deleteMilestone = async (milestoneId: string, projectId: string) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
+
+    const findFreelancer = await prisma.freelancer.findFirst({
+        where: { userId: session.user.id },
+        select: {
+            id: true
+        }
+    });
+    if (!findFreelancer) return { success: false, error: "Profile Not found", status: 404 };
+
+    const findproject = await prisma.project.findFirst({
+        where: {
+            id: projectId,
+            freelancerId: findFreelancer.id
+        }
+    });
+    if (!findproject) {
+        return { success: false, error: "Project Doesn't exist", status: 404 }
+    };
+    if (findproject.status !== "ACTIVE" && findproject.status !== "STOPPED") {
+        return { success: false, error: "You can only delete Active and Stopped project's Milestone", status: 400 }
+    }
+
+    try {
+        await prisma.$transaction(async (tx) => {
+            const milestone = await tx.milestone.findFirst({
+                where: { id: milestoneId, projectId: findproject.id },
+                select: {
+                    status: true,
+                    id: true,
+                    position: true
+                }
+            });
+            if (!milestone) {
+                throw new Error("Milestone Not Found")
+            };
+            if (milestone.status === "COMPLETED" || milestone.status === "PENDING_PAYEMENT") {
+                throw new Error("You can't Delete Completed/Pending Payment milestones")
+            };
+            let nextMilestone: Awaited<
+                ReturnType<typeof tx.milestone.findFirst>
+            > = null;
+
+            if (milestone.status === "IN_PROGRESS") {
+                nextMilestone = await tx.milestone.findFirst({
+                    where: {
+                        projectId: findproject.id,
+                        status: "NOT_STARTED",
+                        position: {
+                            gt: milestone.position
+                        }
+                    },
+                    orderBy: {
+                        position: "asc"
+                    }
+                });
+            }
+            await tx.milestone.delete({
+                where: {
+                    id: milestone.id
+                }
+            });
+            if (nextMilestone) {
+                await tx.milestone.update({
+                    where: { id: nextMilestone.id },
+                    data: {
+                        status: "IN_PROGRESS"
+                    }
+                });
+            };
+
+            await tx.milestone.updateMany({
+                where: {
+                    projectId,
+                    position: {
+                        gt: milestone.position,
+                    },},
+                data: {
+                    position: {
+                        decrement: 1,
+                    },
+                },
+            });
+        });
+
+        return { success: true, deletedMilestoneId: milestoneId, status: 200 };
+    }
+    catch (err) {
+        return {
+            success: false,
+            error: err instanceof Error ? err.message : "Server Error",
+            status: 500
+        };
     }
 }
