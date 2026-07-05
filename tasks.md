@@ -50,7 +50,7 @@
 - [x] make a function to delay the milestone
 - [ ] work on budget raise request
 - [x] payment history ui
-# for 03/07/2006
+# for 05/07/2006
 - [ ] add checks on milestone creation like user cant create milestone if budget reached, and only not started status milestones after one in progress  milestone
 - [ ] payement history controllers
 - [ ] budget raise request ui
