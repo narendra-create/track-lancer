@@ -412,7 +412,7 @@ async function main() {
       },
     });
 
-    for (const m of seed.milestones) {
+    for (const [index, m] of seed.milestones.entries()) {
       await prisma.milestone.create({
         data: {
           projectId: project.id,
@@ -420,6 +420,7 @@ async function main() {
           subtitle: m.subtitle ?? null,
           description: m.description ?? null,
           milestonecost: m.milestonecost,
+          position: index + 1,
           status: m.status,
           deadline: m.deadline,
           delay: m.delay ?? false,

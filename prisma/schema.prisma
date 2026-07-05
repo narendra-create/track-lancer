@@ -132,6 +132,7 @@ model Milestone {
   title         String
   subtitle      String?
   milestonecost Int
+  position      Int
   description   String?
   status        Milestonestatus
   deadline      DateTime
@@ -217,7 +218,7 @@ enum Categorys {
 }
 
 enum Milestonestatus {
-  PENDING_PAYEMENT
+  PENDING_PAYMENT
   COMPLETED
   NOT_STARTED
   IN_PROGRESS
