@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "motion/react";
-import { Check, Clock, Zap, CircleDot, Ban, CreditCard } from "lucide-react";
+import { Check, Clock, Zap, CircleDot, Ban, CreditCard, Trash2 } from "lucide-react";
 import type { MilestoneItem } from "@/types/milestones";
 import type { Milestonestatus } from "@/app/generated/prisma/enums";
 import { formatDate } from "@/app/lib/utilitys";
@@ -66,6 +66,7 @@ interface MilestoneCardProps {
   isLast?: boolean;
   role: "CLIENT" | "FREELANCER";
   onPay?: (milestoneId: string) => void;
+  onDelete?: (milestoneId: string) => void;
 }
 
 export function MilestoneCard({
@@ -74,6 +75,7 @@ export function MilestoneCard({
   isLast = false,
   role,
   onPay,
+  onDelete,
 }: MilestoneCardProps) {
   const cfg = STATUS_CONFIG[milestone.status];
   const isLocked =
@@ -200,6 +202,21 @@ export function MilestoneCard({
             >
               <CreditCard size={11} strokeWidth={2} />
               Pay ₹{milestone.milestonecost.toLocaleString("en-IN")}
+            </button>
+          </div>
+        )}
+
+        {role === "FREELANCER" && onDelete && (milestone.status === "NOT_STARTED" || milestone.status === "IN_PROGRESS") && (
+          <div className="mt-4 pt-4 border-t border-[rgba(192,96,96,0.15)] flex items-center justify-between gap-3">
+            <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+              Manage Milestone
+            </p>
+            <button
+              onClick={() => onDelete(milestone.id)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-[rgba(192,96,96,0.1)] border border-[rgba(192,96,96,0.3)] rounded-md font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-red)] hover:bg-[rgba(192,96,96,0.18)] hover:border-[rgba(192,96,96,0.5)] transition-all duration-200"
+            >
+              <Trash2 size={11} strokeWidth={2} />
+              Delete
             </button>
           </div>
         )}
