@@ -21,8 +21,7 @@
 - [x] WIREUP: Connect the Freelancer dashboard UI to the project fetching API
 - [ ] WIREUP: Connect the Client dashboard UI to the project fetching API
 - [x] WIREUP: Integrate the Project Details view with live milestone and payment data
-- [ ] WIREUP: Wire up the Milestone status update buttons (Approve, Stop, Pending) to backend
-- [ ] WIREUP: Connect Budget Raise Request actions to real API endpoints
+- [x] WIREUP: Connect Budget Raise Request actions to real API endpoints
 - [ ] ADDITIONAL: Set up email notifications or in-app alerts for milestone status changes
 - [ ] ADDITIONAL: Implement automated reminders for pending payments
 - [x] ADDITIONAL: Add role-based access control (RBAC) checks on all sensitive API routes
@@ -40,7 +39,7 @@
 - [x] connect create project feature with controller
 - [x] Make milestones ui
 - [x] make budget raise request ui
-- [ ] add extra buttons in settings page
+- [x] add extra buttons in settings page
 - [ ] Payment history page ui
 - [ ] Approve payments feature with txn beside it
 - [x] make controllers for projectid based milestones
@@ -67,14 +66,16 @@
 - [x] make projectid based budget request returner function
 - [x] make client pages
 - [x] make milestone page for client
-- [ ] make client dashboard
 - [x] make client sidebar
 - [x] make client settings page
-- [ ] make client my projects page
-- [ ] make past projects page for client
+- [x] make client all projects page
 - [x] make approve project system for client
 - [x] make searchProject controller
 # for 07/07/2026
+- [ ] update font size and element sizes in client/all-projects
+- [ ] make client dashboard
+- [ ] make past projects page for client
 - [ ] verify payments page ui
 - [ ] verify payments controller
 - [ ] payment history controllers
+- [ ] WIREUP: Wire up the Milestone status update buttons (Approve, Stop, Pending) to backend
