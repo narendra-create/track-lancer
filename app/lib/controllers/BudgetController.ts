@@ -60,7 +60,7 @@ export const raiseBudgetRequest = async (input: createBudgetInput) => {
             status: 500
         };
     }
-}
+};
 
 export const processRequest = async (budgetId: string, status: "APPROVED" | "REJECTED") => {
     const session = await getSession();
@@ -149,7 +149,7 @@ export const processRequest = async (budgetId: string, status: "APPROVED" | "REJ
             status: 500
         };
     }
-}
+};
 
 export const getBudgetRequests = async () => {
     const session = await getSession();
@@ -220,3 +220,42 @@ export const getBudgetRequests = async () => {
 
     return { success: true, requests: requests, status: 200 }
 };
+export const deleteBudgetRequest = async (budgetId: string) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
+
+    const freelancer = await prisma.freelancer.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true }
+    });
+    if (!freelancer) return { success: false, error: "Profile Not found", status: 404 };
+
+    const request = await prisma.budgetRaiseRequest.findFirst({
+        where: { id: budgetId, requestedById: freelancer.id },
+        select: {
+            id: true,
+            status: true
+        }
+    });
+    if (!request) {
+        return { success: false, error: "This budget request is not associated with your account.", status: 403 };
+    };
+    if (request.status !== "PENDING") {
+        return { success: false, error: "Only pending requests can be deleted.", status: 409 }
+    }
+
+    try {
+        const deleted = await prisma.budgetRaiseRequest.delete({
+            where: { id: request.id }
+        });
+        return { success: true, deletedRequestId: deleted.id, status: 200 };
+    }
+    catch (err) {
+        return {
+            success: false,
+            error: err instanceof Error ? err.message : "Server Error",
+            status: 500
+        };
+    }
+}
