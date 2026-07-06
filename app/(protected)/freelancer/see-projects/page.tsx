@@ -1,4 +1,4 @@
-import { FreelancerAllProjects } from "@/app/components/FreelancerAllProjects";
+import { FreelancerAllProjects } from "@/app/components/freelancer/FreelancerAllProjects";
 import { getSession } from "@/app/lib/session";
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";

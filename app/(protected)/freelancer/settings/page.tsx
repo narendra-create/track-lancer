@@ -1,4 +1,4 @@
-import { FreelancerSettings } from "@/app/components/FreelancerSettings";
+import { FreelancerSettings } from "@/app/components/freelancer/FreelancerSettings";
 import { getSession } from "@/app/lib/session";
 import { redirect } from "next/navigation";
 

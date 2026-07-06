@@ -1,4 +1,4 @@
-import { FreelancerSidebar } from "@/app/components/freelancer-sidebar";
+import { FreelancerSidebar } from "@/app/components/freelancer/freelancer-sidebar";
 import { ReactNode } from "react";
 import { getFreelancerProfile } from "@/app/lib/controllers/profileController";
 import { getInitials, formatCategory } from "@/app/lib/utilitys";

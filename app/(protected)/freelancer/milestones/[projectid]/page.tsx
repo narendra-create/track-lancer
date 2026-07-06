@@ -3,7 +3,7 @@ import { getSession } from "@/app/lib/session";
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { FreelancerMilestones } from "@/app/components/FreelancerMilestones";
+import { FreelancerMilestones } from "@/app/components/freelancer/FreelancerMilestones";
 import {
   createMilestone,
   getAllMilestones,
