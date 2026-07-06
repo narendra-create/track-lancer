@@ -45,3 +45,13 @@ type GetAllProjectsError = {
 };
 
 export type GetAllProjectsResponse = GetAllProjectsSuccess | GetAllProjectsError;
+
+export type AcceptProjectDetails = {
+  projectId: string;
+  title: string;
+  agreedcost: string | number;
+  deadline: string;
+  description: string;
+  freelancerName: string;
+  freelancerEmail: string;
+};

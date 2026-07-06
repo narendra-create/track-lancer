@@ -58,9 +58,6 @@
 - [x] add handleDelay and milestone delete in milestones page of freelancer
 - [x] connect budget request creation
 # for 06/07/2026
-- [ ] verify payments page ui
-- [ ] verify payments controller
-- [ ] payement history controllers
 - [x] make controller for budget approve
 - [x] function to markReviewd in budgetcontroller
 - [x] controller for rejecting the request
@@ -68,3 +65,16 @@
 - [x] approve budget controller
 - [x] delete request controller
 - [x] make projectid based budget request returner function
+- [ ] make client pages
+- [ ] make milestone page for client
+- [ ] make client dashboard
+- [ ] make client sidebar
+- [ ] make client settings page
+- [ ] make client my projects page
+- [ ] make past projects page for client
+- [x] make approve project system for client
+- [ ] make searchProject controller
+# for 07/07/2026
+- [ ] verify payments page ui
+- [ ] verify payments controller
+- [ ] payment history controllers
