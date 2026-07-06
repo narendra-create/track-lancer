@@ -61,9 +61,9 @@
 - [ ] verify payments page ui
 - [ ] verify payments controller
 - [ ] payement history controllers
-- [ ] make controller for budget approve
+- [x] make controller for budget approve
 - [ ] function to markReviewd in budgetcontroller
-- [ ] controller for rejecting the request
+- [x] controller for rejecting the request
 - [ ] add those controllers in frontend
-- [ ] approve budget controller
-- [ ] delete request controller
+- [x] approve budget controller
+- [x] delete request controller

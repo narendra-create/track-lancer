@@ -220,6 +220,7 @@ export const getBudgetRequests = async () => {
 
     return { success: true, requests: requests, status: 200 }
 };
+
 export const deleteBudgetRequest = async (budgetId: string) => {
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
@@ -258,4 +259,5 @@ export const deleteBudgetRequest = async (budgetId: string) => {
             status: 500
         };
     }
-}
+};
+
