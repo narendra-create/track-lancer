@@ -1,19 +1,19 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, AlertTriangle, X, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import type { AllProject, GetAllProjectsResponse, AllProjectStatus } from "@/types/allprojects";
 import { SECTION_ORDER } from "@/types/allprojects";
-import { useToast } from "./ToastProvider";
+import { useToast } from "../ToastProvider";
 
 // ─── PROPS ────────────────────────────────────────────────────────────────────
 
-interface FreelancerAllProjectsProps {
+interface ClientAllProjectsProps {
   initialProjects: AllProject[];
   initialNextCursor: string | null;
   loadMore: (cursor: string) => Promise<GetAllProjectsResponse>;
-  handleDelete: (id: string) => Promise<{ success: boolean; error?: string } | void>;
 }
 
 // ─── STATUS CONFIG ────────────────────────────────────────────────────────────
@@ -80,71 +80,16 @@ function AllProjectCardSkeleton() {
   );
 }
 
-// ─── DELETE MODAL ─────────────────────────────────────────────────────────────
-
-function DeleteModal({
-  onConfirm,
-  onCancel,
-  loading,
-}: {
-  onConfirm: () => void;
-  onCancel: () => void;
-  loading: boolean;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 8 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 8 }}
-        transition={{ duration: 0.16 }}
-        className="bg-[var(--color-dash-surface1)] border border-[var(--color-dash-border)] rounded-xl p-7 max-w-sm w-full shadow-2xl relative"
-      >
-        <button
-          onClick={onCancel}
-          disabled={loading}
-          className="absolute top-4 right-4 text-[var(--color-dash-ink3)] hover:text-white transition-colors"
-        >
-          <X size={18} />
-        </button>
-        <div className="w-10 h-10 rounded-full bg-[var(--color-status-danger-bg)] border border-[var(--color-status-danger-border)] flex items-center justify-center mb-5">
-          <AlertTriangle size={16} className="text-[var(--color-status-danger-text)]" />
-        </div>
-        <p className="font-serif text-[18px] text-white mb-1">Delete Project?</p>
-        <p className="font-mono text-[10px] tracking-[1px] text-[var(--color-dash-ink3)] mb-6">
-          This action cannot be undone.
-        </p>
-        <div className="flex gap-3">
-          <button
-            onClick={onCancel}
-            disabled={loading}
-            className="flex-1 px-4 py-2.5 bg-transparent border border-[var(--color-dash-border)] rounded-md text-white font-mono text-[11px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-surface2)] transition-all duration-200 disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="flex-1 px-4 py-2.5 bg-[var(--color-status-danger-bg)] border border-[var(--color-status-danger-border)] rounded-md text-[var(--color-status-danger-text)] font-mono text-[11px] uppercase tracking-[1.5px] hover:bg-[rgba(192,96,96,0.15)] transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {loading ? "Deleting..." : "Delete"}
-          </button>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
-
 // ─── PROJECT CARD ─────────────────────────────────────────────────────────────
+
+type ClientProjectCardType = AllProject & { freelancer?: { user: { name: string; image: string | null }; email: string | null } };
 
 function ProjectCard({
   project,
   index,
-  onDelete,
 }: {
-  project: AllProject;
+  project: ClientProjectCardType;
   index: number;
-  onDelete?: (id: string) => void;
 }) {
   const router = useRouter();
   const style = STATUS_STYLE[project.status] ?? STATUS_STYLE.ACTIVE;
@@ -158,8 +103,11 @@ function ProjectCard({
 
   const handleClick = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest("[data-no-nav]")) return;
-    router.push(`/freelancer/milestones/${project.id}`);
+    router.push(`/client/milestones/${project.id}`);
   };
+
+  const personName = project.freelancer?.user?.name || project.client?.user?.name || "Unknown";
+  const personEmail = project.freelancer?.email || project.client?.email || "";
 
   return (
     <motion.div
@@ -179,9 +127,9 @@ function ProjectCard({
             </h3>
           </div>
           <p className="font-mono text-[10px] tracking-[1px] text-[var(--color-dash-ink3)] truncate">
-            {project.client.user.name}
-            {project.client.email && (
-              <span className="text-[var(--color-dash-ink4)]"> · {project.client.email}</span>
+            {personName}
+            {personEmail && (
+              <span className="text-[var(--color-dash-ink4)]"> · {personEmail}</span>
             )}
           </p>
         </div>
@@ -191,18 +139,6 @@ function ProjectCard({
           >
             {project.status}
           </span>
-          {project.status === "CANCELLED" && onDelete && (
-            <button
-              data-no-nav=""
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(project.id);
-              }}
-              className="p-1.5 rounded-md border border-transparent text-[var(--color-dash-ink4)] hover:text-[var(--color-dash-red)] hover:border-[var(--color-status-danger-border)] hover:bg-[var(--color-status-danger-bg)] transition-all duration-150"
-            >
-              <Trash2 size={13} />
-            </button>
-          )}
         </div>
       </div>
 
@@ -217,7 +153,7 @@ function ProjectCard({
         </div>
         <div>
           <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-0.5">
-            Received
+            Paid
           </p>
           <p className="font-serif text-[14px] text-[var(--color-dash-green)]">
             ₹{project.money.received.toLocaleString()}
@@ -276,11 +212,9 @@ function ProjectCard({
 function SectionBlock({
   status,
   projects,
-  onDelete,
 }: {
   status: AllProjectStatus;
   projects: AllProject[];
-  onDelete?: (id: string) => void;
 }) {
   if (projects.length === 0) return null;
   const label = status.charAt(0) + status.slice(1).toLowerCase();
@@ -297,7 +231,7 @@ function SectionBlock({
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         <AnimatePresence mode="popLayout">
           {projects.map((p, i) => (
-            <ProjectCard key={p.id} project={p} index={i} onDelete={onDelete} />
+            <ProjectCard key={p.id} project={p} index={i} />
           ))}
         </AnimatePresence>
       </div>
@@ -307,18 +241,16 @@ function SectionBlock({
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
-export function FreelancerAllProjects({
+export function ClientAllProjects({
   initialProjects,
   initialNextCursor,
   loadMore,
-  handleDelete,
-}: FreelancerAllProjectsProps) {
+}: ClientAllProjectsProps) {
+  const router = useRouter();
   const { addToast } = useToast();
   const [projects, setProjects] = useState<AllProject[]>(initialProjects);
   const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   const grouped = SECTION_ORDER.reduce<Record<string, AllProject[]>>((acc, status) => {
     acc[status] = projects.filter((p) => p.status === status);
@@ -338,46 +270,26 @@ export function FreelancerAllProjects({
     }
   };
 
-  const confirmDelete = async () => {
-    if (!deleteTargetId) return;
-    setDeleting(true);
-    const result = await handleDelete(deleteTargetId);
-    setDeleting(false);
-    if (!result) {
-      setDeleteTargetId(null);
-      return;
-    }
-    if (result.success) {
-      setProjects((prev) => prev.filter((p) => p.id !== deleteTargetId));
-      addToast({ title: "Deleted", message: "Project removed successfully.", type: "success" });
-    } else {
-      addToast({ title: "Delete failed", message: result.error ?? "Something went wrong.", type: "error" });
-    }
-    setDeleteTargetId(null);
-  };
-
   const total = projects.length;
 
   return (
     <div className="w-full">
-      <AnimatePresence>
-        {deleteTargetId && (
-          <DeleteModal
-            key="delete-modal"
-            onConfirm={confirmDelete}
-            onCancel={() => setDeleteTargetId(null)}
-            loading={deleting}
-          />
-        )}
-      </AnimatePresence>
-
-      <div className="mb-8">
-        <h1 className="font-serif text-[26px] lg:text-[30px] text-white leading-tight mb-1">
-          All Projects
-        </h1>
-        <p className="font-mono text-[10px] tracking-[2px] uppercase text-[var(--color-dash-ink3)]">
-          {total} project{total !== 1 ? "s" : ""} total
-        </p>
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-[var(--color-dash-ink3)] hover:text-white transition-colors duration-200 mb-4 font-mono text-[11px] tracking-[1px] uppercase"
+          >
+            <ArrowLeft size={14} />
+            Back
+          </button>
+          <h1 className="font-serif text-[26px] lg:text-[30px] text-white leading-tight mb-1">
+            All Projects
+          </h1>
+          <p className="font-mono text-[10px] tracking-[2px] uppercase text-[var(--color-dash-ink3)]">
+            {total} project{total !== 1 ? "s" : ""} total
+          </p>
+        </div>
       </div>
 
       <div className="w-full h-px bg-[var(--color-dash-border)] mb-8" />
@@ -395,7 +307,6 @@ export function FreelancerAllProjects({
               key={status}
               status={status}
               projects={grouped[status]}
-              onDelete={status === "CANCELLED" ? (id) => setDeleteTargetId(id) : undefined}
             />
           ))}
 
