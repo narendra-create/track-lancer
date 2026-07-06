@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, Plus } from "lucide-react";
-import { PaymentHistoryCard } from "./card/PaymentHistoryCard";
+import { PaymentHistoryCard } from "./Cards/PaymentHistoryCard";
 import type { PaymentHistory } from "@/types/payment";
 import { Paymentstatus } from "@/app/generated/prisma/enums";
 
