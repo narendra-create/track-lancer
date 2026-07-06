@@ -62,9 +62,94 @@ export const raiseBudgetRequest = async (input: createBudgetInput) => {
     }
 }
 
-// export const approveRequest = async (budgetId: string) => {
+export const processRequest = async (budgetId: string, status: "APPROVED" | "REJECTED") => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "client") return { success: false, error: "Forbidden", status: 403 };
 
-// }
+    const clientprofile = await prisma.userprofile.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true }
+    });
+    if (!clientprofile) return { success: false, error: "Request Not found", status: 404 };
+    const request = await prisma.budgetRaiseRequest.findFirst({
+        where: {
+            id: budgetId,
+            project: { clientId: clientprofile.id }
+        },
+        include: {
+            project: true
+        }
+    })
+    if (!request) {
+        return { success: false, error: "This request is not associated with your account", status: 403 };
+    };
+    const pendingRequest = await prisma.budgetRaiseRequest.findFirst({
+        where: {
+            projectId: request.project.id,
+            status: "PENDING",
+        },
+    });
+
+    if (pendingRequest) {
+        return {
+            success: false,
+            error: "A budget request is already pending.",
+            status: 409,
+        };
+    };
+
+    if (request.status !== "PENDING") {
+        return {
+            success: false,
+            error: `Request is already ${request.status}`,
+            status: 409,
+        };
+    }
+    if (
+        status === "APPROVED" &&
+        request.project.status !== "ACTIVE" &&
+        request.project.status !== "STOPPED"
+    ) {
+        return {
+            success: false,
+            error: "You can only approve requests from active or stopped projects.",
+            status: 422,
+        };
+    }
+
+    try {
+        const updatedrequest = await prisma.$transaction(async (tx) => {
+            const updatedRequest = await tx.budgetRaiseRequest.update({
+                where: {
+                    id: request.id,
+                    status: "PENDING"
+                },
+                data: {
+                    status: status
+                }
+            });
+            if (status === "APPROVED") {
+                await tx.project.update({
+                    where: { id: request.projectId },
+                    data: {
+                        agreedCost: updatedRequest.requestedBudget
+                    }
+                });
+            };
+            return updatedRequest;
+        });
+
+        return { success: true, updatedrequest: updatedrequest, status: 200 };
+    }
+    catch (err) {
+        return {
+            success: false,
+            error: err instanceof Error ? err.message : "Server Error",
+            status: 500
+        };
+    }
+}
 
 export const getBudgetRequests = async () => {
     const session = await getSession();
