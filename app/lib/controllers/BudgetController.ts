@@ -296,4 +296,28 @@ export const markReviewed = async (budgetId: string) => {
             reviewedAt: new Date(),
         },
     });
-}
+};
+
+export const getProjectBudgetRequests = async (projectId: string) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    const role = session.user.role.toLowerCase();
+    if (role !== "freelancer" && role !== "client") return { success: false, error: "Forbidden", status: 403 };
+
+    const requests = await prisma.budgetRaiseRequest.findMany({
+        where: { projectId: projectId },
+        include: {
+            project: {
+                select: {
+                    id: true,
+                    title: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
+    });
+
+    return { success: true, requests: requests, status: 200 }
+};
