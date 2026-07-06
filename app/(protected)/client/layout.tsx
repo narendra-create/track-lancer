@@ -1,4 +1,4 @@
-import { ClientSidebar } from "@/app/components/client-sidebar";
+import { ClientSidebar } from "@/app/components/client/client-sidebar";
 import { ReactNode } from "react";
 import { getClientProfile } from "@/app/lib/controllers/profileController";
 import { getInitials, formatCategory } from "@/app/lib/utilitys";

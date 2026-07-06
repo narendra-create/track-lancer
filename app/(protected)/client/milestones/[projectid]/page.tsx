@@ -3,24 +3,8 @@ import { getSession } from "@/app/lib/session";
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { FreelancerMilestones } from "@/app/components/FreelancerMilestones";
-import {
-  createMilestone,
-  getAllMilestones,
-  delayMilestone,
-  deleteMilestone,
-} from "@/app/lib/controllers/milestoneController";
-import {
-  createMilestoneInput,
-  createMilestoneSchema,
-  delayMilestoneInput,
-  delayMilestoneSchema,
-} from "@/app/lib/validations/MilestoneValidation";
-import {
-  createBudgetRequestSchema,
-  createBudgetInput,
-} from "@/app/lib/validations/Budgetrequest";
-import { raiseBudgetRequest } from "@/app/lib/controllers/BudgetController";
+import { FreelancerMilestones } from "@/app/components/freelancer/FreelancerMilestones";
+import { getAllMilestones } from "@/app/lib/controllers/milestoneController";
 
 type Props = {
   params: Promise<{
@@ -35,8 +19,9 @@ const Milestones = async ({ params }: Props) => {
   }
   const session = await getSession();
   if (!session) return redirect("/login");
-  if (session.user.role.toLowerCase() !== "client")
+  if (session.user.role.toLowerCase() !== "client") {
     return redirect("/unauthorized");
+  }
 
   const client = await prisma.userprofile.findUnique({
     where: { userId: session.user.id },
