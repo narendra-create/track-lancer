@@ -65,15 +65,15 @@
 - [x] approve budget controller
 - [x] delete request controller
 - [x] make projectid based budget request returner function
-- [ ] make client pages
-- [ ] make milestone page for client
+- [x] make client pages
+- [x] make milestone page for client
 - [ ] make client dashboard
-- [ ] make client sidebar
-- [ ] make client settings page
+- [x] make client sidebar
+- [x] make client settings page
 - [ ] make client my projects page
 - [ ] make past projects page for client
 - [x] make approve project system for client
-- [ ] make searchProject controller
+- [x] make searchProject controller
 # for 07/07/2026
 - [ ] verify payments page ui
 - [ ] verify payments controller
