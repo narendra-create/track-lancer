@@ -9,7 +9,7 @@ interface RaiseBudgetFormProps {
   projectId: string;
   currentBudget: number;
   onClose: () => void;
-  onSubmit: (
+  onSubmit?: (
     data: {
       projectId: string;
       requestedAmount: number;
@@ -65,6 +65,10 @@ export function RaiseBudgetForm({
         requestedAmount: parsedExtra,
         reason: reason.trim() || undefined,
       };
+      if (!onSubmit) {
+        setError("Access this page from freelancer account");
+        return;
+      }
       const result = await onSubmit(data, projectId);
       if (result?.error) {
         setError(result.error);

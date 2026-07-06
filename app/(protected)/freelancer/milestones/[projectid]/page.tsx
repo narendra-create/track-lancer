@@ -58,6 +58,7 @@ const Milestones = async ({ params }: Props) => {
     if (!result.success) {
       return { error: `${result.error} - ${result.status}` };
     }
+    revalidatePath(`/freelancer/milestones/${projectid}`);
     return parsed;
   };
 
