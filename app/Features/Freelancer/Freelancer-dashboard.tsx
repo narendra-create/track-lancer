@@ -8,8 +8,8 @@ import {
   Primarydashboardbutton,
   Seconddashboardbutton,
 } from "@/app/components/Buttons/Dashboardbuttons";
-import TodayTasks from "@/app/components/FreelancerTodo";
-import FreelancerActivity from "@/app/components/FreelancerActivity";
+import TodayTasks from "@/app/components/freelancer/FreelancerTodo";
+import FreelancerActivity from "@/app/components/freelancer/FreelancerActivity";
 import {
   CurrentClientcard,
   Dummycard,
@@ -20,7 +20,7 @@ import {
   scaleIn,
   staggerContainer,
 } from "@/app/lib/animations";
-import RavenueChart from "@/app/components/FreelancerChart";
+import RavenueChart from "@/app/components/freelancer/FreelancerChart";
 import { FreelancerDashboardData } from "@/types/dashboard";
 import type { LoadMoreResult } from "@/types/dashboard";
 import { useState } from "react";

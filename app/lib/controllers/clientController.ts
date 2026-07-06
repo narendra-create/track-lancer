@@ -1,5 +1,5 @@
 import { prisma } from "@/app/lib/prisma";
-import type { ChartDataPoint } from "@/app/components/FreelancerChart";
+import type { ChartDataPoint } from "@/app/components/freelancer/FreelancerChart";
 
 export const getClientStat = async (freelancerid: string) => {
     const result = await prisma.$queryRaw<

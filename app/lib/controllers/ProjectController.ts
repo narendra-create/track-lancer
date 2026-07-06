@@ -3,6 +3,7 @@ import type { userrole } from "@/app/generated/prisma/enums";
 import { formatDate, generateCode } from "../utilitys";
 import type { FreelancerPastProjectsResponse, ClientPastProjectsResponse, PastProjectPaymentStatus } from "@/types/pastprojects";
 import type { newProjectInput } from "../validations/ProjectValidation";
+import type { GetAllProjectsResponse, AllProjectStatus } from "@/types/allprojects";
 import { getSession } from "../session";
 
 export const getPastProjects = async (role: userrole, profileid: string, cursor?: string): Promise<FreelancerPastProjectsResponse | ClientPastProjectsResponse> => {
@@ -299,7 +300,7 @@ export const regenerateCode = async (freelancerId: string, projectId: string) =>
     }
 }
 
-export const getAllProjects = async (profileid: string, role: userrole, cursor?: string) => {
+export const getAllProjects = async (profileid: string, role: userrole, cursor?: string): Promise<GetAllProjectsResponse> => {
     if (!profileid) {
         return { success: false, error: "Invalid Profile id", status: 400 }
     }
@@ -390,7 +391,7 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                     received,
                     remaining: totalAmount - received
                 },
-                status: project.status,
+                status: project.status as AllProjectStatus,
                 stats: {
                     totalMilestones,
                     completedMilestones,
@@ -474,7 +475,7 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
             return {
                 id: project.id,
                 title: project.title,
-                freelancer: project.freelancer ? {
+                client: project.freelancer ? {
                     user: {
                         name: project.freelancer.user.name,
                         image: project.freelancer.user.image
@@ -489,10 +490,10 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                 },
                 money: {
                     totalAmount,
-                    paid,
+                    received: paid,
                     remaining: totalAmount - paid
                 },
-                status: project.status,
+                status: project.status as AllProjectStatus,
                 stats: {
                     totalMilestones,
                     completedMilestones,
