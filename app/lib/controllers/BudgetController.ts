@@ -261,3 +261,39 @@ export const deleteBudgetRequest = async (budgetId: string) => {
     }
 };
 
+export const markReviewed = async (budgetId: string) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "client") return { success: false, error: "Forbidden", status: 403 };
+
+    const clientprofile = await prisma.userprofile.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true }
+    });
+    if (!clientprofile) return { success: false, error: "Request Not found", status: 404 };
+    const request = await prisma.budgetRaiseRequest.findFirst({
+        where: {
+            id: budgetId,
+            project: { clientId: clientprofile.id }
+        }
+    })
+    if (!request) {
+        return;
+    };
+    if (request.status !== "PENDING") {
+        return;
+    }
+    await prisma.budgetRaiseRequest.update({
+        where: {
+            id: budgetId,
+            reviewedAt: null,
+            status: "PENDING",
+            project: {
+                clientId: clientprofile.id,
+            },
+        },
+        data: {
+            reviewedAt: new Date(),
+        },
+    });
+}
