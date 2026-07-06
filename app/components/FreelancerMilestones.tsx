@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Plus,
   ArrowLeft,
@@ -298,7 +299,7 @@ interface FreelancerMilestonesProps {
     data: delayMilestoneInput,
     projectId: string,
   ) => Promise<any>;
-  onBudgetRaiseRequest: (
+  onBudgetRaiseRequest?: (
     data: createBudgetInput,
     projectId: string,
   ) => Promise<any>;
@@ -319,6 +320,7 @@ export function FreelancerMilestones({
   const [showStopModal, setShowStopModal] = useState(false);
   const [showBudgetrequestModal, setshowBudgetrequestModal] = useState(false);
   const { addToast } = useToast();
+  const router = useRouter();
 
   const totalEarned =
     project.payments?.reduce((acc, p) => acc + (p.paid_amount || 0), 0) ?? 0;
@@ -426,8 +428,22 @@ export function FreelancerMilestones({
           </button>
           {role === "FREELANCER" && (
             <button
-              onClick={() => setShowAddModal(true)}
-              className="px-4 py-2 lg:text-[16px] bg-transparent border border-[var(--color-dash-border-hover)] rounded-md text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-surface2)] transition-all duration-200 flex items-center gap-2"
+              onClick={() => {
+                if (costUsed >= totalCost) {
+                  addToast({
+                    title: "Budget Reached",
+                    message: "Cannot create milestone because the budget is full.",
+                    type: "error",
+                  });
+                  return;
+                }
+                setShowAddModal(true);
+              }}
+              className={`px-4 py-2 lg:text-[16px] bg-transparent border border-[var(--color-dash-border-hover)] rounded-md text-white font-mono text-[10px] uppercase tracking-[1.5px] transition-all duration-200 flex items-center gap-2 ${
+                costUsed >= totalCost 
+                  ? "opacity-50 cursor-not-allowed" 
+                  : "hover:bg-[var(--color-dash-surface2)]"
+              }`}
             >
               <Plus size={13} />
               Milestone
@@ -480,7 +496,7 @@ export function FreelancerMilestones({
                     Raise Budget
                   </button>
                 ) : (
-                  <button className="w-full py-2 bg-[var(--color-dash-amber-bg)] border border-[rgba(200,120,64,0.3)] rounded-md text-[var(--color-dash-amber)] font-mono text-[10px] uppercase tracking-[1px] hover:bg-[rgba(200,120,64,0.15)] transition-all duration-200">
+                  <button onClick={() => router.push(`/${role.toLowerCase()}/Budget-requests?projectId=${project.id}`)} className="w-full py-2 bg-[var(--color-dash-amber-bg)] border border-[rgba(200,120,64,0.3)] rounded-md text-[var(--color-dash-amber)] font-mono text-[10px] uppercase tracking-[1px] hover:bg-[rgba(200,120,64,0.15)] transition-all duration-200">
                     See Budget Requests
                   </button>
                 )}
