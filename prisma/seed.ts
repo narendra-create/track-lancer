@@ -96,6 +96,8 @@ async function main() {
 
   // ── Wipe ────────────────────────────────────────────────────────────────────
   console.log("🗑️   Wiping existing data...");
+  await prisma.paymentverification.deleteMany();
+  await prisma.milestonedelay.deleteMany();
   await prisma.budgetRaiseRequest.deleteMany();
   await prisma.payment.deleteMany();
   await prisma.milestone.deleteMany();
@@ -124,6 +126,7 @@ async function main() {
     { email: "rohan.das.client@gmail.com", name: "Rohan Das", password: "Client123!" },
     { email: "sneha.nair.client@gmail.com", name: "Sneha Nair", password: "Client123!" },
     { email: "vikram.iyer.client@gmail.com", name: "Vikram Iyer", password: "Client123!" },
+    { email: "c89927187@gmail.com", name: "client tester", password: "Capaccount07" },
   ];
 
   const clientProfiles: { name: string; profileId: string }[] = [];
@@ -329,6 +332,20 @@ async function main() {
       title: "CRM Integration", clientIndex: 2, status: "CANCELLED", agreedCost: 30000, completedAt: monthsAgo(1),
       milestones: [{ title: "Planning", milestonecost: 5000, status: "COMPLETED", deadline: monthsAgo(2) }, { title: "API Integration", milestonecost: 25000, status: "STOPPED", deadline: monthsAgo(1) }],
       payments: [{ total_cost: 5000, paid_amount: 5000, payment_status: "PAID", due_date: monthsAgo(1), createdAt: monthsAgo(2) }]
+    },
+    {
+      title: "Tester Landing Page",
+      clientIndex: 5,
+      status: "COMPLETED",
+      agreedCost: 15000,
+      completedAt: monthsAgo(2),
+      milestones: [
+        { title: "Design & Copy", milestonecost: 5000, status: "COMPLETED", deadline: monthsAgo(3) },
+        { title: "Development", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(2) }
+      ],
+      payments: [
+        { total_cost: 15000, paid_amount: 15000, payment_status: "PAID", due_date: monthsAgo(2), createdAt: monthsAgo(3) }
+      ]
     }
   ];
 
@@ -394,6 +411,20 @@ async function main() {
       payments: [
         { total_cost: 45000, paid_amount: 7000, payment_status: "DUE", due_date: daysFromNow(30), createdAt: monthsAgo(1, 10) },
       ],
+    },
+    {
+      title: "Tester E-commerce Store",
+      clientIndex: 5,
+      status: "ACTIVE",
+      agreedCost: 60000,
+      milestones: [
+        { title: "Design Phase", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(1) },
+        { title: "Development Phase", milestonecost: 30000, status: "IN_PROGRESS", deadline: daysFromNow(20) },
+        { title: "Testing & Deployment", milestonecost: 15000, status: "NOT_STARTED", deadline: daysFromNow(40) }
+      ],
+      payments: [
+        { total_cost: 60000, paid_amount: 15000, payment_status: "DUE", due_date: daysFromNow(10), createdAt: monthsAgo(1) }
+      ]
     }
   ];
 
@@ -537,9 +568,9 @@ async function main() {
   console.log("  Email   : websitet547@gmail.com");
   console.log("  Password: Websitetester07");
   console.log("─────────────────────────────────────────────────────");
-  console.log("  Client logins  (password: Client123!)");
+  console.log("  Client logins:");
   for (const s of clientSeeds) {
-    console.log(`  ${s.name.padEnd(16)} ${s.email}`);
+    console.log(`  ${s.name.padEnd(16)} ${s.email} (password: ${s.password})`);
   }
   console.log("─────────────────────────────────────────────────────");
   console.log(`  Projects: ${completedProjects.length} completed, ${activeProjects.length} active`);
