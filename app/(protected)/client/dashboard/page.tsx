@@ -1,3 +1,7 @@
-export default function ClientDashboardPage() {
-  return <div>Client Dashboard</div>;
-}
+import React from "react";
+
+const Dashboard = () => {
+  return <main>dashboard</main>;
+};
+
+export default Dashboard;
