@@ -2,9 +2,7 @@ import { BudgetRequestsList } from "@/app/components/BudgetRequestsList";
 import type { BudgetRequestItem } from "@/types/budget";
 import {
   getBudgetRequests,
-  deleteBudgetRequest,
-  processRequest,
-  markReviewed,
+  deleteBudgetRequest
 } from "@/app/lib/controllers/BudgetController";
 import { ToastProvider } from "@/app/components/ToastProvider";
 
@@ -30,23 +28,6 @@ const BudgetRequestsPage = async () => {
     return { deletedRequestId: result.deletedRequestId };
   };
 
-  const handleApprove = async (id: string) => {
-    "use server";
-    const result = await processRequest(id, "APPROVED");
-    if (!result.success) {
-      return { error: `${result.error} - ${result.status}` };
-    }
-    return { acceptedProject: result.updatedrequest };
-  };
-
-  const handleReject = async (id: string) => {
-    "use server";
-    const result = await processRequest(id, "REJECTED");
-    if (!result.success) {
-      return { error: `${result.error} - ${result.status}` };
-    }
-    return { acceptedProject: result.updatedrequest };
-  };
 
   return (
     <ToastProvider>
