@@ -57,6 +57,13 @@ function SectionNav({
         <ExternalLink size={14} strokeWidth={1.6} />
         <span className="whitespace-nowrap">Projects</span>
       </Link>
+      <Link
+        href="/client/Budget-requests"
+        className="flex items-center gap-3 px-3 py-2.5 rounded-md text-[var(--color-dash-ink3)] hover:bg-[var(--color-dash-surface2)] hover:text-[var(--color-dash-ink2)] border border-transparent transition-all duration-150 font-sans text-[13px] shrink-0 w-auto lg:w-full"
+      >
+        <ExternalLink size={14} strokeWidth={1.6} />
+        <span className="whitespace-nowrap">Budget Requests</span>
+      </Link>
     </nav>
   );
 }
@@ -94,7 +101,11 @@ function ProfileSection() {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setSaved(false);
@@ -124,7 +135,9 @@ function ProfileSection() {
           </button>
         </div>
         <div>
-          <p className="font-serif text-[17px] text-white mb-0.5">{form.name}</p>
+          <p className="font-serif text-[17px] text-white mb-0.5">
+            {form.name}
+          </p>
           <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
             {form.company}
           </p>
@@ -226,22 +239,53 @@ function NotificationsSection() {
   };
 
   const rows: { key: keyof typeof prefs; label: string; sub: string }[] = [
-    { key: "milestonePaid", label: "Milestone Paid", sub: "When a milestone payment is processed" },
-    { key: "projectFlagged", label: "Project Flagged", sub: "When a delay is flagged on your project" },
-    { key: "freelancerMessage", label: "Freelancer Messages", sub: "New messages from freelancers" },
-    { key: "weeklyDigest", label: "Weekly Digest", sub: "Summary of your week every Monday" },
-    { key: "deadlineReminder", label: "Deadline Reminders", sub: "48 hours before a milestone due date" },
-    { key: "marketingEmails", label: "Product Updates", sub: "New features and announcements" },
+    {
+      key: "milestonePaid",
+      label: "Milestone Paid",
+      sub: "When a milestone payment is processed",
+    },
+    {
+      key: "projectFlagged",
+      label: "Project Flagged",
+      sub: "When a delay is flagged on your project",
+    },
+    {
+      key: "freelancerMessage",
+      label: "Freelancer Messages",
+      sub: "New messages from freelancers",
+    },
+    {
+      key: "weeklyDigest",
+      label: "Weekly Digest",
+      sub: "Summary of your week every Monday",
+    },
+    {
+      key: "deadlineReminder",
+      label: "Deadline Reminders",
+      sub: "48 hours before a milestone due date",
+    },
+    {
+      key: "marketingEmails",
+      label: "Product Updates",
+      sub: "New features and announcements",
+    },
   ];
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <div className="flex flex-col divide-y divide-[var(--color-dash-border)]">
         {rows.map(({ key, label, sub }) => (
-          <div key={key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+          <div
+            key={key}
+            className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
+          >
             <div>
-              <p className="font-sans text-[13px] text-[var(--color-dash-ink)] mb-0.5">{label}</p>
-              <p className="font-mono text-[10px] tracking-[0.5px] text-[var(--color-dash-ink3)]">{sub}</p>
+              <p className="font-sans text-[13px] text-[var(--color-dash-ink)] mb-0.5">
+                {label}
+              </p>
+              <p className="font-mono text-[10px] tracking-[0.5px] text-[var(--color-dash-ink3)]">
+                {sub}
+              </p>
             </div>
             <button
               type="button"
@@ -295,7 +339,9 @@ function SecuritySection() {
     <div className="flex flex-col gap-8">
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div>
-          <p className="font-serif text-[16px] text-white mb-1">Change Password</p>
+          <p className="font-serif text-[16px] text-white mb-1">
+            Change Password
+          </p>
           <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
             Use a strong, unique password
           </p>
@@ -349,13 +395,25 @@ function SecuritySection() {
       </form>
 
       <div className="border-t border-[var(--color-dash-border)] pt-8">
-        <p className="font-serif text-[16px] text-white mb-1">Active Sessions</p>
+        <p className="font-serif text-[16px] text-white mb-1">
+          Active Sessions
+        </p>
         <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)] mb-5">
           Devices logged in to your account
         </p>
         {[
-          { device: "Chrome · Windows 11", location: "Mumbai, India", current: true, time: "Active now" },
-          { device: "Safari · iPhone 15", location: "Mumbai, India", current: false, time: "2 days ago" },
+          {
+            device: "Chrome · Windows 11",
+            location: "Mumbai, India",
+            current: true,
+            time: "Active now",
+          },
+          {
+            device: "Safari · iPhone 15",
+            location: "Mumbai, India",
+            current: false,
+            time: "2 days ago",
+          },
         ].map((session, i) => (
           <div
             key={i}
@@ -420,7 +478,9 @@ export function ClientSettings() {
         <div className="flex-1 min-w-0">
           <div className="bg-[var(--color-dash-surface1)] border border-[var(--color-dash-border)] rounded-xl p-6 lg:p-7">
             <div className="mb-6">
-              <p className="font-serif text-[18px] text-white mb-1">{activeLabel}</p>
+              <p className="font-serif text-[18px] text-white mb-1">
+                {activeLabel}
+              </p>
               <div className="w-8 h-px bg-[var(--color-dash-gold-dim)]" />
             </div>
             {SECTION_CONTENT[active]}
