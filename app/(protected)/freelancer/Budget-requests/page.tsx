@@ -48,20 +48,12 @@ const BudgetRequestsPage = async () => {
     return { acceptedProject: result.updatedrequest };
   };
 
-  const handleMarkReviewed = async (id: string) => {
-    "use server";
-    await markReviewed(id);
-  };
-
   return (
     <ToastProvider>
       <BudgetRequestsList
         budgetRequests={requests}
         role="FREELANCER"
         onDelete={handleDelete}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        markReviewed={handleMarkReviewed}
       />
     </ToastProvider>
   );
