@@ -51,7 +51,7 @@ function SectionNav({
         <span className="whitespace-nowrap">Dashboard</span>
       </Link>
       <Link
-        href="/client/projects"
+        href="/client/all-projects"
         className="flex items-center gap-3 px-3 py-2.5 rounded-md text-[var(--color-dash-ink3)] hover:bg-[var(--color-dash-surface2)] hover:text-[var(--color-dash-ink2)] border border-transparent transition-all duration-150 font-sans text-[13px] shrink-0 w-auto lg:w-full"
       >
         <ExternalLink size={14} strokeWidth={1.6} />

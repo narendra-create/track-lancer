@@ -3,7 +3,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, AlertTriangle, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import type { AllProject, GetAllProjectsResponse, AllProjectStatus } from "@/types/allprojects";
+import type {
+  AllProject,
+  GetAllProjectsResponse,
+  AllProjectStatus,
+} from "@/types/allprojects";
 import { SECTION_ORDER } from "@/types/allprojects";
 import { useToast } from "../ToastProvider";
 
@@ -13,28 +17,31 @@ interface FreelancerAllProjectsProps {
   initialProjects: AllProject[];
   initialNextCursor: string | null;
   loadMore: (cursor: string) => Promise<GetAllProjectsResponse>;
-  handleDelete: (id: string) => Promise<{ success: boolean; error?: string } | void>;
+  handleDelete: (
+    id: string,
+  ) => Promise<{ success: boolean; error?: string } | void>;
 }
 
 // ─── STATUS CONFIG ────────────────────────────────────────────────────────────
 
-const STATUS_STYLE: Record<string, { dot: string; text: string; bg: string }> = {
-  ACTIVE: {
-    dot: "bg-[var(--color-dash-green)]",
-    text: "text-[var(--color-dash-green)]",
-    bg: "bg-[var(--color-dash-green-bg)]",
-  },
-  STOPPED: {
-    dot: "bg-[var(--color-dash-amber)]",
-    text: "text-[var(--color-dash-amber)]",
-    bg: "bg-[var(--color-dash-amber-bg)]",
-  },
-  CANCELLED: {
-    dot: "bg-[var(--color-dash-red)]",
-    text: "text-[var(--color-dash-red)]",
-    bg: "bg-[var(--color-dash-red-bg)]",
-  },
-};
+const STATUS_STYLE: Record<string, { dot: string; text: string; bg: string }> =
+  {
+    ACTIVE: {
+      dot: "bg-[var(--color-dash-green)]",
+      text: "text-[var(--color-dash-green)]",
+      bg: "bg-[var(--color-dash-green-bg)]",
+    },
+    STOPPED: {
+      dot: "bg-[var(--color-dash-amber)]",
+      text: "text-[var(--color-dash-amber)]",
+      bg: "bg-[var(--color-dash-amber-bg)]",
+    },
+    CANCELLED: {
+      dot: "bg-[var(--color-dash-red)]",
+      text: "text-[var(--color-dash-red)]",
+      bg: "bg-[var(--color-dash-red-bg)]",
+    },
+  };
 
 const SECTION_ACCENT: Record<AllProjectStatus, string> = {
   ACTIVE: "bg-[var(--color-dash-green)]",
@@ -108,9 +115,14 @@ function DeleteModal({
           <X size={18} />
         </button>
         <div className="w-10 h-10 rounded-full bg-[var(--color-status-danger-bg)] border border-[var(--color-status-danger-border)] flex items-center justify-center mb-5">
-          <AlertTriangle size={16} className="text-[var(--color-status-danger-text)]" />
+          <AlertTriangle
+            size={16}
+            className="text-[var(--color-status-danger-text)]"
+          />
         </div>
-        <p className="font-serif text-[18px] text-white mb-1">Delete Project?</p>
+        <p className="font-serif text-[18px] text-white mb-1">
+          Delete Project?
+        </p>
         <p className="font-mono text-[10px] tracking-[1px] text-[var(--color-dash-ink3)] mb-6">
           This action cannot be undone.
         </p>
@@ -148,12 +160,15 @@ function ProjectCard({
 }) {
   const router = useRouter();
   const style = STATUS_STYLE[project.status] ?? STATUS_STYLE.ACTIVE;
-  const { totalMilestones, completedMilestones, progress, projectDeadline } = project.stats;
+  const { totalMilestones, completedMilestones, progress, projectDeadline } =
+    project.stats;
 
   const formattedDeadline = projectDeadline
-    ? new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(
-        new Date(projectDeadline),
-      )
+    ? new Intl.DateTimeFormat("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }).format(new Date(projectDeadline))
     : null;
 
   const handleClick = (e: React.MouseEvent) => {
@@ -172,25 +187,33 @@ function ProjectCard({
     >
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2.5 mb-1.5">
-            <span className={`w-[7px] h-[7px] rounded-full shrink-0 ${style.dot}`} />
-            <h3 className="font-serif text-[15px] text-white leading-snug truncate">
+          <div className="flex items-center gap-2.5 lg:gap-3 mb-1.5">
+            <span
+              className={`w-[7px] h-[7px] rounded-full shrink-0 ${style.dot}`}
+            />
+            <h3 className="font-serif text-[15px] lg:text-[19px] text-white leading-snug truncate">
               {project.title}
             </h3>
           </div>
-          <p className="font-mono text-[10px] tracking-[1px] text-[var(--color-dash-ink3)] truncate">
+
+          <p className="font-serif py-1 text-[10px] lg:text-[12px] tracking-[1px] text-dash-ink2/80 font-semibold truncate">
             {project.client.user.name}
             {project.client.email && (
-              <span className="text-[var(--color-dash-ink4)]"> · {project.client.email}</span>
+              <span className="text-dash-ink3/90">
+                {" "}
+                · {project.client.email}
+              </span>
             )}
           </p>
         </div>
+
         <div className="flex items-center gap-2 shrink-0">
           <span
-            className={`font-mono text-[9px] tracking-[1.5px] uppercase px-2 py-[3px] rounded-sm ${style.bg} ${style.text}`}
+            className={`font-mono text-[9px] lg:text-[11px] font-bold tracking-[1.5px] uppercase px-3 py-0.75 rounded-md ${style.bg} ${style.text}`}
           >
             {project.status}
           </span>
+
           {project.status === "CANCELLED" && onDelete && (
             <button
               data-no-nav=""
@@ -208,26 +231,28 @@ function ProjectCard({
 
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div>
-          <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-0.5">
+          <p className="font-sans text-[9px] tracking-[1.5px] uppercase text-dash-ink2/70 font-semibold mb-0.5">
             Value
           </p>
-          <p className="font-serif text-[14px] text-[var(--color-dash-ink)]">
+          <p className="font-mono text-[14px] lg:text-[17px] font-semibold text-[var(--color-dash-ink)]">
             ₹{project.money.totalAmount.toLocaleString()}
           </p>
         </div>
+
         <div>
-          <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-0.5">
+          <p className="font-sans text-[9px] tracking-[1.5px] uppercase text-dash-ink2/70 font-semibold mb-0.5">
             Received
           </p>
-          <p className="font-serif text-[14px] text-[var(--color-dash-green)]">
+          <p className="font-mono text-[14px] lg:text-[17px] font-semibold text-[var(--color-dash-green)]">
             ₹{project.money.received.toLocaleString()}
           </p>
         </div>
+
         <div>
-          <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-0.5">
+          <p className="font-sans text-[9px] tracking-[1.5px] uppercase text-dash-ink2/70 font-semibold mb-0.5">
             Remaining
           </p>
-          <p className="font-serif text-[14px] text-[var(--color-dash-amber)]">
+          <p className="font-mono text-[14px] lg:text-[17px] font-semibold text-[var(--color-dash-amber)]">
             ₹{project.money.remaining.toLocaleString()}
           </p>
         </div>
@@ -235,11 +260,15 @@ function ProjectCard({
 
       <div className="mb-3">
         <div className="flex justify-between items-center mb-1.5">
-          <span className="font-mono text-[9px] tracking-[1px] uppercase text-[var(--color-dash-ink4)]">
+          <span className="font-mono text-[9px] lg:text-[11px] pt-3 tracking-[1px] uppercase text-dash-ink2/60 font-bold">
             {completedMilestones}/{totalMilestones} milestones
           </span>
-          <span className="font-mono text-[9px] text-[var(--color-dash-ink3)]">{progress}%</span>
+
+          <span className="font-mono text-[9px] lg:text-[11px] text-dash-ink2/80 font-semibold">
+            {progress}%
+          </span>
         </div>
+
         <div className="w-full h-[3px] bg-[var(--color-dash-surface3)] rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
@@ -256,15 +285,19 @@ function ProjectCard({
 
       <div className="flex items-center justify-between">
         {formattedDeadline ? (
-          <span className="font-mono text-[10px] tracking-[0.5px] text-[var(--color-dash-ink4)]">
-            Due: <span className="text-[var(--color-dash-ink3)]">{formattedDeadline}</span>
+          <span className="font-sans font-semibold text-[10px] lg:text-[12px] tracking-[0.5px] text-dash-red text-shadow-dash-red">
+            Deadline:
+            <span className="text-dash-ink2/70 font-mono pl-1">
+              {formattedDeadline}
+            </span>
           </span>
         ) : (
           <span />
         )}
+
         <ChevronRight
-          size={14}
-          className="text-[var(--color-dash-ink4)] group-hover:text-[var(--color-dash-ink3)] group-hover:translate-x-0.5 transition-all duration-150"
+          size={15}
+          className="text-dash-ink3 group-hover:text-dash-ink group-hover:translate-x-0.5 transition-all duration-150"
         />
       </div>
     </motion.div>
@@ -288,7 +321,9 @@ function SectionBlock({
   return (
     <div className="mb-10">
       <div className="flex items-center gap-3 mb-5">
-        <span className={`w-[6px] h-[6px] rounded-full shrink-0 ${SECTION_ACCENT[status]}`} />
+        <span
+          className={`w-[6px] h-[6px] rounded-full shrink-0 ${SECTION_ACCENT[status]}`}
+        />
         <h2 className="font-serif text-[18px] text-white">{label}</h2>
         <span className="font-mono text-[10px] tracking-[2px] text-[var(--color-dash-ink4)]">
           {projects.length}
@@ -315,15 +350,20 @@ export function FreelancerAllProjects({
 }: FreelancerAllProjectsProps) {
   const { addToast } = useToast();
   const [projects, setProjects] = useState<AllProject[]>(initialProjects);
-  const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor);
+  const [nextCursor, setNextCursor] = useState<string | null>(
+    initialNextCursor,
+  );
   const [loadingMore, setLoadingMore] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const grouped = SECTION_ORDER.reduce<Record<string, AllProject[]>>((acc, status) => {
-    acc[status] = projects.filter((p) => p.status === status);
-    return acc;
-  }, {});
+  const grouped = SECTION_ORDER.reduce<Record<string, AllProject[]>>(
+    (acc, status) => {
+      acc[status] = projects.filter((p) => p.status === status);
+      return acc;
+    },
+    {},
+  );
 
   const onLoadMore = async () => {
     if (!nextCursor) return;
@@ -334,7 +374,11 @@ export function FreelancerAllProjects({
       setProjects((prev) => [...prev, ...result.projects]);
       setNextCursor(result.nextCursor);
     } else {
-      addToast({ title: "Failed to load", message: result.error, type: "error" });
+      addToast({
+        title: "Failed to load",
+        message: result.error,
+        type: "error",
+      });
     }
   };
 
@@ -349,9 +393,17 @@ export function FreelancerAllProjects({
     }
     if (result.success) {
       setProjects((prev) => prev.filter((p) => p.id !== deleteTargetId));
-      addToast({ title: "Deleted", message: "Project removed successfully.", type: "success" });
+      addToast({
+        title: "Deleted",
+        message: "Project removed successfully.",
+        type: "success",
+      });
     } else {
-      addToast({ title: "Delete failed", message: result.error ?? "Something went wrong.", type: "error" });
+      addToast({
+        title: "Delete failed",
+        message: result.error ?? "Something went wrong.",
+        type: "error",
+      });
     }
     setDeleteTargetId(null);
   };
@@ -395,7 +447,11 @@ export function FreelancerAllProjects({
               key={status}
               status={status}
               projects={grouped[status]}
-              onDelete={status === "CANCELLED" ? (id) => setDeleteTargetId(id) : undefined}
+              onDelete={
+                status === "CANCELLED"
+                  ? (id) => setDeleteTargetId(id)
+                  : undefined
+              }
             />
           ))}
 

@@ -72,10 +72,13 @@
 - [x] make approve project system for client
 - [x] make searchProject controller
 # for 07/07/2026
-- [ ] update font size and element sizes in client/all-projects
+- [x] update font size and element sizes in client/all-projects and freelancer/see-projects
 - [ ] make client dashboard
 - [ ] make past projects page for client
 - [ ] verify payments page ui
 - [ ] verify payments controller
 - [ ] payment history controllers
 - [ ] WIREUP: Wire up the Milestone status update buttons (Approve, Stop, Pending) to backend
+# for 08/07/2026
+- [ ] make profile update system
+- [ ] update settings page to update profile and more
