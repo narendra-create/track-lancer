@@ -84,20 +84,6 @@ export const processRequest = async (budgetId: string, status: "APPROVED" | "REJ
     if (!request) {
         return { success: false, error: "This request is not associated with your account", status: 403 };
     };
-    const pendingRequest = await prisma.budgetRaiseRequest.findFirst({
-        where: {
-            projectId: request.project.id,
-            status: "PENDING",
-        },
-    });
-
-    if (pendingRequest) {
-        return {
-            success: false,
-            error: "A budget request is already pending.",
-            status: 409,
-        };
-    };
 
     if (request.status !== "PENDING") {
         return {
@@ -122,8 +108,7 @@ export const processRequest = async (budgetId: string, status: "APPROVED" | "REJ
         const updatedrequest = await prisma.$transaction(async (tx) => {
             const updatedRequest = await tx.budgetRaiseRequest.update({
                 where: {
-                    id: request.id,
-                    status: "PENDING"
+                    id: request.id
                 },
                 data: {
                     status: status
@@ -283,14 +268,12 @@ export const markReviewed = async (budgetId: string) => {
     if (request.status !== "PENDING") {
         return;
     }
+    if (request.reviewedAt) {
+        return;
+    }
     await prisma.budgetRaiseRequest.update({
         where: {
-            id: budgetId,
-            reviewedAt: null,
-            status: "PENDING",
-            project: {
-                clientId: clientprofile.id,
-            },
+            id: budgetId
         },
         data: {
             reviewedAt: new Date(),
