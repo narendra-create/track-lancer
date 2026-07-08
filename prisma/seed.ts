@@ -155,8 +155,7 @@ async function main() {
         { title: "Launch & Handoff", subtitle: "Deploy + docs", description: "Deployed to Vercel, handed over with full documentation.", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(2) },
       ],
       payments: [
-        { total_cost: 30000, paid_amount: 30000, payment_status: "PAID", due_date: monthsAgo(4), createdAt: monthsAgo(5) },
-        { total_cost: 50000, paid_amount: 50000, payment_status: "PAID", due_date: monthsAgo(2), createdAt: monthsAgo(2, 20) },
+        { total_cost: 80000, paid_amount: 80000, payment_status: "PAID", due_date: monthsAgo(2), createdAt: monthsAgo(5) },
       ],
     },
     {
@@ -172,8 +171,7 @@ async function main() {
         { title: "QA & Handoff", milestonecost: 5000, status: "COMPLETED", deadline: monthsAgo(3) },
       ],
       payments: [
-        { total_cost: 25000, paid_amount: 25000, payment_status: "PAID", due_date: monthsAgo(5), createdAt: monthsAgo(6) },
-        { total_cost: 30000, paid_amount: 30000, payment_status: "PAID", due_date: monthsAgo(3), createdAt: monthsAgo(3, 10) },
+        { total_cost: 55000, paid_amount: 55000, payment_status: "PAID", due_date: monthsAgo(3), createdAt: monthsAgo(6) },
       ],
     },
     {
@@ -204,8 +202,7 @@ async function main() {
         { title: "App Store Release", description: "iOS & Android builds, App Store and Play Store listings.", milestonecost: 15000, status: "COMPLETED", deadline: monthsAgo(4) },
       ],
       payments: [
-        { total_cost: 40000, paid_amount: 40000, payment_status: "PAID", due_date: monthsAgo(8), createdAt: monthsAgo(9) },
-        { total_cost: 50000, paid_amount: 50000, payment_status: "PAID", due_date: monthsAgo(4), createdAt: monthsAgo(4, 8) },
+        { total_cost: 90000, paid_amount: 90000, payment_status: "PAID", due_date: monthsAgo(4), createdAt: monthsAgo(9) },
       ],
     },
     {
@@ -251,8 +248,7 @@ async function main() {
         { title: "Deployment & Docs", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(5) },
       ],
       payments: [
-        { total_cost: 30000, paid_amount: 30000, payment_status: "PAID", due_date: monthsAgo(8), createdAt: monthsAgo(9) },
-        { total_cost: 30000, paid_amount: 30000, payment_status: "PAID", due_date: monthsAgo(5), createdAt: monthsAgo(5, 3) },
+        { total_cost: 60000, paid_amount: 60000, payment_status: "PAID", due_date: monthsAgo(5), createdAt: monthsAgo(9) },
       ],
     },
     {
@@ -298,8 +294,7 @@ async function main() {
         { title: "Stationery & Collaterals", description: "Business cards, letterhead, email signature, social kit.", milestonecost: 10000, status: "COMPLETED", deadline: monthsAgo(7) },
       ],
       payments: [
-        { total_cost: 20000, paid_amount: 20000, payment_status: "PAID", due_date: monthsAgo(9), createdAt: monthsAgo(10) },
-        { total_cost: 25000, paid_amount: 25000, payment_status: "PAID", due_date: monthsAgo(7), createdAt: monthsAgo(7, 6) },
+        { total_cost: 45000, paid_amount: 45000, payment_status: "PAID", due_date: monthsAgo(7), createdAt: monthsAgo(10) },
       ],
     },
     {
@@ -314,8 +309,7 @@ async function main() {
         { title: "Polish & Chrome Store Publish", description: "Keyboard shortcuts, settings sync, and store listing.", milestonecost: 7000, status: "COMPLETED", deadline: monthsAgo(10) },
       ],
       payments: [
-        { total_cost: 15000, paid_amount: 15000, payment_status: "PAID", due_date: monthsAgo(12), createdAt: monthsAgo(13) },
-        { total_cost: 20000, paid_amount: 20000, payment_status: "PAID", due_date: monthsAgo(10), createdAt: monthsAgo(10, 14) },
+        { total_cost: 35000, paid_amount: 35000, payment_status: "PAID", due_date: monthsAgo(10), createdAt: monthsAgo(13) },
       ],
     },
     {
