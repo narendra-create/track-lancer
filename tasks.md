@@ -90,3 +90,4 @@
 - [ ] make profile update system
 - [ ] update settings page to update profile and more
 - [ ] fix - background of verify-payments page
+- [ ] continue paymentController
