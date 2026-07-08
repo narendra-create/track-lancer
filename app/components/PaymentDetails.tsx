@@ -22,7 +22,6 @@ import { Paymentstatus } from "@/app/generated/prisma/enums";
 const DUMMY_PAYMENT = {
   id: "pay_123456",
   status: "DUE" as Paymentstatus, // Change to PAID or PENDING_VERIFICATION to see different states
-  txn_number: "TXN-987654321",
   total_cost: 50000,
   paid_amount: 0,
   due_amount: 50000,
@@ -183,28 +182,7 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
           </div>
         </div>
 
-        {/* Transaction Details Section */}
-        {isPaid && payment.txn_number && (
-          <div className="mb-8 p-5 bg-[rgba(16,185,129,0.05)] border border-[rgba(16,185,129,0.2)] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[rgba(16,185,129,0.1)] flex items-center justify-center text-dash-green">
-                <Hash size={18} />
-              </div>
-              <div>
-                <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)] mb-1">
-                  Transaction Number
-                </p>
-                <p className="font-mono text-[13px] text-white">
-                  {payment.txn_number}
-                </p>
-              </div>
-            </div>
-            <div className="font-mono text-[11px] text-dash-green tracking-[1px] uppercase flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(16,185,129,0.1)] rounded-md border border-[rgba(16,185,129,0.2)]">
-              <Check size={12} />
-              Payment Verified
-            </div>
-          </div>
-        )}
+        {/* Transaction Details removed because txn_number was removed from Payment */}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           {/* People Information Section */}
