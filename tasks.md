@@ -82,7 +82,7 @@
 - [x] Milestone status complete controller
 - [x] add limit on milestone cost for freelancer
 # for 08/07/2026
-- [ ] assign navigation buttons to all newly created pages
+- [x] assign navigation buttons to all newly created pages
 # for 09/07/2026
 - [ ] verify payments controller
 - [ ] make client dashboard
