@@ -288,6 +288,7 @@ interface FreelancerMilestonesProps {
   role: "CLIENT" | "FREELANCER";
   onCreate?: (data: createMilestoneInput) => Promise<any>;
   onDelete?: (milestoneId: string, projectId: string) => Promise<any>;
+  onCompleteMilestone?: (milestoneId: string, projectId: string) => Promise<any>;
   onDelayMilestone?: (
     data: delayMilestoneInput,
     projectId: string,
@@ -305,6 +306,7 @@ export function FreelancerMilestones({
   onCreate,
   role,
   onDelete,
+  onCompleteMilestone,
   onDelayMilestone,
   onBudgetRaiseRequest,
 }: FreelancerMilestonesProps) {
@@ -674,6 +676,29 @@ export function FreelancerMilestones({
                             addToast({
                               title: "Success",
                               message: "Milestone deleted successfully",
+                              type: "success",
+                            });
+                          }
+                        }
+                      : undefined
+                  }
+                  onComplete={
+                    onCompleteMilestone
+                      ? async (milestoneId) => {
+                          const result = await onCompleteMilestone(
+                            milestoneId,
+                            project.id,
+                          );
+                          if (result?.error) {
+                            addToast({
+                              title: "Error",
+                              message: result.error,
+                              type: "error",
+                            });
+                          } else {
+                            addToast({
+                              title: "Success",
+                              message: "Milestone marked as completed",
                               type: "success",
                             });
                           }

@@ -60,6 +60,7 @@ interface MilestoneCardProps {
   role: "CLIENT" | "FREELANCER";
   onPay?: (milestoneId: string) => void;
   onDelete?: (milestoneId: string) => void;
+  onComplete?: (milestoneId: string) => void;
 }
 
 export function MilestoneCard({
@@ -69,6 +70,7 @@ export function MilestoneCard({
   role,
   onPay,
   onDelete,
+  onComplete,
 }: MilestoneCardProps) {
   const cfg = STATUS_CONFIG[milestone.status];
   const isLocked =
@@ -182,18 +184,34 @@ export function MilestoneCard({
         )}
 
 
-        {role === "FREELANCER" && onDelete && (milestone.status === "NOT_STARTED" || milestone.status === "IN_PROGRESS") && (
+        {role === "FREELANCER" && (
+          (onDelete && (milestone.status === "NOT_STARTED" || milestone.status === "IN_PROGRESS")) || 
+          (onComplete && milestone.status === "IN_PROGRESS")
+        ) && (
           <div className="mt-4 pt-4 border-t border-[rgba(192,96,96,0.15)] flex items-center justify-between gap-3">
             <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
               Manage Milestone
             </p>
-            <button
-              onClick={() => onDelete(milestone.id)}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[rgba(192,96,96,0.1)] border border-[rgba(192,96,96,0.3)] rounded-md font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-red)] hover:bg-[rgba(192,96,96,0.18)] hover:border-[rgba(192,96,96,0.5)] transition-all duration-200"
-            >
-              <Trash2 size={11} strokeWidth={2} />
-              Delete
-            </button>
+            <div className="flex items-center gap-2">
+              {onComplete && milestone.status === "IN_PROGRESS" && (
+                <button
+                  onClick={() => onComplete(milestone.id)}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-[var(--color-status-paid-bg)] border border-[var(--color-status-paid-border)] rounded-md font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-green)] hover:opacity-80 transition-all duration-200"
+                >
+                  <Check size={11} strokeWidth={2} />
+                  Mark Completed
+                </button>
+              )}
+              {onDelete && (milestone.status === "NOT_STARTED" || milestone.status === "IN_PROGRESS") && (
+                <button
+                  onClick={() => onDelete(milestone.id)}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-[rgba(192,96,96,0.1)] border border-[rgba(192,96,96,0.3)] rounded-md font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-red)] hover:bg-[rgba(192,96,96,0.18)] hover:border-[rgba(192,96,96,0.5)] transition-all duration-200"
+                >
+                  <Trash2 size={11} strokeWidth={2} />
+                  Delete
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>

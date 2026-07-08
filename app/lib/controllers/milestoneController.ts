@@ -359,7 +359,8 @@ export const deleteMilestone = async (milestoneId: string, projectId: string) =>
                     projectId,
                     position: {
                         gt: milestone.position,
-                    },},
+                    },
+                },
                 data: {
                     position: {
                         decrement: 1,
@@ -369,6 +370,109 @@ export const deleteMilestone = async (milestoneId: string, projectId: string) =>
         });
 
         return { success: true, deletedMilestoneId: milestoneId, status: 200 };
+    }
+    catch (err) {
+        return {
+            success: false,
+            error: err instanceof Error ? err.message : "Server Error",
+            status: 500
+        };
+    }
+}
+
+export const markMilestoneCompleted = async (milestoneId: string, projectId: string) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
+
+    const findFreelancer = await prisma.freelancer.findFirst({
+        where: { userId: session.user.id },
+        select: {
+            id: true
+        }
+    });
+    if (!findFreelancer) return { success: false, error: "Profile Not found", status: 404 };
+
+    const findproject = await prisma.project.findFirst({
+        where: {
+            id: projectId,
+            freelancerId: findFreelancer.id
+        }
+    });
+    if (!findproject) {
+        return { success: false, error: "Project Doesn't exist", status: 404 }
+    };
+    const foundmilestone = await prisma.milestone.findFirst({
+        where: { id: milestoneId, projectId }
+    });
+    if (!foundmilestone) {
+        return { success: false, error: "Milestone doesn't exist", status: 404 }
+    };
+    if (foundmilestone.status !== "IN_PROGRESS") {
+        return {
+            success: false,
+            error: "Only active milestones can be completed.",
+            status: 400,
+        };
+    };
+
+    try {
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 7);
+        const completed = await prisma.$transaction(async (tx) => {
+            const current = await tx.milestone.update({
+                where: { id: foundmilestone.id },
+                data: {
+                    status: "COMPLETED"
+                },
+                select: {
+                    id: true,
+                    status: true
+                }
+            });
+
+            const nextMilestone = await tx.milestone.findFirst({
+                where: {
+                    projectId,
+                    status: "NOT_STARTED",
+                },
+                orderBy: {
+                    position: "asc",
+                },
+            });
+
+            if (nextMilestone) {
+                await tx.milestone.update({
+                    where: { id: nextMilestone.id },
+                    data: { status: "IN_PROGRESS" },
+                });
+            }
+
+            await tx.payment.upsert({
+                where: { projectId: findproject.id },
+                create: {
+                    due_date: dueDate,
+                    paid_amount: 0,
+                    total_cost: foundmilestone.milestonecost,
+                    payment_status: "DUE",
+                    projectId: findproject.id
+                },
+                update: {
+                    total_cost: {
+                        increment: foundmilestone.milestonecost
+                    },
+                    payment_status: "DUE",
+                    due_date: dueDate
+                }
+            });
+
+            return {
+                status: current.status,
+                id: current.id
+            }
+        });
+
+        return { success: true, milestone: completed, status: 200 }
     }
     catch (err) {
         return {

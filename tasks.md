@@ -82,7 +82,7 @@
 - [ ] verify payments controller
 - [x] payment history cards and page
 - [ ] payment history controllers
-- [ ] Milestone status update buttons to backend
+- [x] Milestone status complete controller
 # for 08/07/2026
 - [ ] make profile update system
 - [ ] update settings page to update profile and more

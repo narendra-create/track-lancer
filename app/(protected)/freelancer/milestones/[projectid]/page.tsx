@@ -9,6 +9,7 @@ import {
   getAllMilestones,
   delayMilestone,
   deleteMilestone,
+  markMilestoneCompleted,
 } from "@/app/lib/controllers/milestoneController";
 import {
   createMilestoneInput,
@@ -16,7 +17,10 @@ import {
   delayMilestoneInput,
   delayMilestoneSchema,
 } from "@/app/lib/validations/MilestoneValidation";
-import { createBudgetRequestSchema, createBudgetInput } from "@/app/lib/validations/Budgetrequest";
+import {
+  createBudgetRequestSchema,
+  createBudgetInput,
+} from "@/app/lib/validations/Budgetrequest";
 import { raiseBudgetRequest } from "@/app/lib/controllers/BudgetController";
 
 type Props = {
@@ -102,6 +106,16 @@ const Milestones = async ({ params }: Props) => {
     };
   };
 
+  const handleComplete = async (milestoneId: string, projectId: string) => {
+    "use server";
+    const result = await markMilestoneCompleted(milestoneId, projectId);
+    if (!result.success) {
+      return { error: `${result.error} - ${result.status}` };
+    }
+    revalidatePath(`/freelancer/milestones/${projectId}`);
+    return { updated: result.milestone };
+  };
+
   return (
     <main>
       <FreelancerMilestones
@@ -112,6 +126,7 @@ const Milestones = async ({ params }: Props) => {
         project={result.project}
         projectTitle={result.project.title}
         projectStatus={result.project.status}
+        onCompleteMilestone={handleComplete}
         role="FREELANCER"
       />
     </main>
