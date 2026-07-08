@@ -21,7 +21,7 @@ import { Paymentstatus } from "@/app/generated/prisma/enums";
 // Dummy data for demonstration
 const DUMMY_PAYMENT = {
   id: "pay_123456",
-  status: "DUE" as Paymentstatus, // Change to PAID or PENDING_VERIFICATION to see different states
+  status: "DUE" as Paymentstatus, // Change to PAID to see different states
   total_cost: 50000,
   paid_amount: 0,
   due_amount: 50000,
@@ -64,19 +64,11 @@ const STATUS_CONFIG: Record<
     badgeBorder: "border-[var(--color-status-pending-border)]",
     badgeText: "text-[var(--color-dash-gold)]",
   },
-  PENDING_VERIFICATION: {
-    label: "VERIFICATION PENDING",
-    dotColor: "bg-[var(--color-dash-amber)]",
-    badgeBg: "bg-[var(--color-dash-amber-bg)]",
-    badgeBorder: "border-[rgba(200,120,64,0.3)]",
-    badgeText: "text-[var(--color-dash-amber)]",
-  },
 };
 
 const STATUS_ICON: Record<Paymentstatus, React.ReactNode> = {
   PAID: <Check size={12} strokeWidth={2.5} />,
   DUE: <Clock size={12} strokeWidth={2.5} />,
-  PENDING_VERIFICATION: <Zap size={12} strokeWidth={2.5} />,
 };
 
 interface PaymentDetailsProps {
@@ -90,7 +82,6 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
   const cfg = STATUS_CONFIG[payment.status];
   const isPaid = payment.status === "PAID";
   const isDue = payment.status === "DUE";
-  const isPendingVerification = payment.status === "PENDING_VERIFICATION";
 
   return (
     <div className="w-full max-w-4xl mx-auto pb-10">
@@ -139,13 +130,6 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
                 Pay Now
               </button>
             )}
-            
-            {role === "FREELANCER" && isPendingVerification && (
-              <button className="flex items-center gap-2 px-6 py-3 bg-[rgba(200,120,64,0.15)] border border-[rgba(200,120,64,0.4)] rounded-md font-mono text-[12px] tracking-[1.5px] uppercase text-[var(--color-dash-amber)] hover:bg-[rgba(200,120,64,0.25)] transition-colors shadow-[0_0_20px_rgba(200,120,64,0.15)]">
-                <CheckCircle size={14} strokeWidth={2} />
-                Verify Payment
-              </button>
-            )}
           </div>
         </div>
 
@@ -177,7 +161,7 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
               Due Amount
             </p>
             <p className={`font-serif text-[24px] tabular-nums ${isDue ? "text-[var(--color-dash-gold)]" : "text-white"}`}>
-              ₹{isDue || isPendingVerification ? payment.due_amount.toLocaleString("en-IN") : "0"}
+              ₹{isDue ? payment.due_amount.toLocaleString("en-IN") : "0"}
             </p>
           </div>
         </div>
