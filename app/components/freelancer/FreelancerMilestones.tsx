@@ -360,6 +360,8 @@ export function FreelancerMilestones({
           <AddMilestoneModal
             key="add"
             productId={project.id}
+            remainingLimit={totalCost - costUsed}
+            totalBudget={totalCost}
             onClose={() => setShowAddModal(false)}
             handleSubmit={async (data) => {
               if (!onCreate) return;

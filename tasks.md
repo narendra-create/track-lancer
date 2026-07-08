@@ -85,4 +85,4 @@
 # for 08/07/2026
 - [ ] make profile update system
 - [ ] update settings page to update profile and more
-- [ ] add limit on milestone cost for freelancer
+- [x] add limit on milestone cost for freelancer

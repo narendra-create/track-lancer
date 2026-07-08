@@ -4,13 +4,17 @@ import { X } from "lucide-react";
 import { motion } from "motion/react";
 import type { createMilestoneInput } from "@/app/lib/validations/MilestoneValidation";
 
+import { useToast } from "@/app/components/ToastProvider";
+
 interface AddMilestoneModalProps {
     productId: string;
+    remainingLimit: number;
+    totalBudget: number;
     onClose: () => void;
     handleSubmit: (data: createMilestoneInput) => Promise<void>;
 }
 
-export function AddMilestoneModal({ productId, onClose, handleSubmit }: AddMilestoneModalProps) {
+export function AddMilestoneModal({ productId, remainingLimit, totalBudget, onClose, handleSubmit }: AddMilestoneModalProps) {
     const [form, setForm] = useState({
         title: "",
         subtitle: "",
@@ -19,6 +23,7 @@ export function AddMilestoneModal({ productId, onClose, handleSubmit }: AddMiles
         description: "",
     });
     const [loading, setLoading] = useState(false);
+    const { addToast } = useToast();
 
     const today = new Date().toISOString().split("T")[0];
 
@@ -29,6 +34,17 @@ export function AddMilestoneModal({ productId, onClose, handleSubmit }: AddMiles
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        const costValue = Number(form.cost);
+        if (costValue > remainingLimit) {
+            addToast({
+                title: "Limit Exceeded",
+                message: `Stay in limit because you can use only ₹${remainingLimit.toLocaleString("en-IN")} now since budget is ₹${totalBudget.toLocaleString("en-IN")}. If you need more, you can create a raise budget request.`,
+                type: "error",
+            });
+            return;
+        }
+
         setLoading(true);
         try {
             await handleSubmit({
@@ -118,6 +134,11 @@ export function AddMilestoneModal({ productId, onClose, handleSubmit }: AddMiles
                                 required
                                 className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
                             />
+                            {Number(form.cost) > remainingLimit && (
+                                <p className="font-sans text-[11px] text-[var(--color-dash-red)] leading-relaxed mt-1">
+                                    Limit exceeded. You can only use ₹{remainingLimit.toLocaleString("en-IN")} now since budget is ₹{totalBudget.toLocaleString("en-IN")}. Create a raise budget request for more.
+                                </p>
+                            )}
                         </div>
                         <div className="flex flex-col gap-2">
                             <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
@@ -159,7 +180,7 @@ export function AddMilestoneModal({ productId, onClose, handleSubmit }: AddMiles
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || Number(form.cost) > remainingLimit}
                         className="mt-1 px-6 py-3 bg-transparent border border-[var(--color-dash-border-hover)] rounded-md text-white font-mono text-[11px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-surface2)] hover:border-[var(--color-dash-ink3)] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? "Adding..." : "Add Milestone →"}
