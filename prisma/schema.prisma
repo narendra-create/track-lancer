@@ -91,10 +91,11 @@ model Payment {
 }
 
 model Paymentverification {
-  id           String  @id @default(cuid())
+  id           String             @id @default(cuid())
   txn_number   String
   paymentid    String
   paid_amount  Int
+  status       VerificationStatus @default(PENDING_VERIFICATION)
   imageurl     String?
   freelancerId String
   clientId     String
@@ -225,7 +226,6 @@ enum Milestonestatus {
 
 enum Paymentstatus {
   DUE
-  PENDING_VERIFICATION
   PAID
 }
 
@@ -245,5 +245,11 @@ enum Projectstatus {
 enum BudgetRequestStatus {
   PENDING
   APPROVED
+  REJECTED
+}
+
+enum VerificationStatus {
+  VERIFIED
+  PENDING_VERIFICATION
   REJECTED
 }
