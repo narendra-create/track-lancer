@@ -78,7 +78,6 @@ model Payment {
   total_cost           Int
   paid_amount          Int
   payment_status       Paymentstatus
-  txn_number           String?
   due_date             DateTime
   projectId            String?
   project              Project?              @relation(fields: [projectId], references: [id])
