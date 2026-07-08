@@ -218,7 +218,6 @@ enum Categorys {
 }
 
 enum Milestonestatus {
-  PENDING_PAYMENT
   COMPLETED
   NOT_STARTED
   IN_PROGRESS
