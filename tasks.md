@@ -77,7 +77,7 @@
 - [x] refresh page or animate when approve or reject clicked
 - [x] budget requests page for client
 - [x] project specific budget requests page
-- [ ] make past projects page for client
+- [x] make past projects page for client
 - [ ] verify payments page ui
 - [ ] verify payments controller
 - [ ] payment history controllers
@@ -85,3 +85,4 @@
 # for 08/07/2026
 - [ ] make profile update system
 - [ ] update settings page to update profile and more
+- [ ] add limit on milestone cost for freelancer
