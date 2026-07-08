@@ -73,17 +73,19 @@
 - [x] make searchProject controller
 # for 07/07/2026
 - [x] update font size and element sizes in client/all-projects and freelancer/see-projects
-- [ ] make client dashboard
 - [x] refresh page or animate when approve or reject clicked
 - [x] budget requests page for client
 - [x] project specific budget requests page
 - [x] make past projects page for client
 - [x] verify payments page ui
-- [ ] verify payments controller
 - [x] payment history cards and page
-- [ ] payment history controllers
 - [x] Milestone status complete controller
+- [x] add limit on milestone cost for freelancer
 # for 08/07/2026
+- [ ] assign navigation buttons to all newly created pages
+# for 09/07/2026
+- [ ] verify payments controller
+- [ ] make client dashboard
+- [ ] payment history controllers
 - [ ] make profile update system
 - [ ] update settings page to update profile and more
-- [x] add limit on milestone cost for freelancer
