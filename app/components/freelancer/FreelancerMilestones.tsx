@@ -685,21 +685,29 @@ export function FreelancerMilestones({
                   onComplete={
                     onCompleteMilestone
                       ? async (milestoneId) => {
-                          const result = await onCompleteMilestone(
-                            milestoneId,
-                            project.id,
-                          );
-                          if (result?.error) {
+                          try {
+                            const result = await onCompleteMilestone(
+                              milestoneId,
+                              project.id,
+                            );
+                            if (result?.error) {
+                              addToast({
+                                title: "Error",
+                                message: String(result.error),
+                                type: "error",
+                              });
+                            } else {
+                              addToast({
+                                title: "Success",
+                                message: "Milestone marked as completed",
+                                type: "success",
+                              });
+                            }
+                          } catch (err: any) {
                             addToast({
                               title: "Error",
-                              message: result.error,
+                              message: err?.message || "An unexpected error occurred",
                               type: "error",
-                            });
-                          } else {
-                            addToast({
-                              title: "Success",
-                              message: "Milestone marked as completed",
-                              type: "success",
                             });
                           }
                         }
