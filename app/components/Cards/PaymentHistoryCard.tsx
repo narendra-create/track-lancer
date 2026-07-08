@@ -114,16 +114,13 @@ export function PaymentHistoryCard({ payment, index, role }: PaymentHistoryCardP
           {/* Right side: Amounts */}
           <div className="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-start gap-4 lg:gap-2 shrink-0 border-t lg:border-t-0 border-[var(--color-dash-border)] pt-3 lg:pt-0">
             <div className="flex flex-col lg:items-end">
-              <span className="font-mono text-[9px] lg:text-[11px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)] mb-0.5">Total Cost</span>
-              <span className="font-serif text-[15px] lg:text-[20px] tabular-nums text-white">
-                ₹{payment.total_cost.toLocaleString("en-IN")}
-              </span>
+              <span className="text-[var(--color-dash-ink3)] uppercase text-[9px] lg:text-[10px] tracking-[1.5px] mb-0.5">Total Cost</span>
+              <span className="font-serif text-[16px] lg:text-[18px] text-white">₹{payment.total_cost.toLocaleString('en-IN')}</span>
             </div>
-            <div className="flex flex-col items-end">
-              <span className="font-mono text-[9px] lg:text-[11px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)] mb-0.5">Paid</span>
-              <span className={`font-serif text-[15px] lg:text-[20px] tabular-nums ${isPaid ? "text-dash-green" : "text-[var(--color-dash-ink2)]"}`}>
-                ₹{payment.paid_amount.toLocaleString("en-IN")}
-              </span>
+            
+            <div className="flex flex-col lg:items-end">
+              <span className="text-[var(--color-dash-ink3)] uppercase text-[9px] lg:text-[10px] tracking-[1.5px] mb-0.5">Paid Amount</span>
+              <span className="font-serif text-[16px] lg:text-[18px] text-[var(--color-dash-green)]">₹{payment.paid_amount.toLocaleString('en-IN')}</span>
             </div>
           </div>
         </div>
