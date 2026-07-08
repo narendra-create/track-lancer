@@ -74,7 +74,7 @@
 # for 07/07/2026
 - [x] update font size and element sizes in client/all-projects and freelancer/see-projects
 - [ ] make client dashboard
-- [ ] refresh page or animate when approve or reject clicked
+- [x] refresh page or animate when approve or reject clicked
 - [x] budget requests page for client
 - [x] project specific budget requests page
 - [ ] make past projects page for client

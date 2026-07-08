@@ -1,5 +1,6 @@
 import { BudgetRequestsList } from "@/app/components/BudgetRequestsList";
 import type { BudgetRequestItem } from "@/types/budget";
+import { revalidatePath } from "next/cache";
 import {
   getBudgetRequests,
   processRequest,
@@ -26,6 +27,7 @@ const BudgetRequestsPage = async () => {
     if (!result.success) {
       return { error: `${result.error} - ${result.status}` };
     }
+    revalidatePath(`/client/Budget-requests`);
     return { acceptedProject: result.updatedrequest };
   };
 
@@ -35,12 +37,14 @@ const BudgetRequestsPage = async () => {
     if (!result.success) {
       return { error: `${result.error} - ${result.status}` };
     }
+    revalidatePath(`/client/Budget-requests`);
     return { acceptedProject: result.updatedrequest };
   };
 
   const handleMark = async (id: string) => {
     "use server";
     await markReviewed(id);
+    revalidatePath(`/client/Budget-requests`);
     return;
   };
 
