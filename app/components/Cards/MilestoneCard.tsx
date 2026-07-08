@@ -22,13 +22,7 @@ const STATUS_CONFIG: Record<
     badgeBorder: "border-[var(--color-status-paid-border)]",
     badgeText: "text-dash-green",
   },
-  PENDING_PAYMENT: {
-    label: "PENDING PAYMENT",
-    dotColor: "bg-[var(--color-dash-gold)]",
-    badgeBg: "bg-[var(--color-status-pending-bg)]",
-    badgeBorder: "border-[var(--color-status-pending-border)]",
-    badgeText: "text-[var(--color-dash-gold)]",
-  },
+
   IN_PROGRESS: {
     label: "IN PROGRESS",
     dotColor: "bg-[var(--color-dash-amber)]",
@@ -54,7 +48,6 @@ const STATUS_CONFIG: Record<
 
 const STATUS_ICON: Record<Milestonestatus, React.ReactNode> = {
   COMPLETED: <Check size={9} strokeWidth={2.5} />,
-  PENDING_PAYMENT: <Clock size={9} strokeWidth={2.5} />,
   IN_PROGRESS: <Zap size={9} strokeWidth={2.5} />,
   NOT_STARTED: <CircleDot size={9} strokeWidth={2.5} />,
   STOPPED: <Ban size={9} strokeWidth={2.5} />,
@@ -81,9 +74,8 @@ export function MilestoneCard({
   const isLocked =
     milestone.status === "NOT_STARTED" || milestone.status === "STOPPED";
   const isInProgress = milestone.status === "IN_PROGRESS";
-  const isPendingPayment = milestone.status === "PENDING_PAYMENT";
   const isDone = milestone.status === "COMPLETED";
-  const isLineComplete = isDone || isPendingPayment;
+  const isLineComplete = isDone;
 
   return (
     <motion.div
@@ -115,9 +107,7 @@ export function MilestoneCard({
         className={`flex-1 mb-4 border rounded-xl p-5 transition-all duration-200 group ${
           isInProgress
             ? "bg-[rgba(200,120,64,0.05)] border-[rgba(200,120,64,0.35)] hover:border-[rgba(200,120,64,0.55)] shadow-[0_0_24px_rgba(200,120,64,0.1)]"
-            : isPendingPayment
-              ? "bg-[rgba(200,169,110,0.03)] border-[rgba(200,169,110,0.18)] hover:border-[rgba(200,169,110,0.28)]"
-              : isLocked
+            : isLocked
                 ? "bg-[var(--color-dash-surface1)] border-[var(--color-dash-border)] opacity-55"
                 : "bg-[var(--color-dash-surface1)] border-[var(--color-dash-border)] hover:border-[var(--color-dash-border-hover)]"
         }`}
@@ -142,7 +132,7 @@ export function MilestoneCard({
             </span>
           </div>
           <span
-            className={`font-serif text-[16px] lg:text-[22px] shrink-0 tabular-nums ${isPendingPayment ? "text-[var(--color-dash-gold)]" : "text-[var(--color-dash-gold)]"}`}
+            className={`font-serif text-[16px] lg:text-[22px] shrink-0 tabular-nums text-[var(--color-dash-gold)]`}
           >
             ₹{milestone.milestonecost.toLocaleString("en-IN")}
           </span>
@@ -191,20 +181,6 @@ export function MilestoneCard({
           </div>
         )}
 
-        {isPendingPayment && role === "CLIENT" && (
-          <div className="mt-4 pt-4 border-t border-[rgba(200,169,110,0.15)] flex items-center justify-between gap-3">
-            <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
-              Awaiting your payment
-            </p>
-            <button
-              onClick={() => onPay?.(milestone.id)}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[rgba(200,169,110,0.1)] border border-[rgba(200,169,110,0.3)] rounded-md font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-gold)] hover:bg-[rgba(200,169,110,0.18)] hover:border-[rgba(200,169,110,0.5)] transition-all duration-200"
-            >
-              <CreditCard size={11} strokeWidth={2} />
-              Pay ₹{milestone.milestonecost.toLocaleString("en-IN")}
-            </button>
-          </div>
-        )}
 
         {role === "FREELANCER" && onDelete && (milestone.status === "NOT_STARTED" || milestone.status === "IN_PROGRESS") && (
           <div className="mt-4 pt-4 border-t border-[rgba(192,96,96,0.15)] flex items-center justify-between gap-3">
