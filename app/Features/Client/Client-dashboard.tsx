@@ -203,7 +203,7 @@ const ClientDashboard = ({ data }: { data: ClientDashboardData }) => {
             All Projects
           </Seconddashboardbutton>
           <Primarydashboardbutton href="/client/accept-project">
-            New Project
+           <b>+</b> New Project
           </Primarydashboardbutton>
         </div>
       </section>
