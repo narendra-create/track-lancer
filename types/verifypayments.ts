@@ -1,11 +1,8 @@
 export interface VerifyPaymentType {
   id: string;
   txn_number: string;
-  paymentid: string;
   paid_amount: number;
-  imageurl?: string | null;
-  freelancerId: string;
-  clientId: string;
+  status: "PENDING_VERIFICATION" | "VERIFIED" | "REJECTED";
   
   // Relations
   Payment?: {
@@ -15,13 +12,19 @@ export interface VerifyPaymentType {
     } | null;
   } | null;
 
-  client?: {
+  // Present for Client view
+  clientId?: string;
+  freelancer?: {
+    id: string;
     user: {
       name: string;
     };
   } | null;
 
-  freelancer?: {
+  // Present for Freelancer view
+  freelancerId?: string;
+  client?: {
+    id: string;
     user: {
       name: string;
     };
