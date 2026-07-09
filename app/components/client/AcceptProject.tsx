@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Check, AlertCircle, Loader2 } from "lucide-react";
+import { Search, Check, AlertCircle, Loader2, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useToast } from "../ToastProvider";
 import type { AcceptProjectDetails } from "@/types/allprojects";
@@ -115,6 +115,13 @@ export function AcceptProject({
   return (
     <div className="w-full max-w-2xl relative">
       <div className="mb-10">
+        <button
+          onClick={() => window.history.back()}
+          className="mb-6 px-4 py-2 bg-transparent border border-[var(--color-dash-border)] rounded-md text-white font-mono text-[10px] lg:text-[12px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-surface2)] hover:border-[var(--color-dash-border-hover)] transition-all duration-200 flex items-center gap-2 w-fit"
+        >
+          <ArrowLeft size={13} className="transition-transform group-hover:-translate-x-0.5" />
+          Back
+        </button>
         <h1 className="font-serif text-3xl lg:text-4xl text-[#e8dfce] mb-2 flex items-center gap-2">
           <span className="text-white">Accept</span> Project
         </h1>
@@ -122,7 +129,6 @@ export function AcceptProject({
           Find and review client project
         </p>
       </div>
-
       <div className="w-full h-px bg-[#2a2a2a] mb-8" />
 
       {/* --- Search Section --- */}
