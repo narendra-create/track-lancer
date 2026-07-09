@@ -84,10 +84,10 @@
 # for 08/07/2026
 - [x] assign navigation buttons to all newly created pages
 # for 09/07/2026
-- [ ] verify payments controller
+- [x] verify payments controller
 - [ ] make client dashboard
 - [ ] payment history controllers
 - [ ] make profile update system
 - [ ] update settings page to update profile and more
 - [ ] fix - background of verify-payments page
-- [ ] continue paymentController
+- [x] continue paymentController
