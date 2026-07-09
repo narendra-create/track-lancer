@@ -72,7 +72,7 @@ const VerifyPaymentsPage = async () => {
   };
 
   return (
-    <main className="mx-4 lg:pl-7 lg:pt-10">
+    <main>
       <VerifyPaymentsList
         initialVerifications={requests}
         role="FREELANCER"
