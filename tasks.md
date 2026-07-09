@@ -86,7 +86,7 @@
 # for 09/07/2026
 - [x] verify payments controller
 - [ ] make client dashboard
-- [ ] payment history controllers
+- [x] payment history controllers
 - [ ] make profile update system
 - [ ] update settings page to update profile and more
 - [ ] fix - background of verify-payments page
