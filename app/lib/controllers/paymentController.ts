@@ -1,8 +1,11 @@
 import { prisma } from "@/app/lib/prisma";
 import { getSession } from "@/app/lib/session";
 import type { intiiatePaymentInput } from "../validations/PaymentValidation";
+import { ActionResponse } from "@/types/api";
+import { PaymentHistory } from "@/types/payment";
+import { VerifyPaymentType } from "@/types/verifypayments";
 
-export const getPaymentHistory = async (cursor?: string) => {
+export const getPaymentHistory = async (cursor?: string): Promise<ActionResponse<{ payments: PaymentHistory[], nextCursor: string | null }>> => {
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     const role = session.user.role.toLowerCase();
@@ -349,7 +352,7 @@ export const markRejectPayment = async (verificationPaymentId: string) => {
     }
 }
 
-export const getPaymentVerificationRequests = async (cursor?: string) => {
+export const getPaymentVerificationRequests = async (cursor?: string): Promise<ActionResponse<{ requests: VerifyPaymentType[], nextCursor: string | null }>> => {
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     const role = session.user.role.toLowerCase();
