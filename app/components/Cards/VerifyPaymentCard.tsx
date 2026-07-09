@@ -9,8 +9,8 @@ import { formatDate } from "@/app/lib/utilitys";
 interface VerifyPaymentCardProps {
   verification: VerifyPaymentType;
   role: "CLIENT" | "FREELANCER";
-  onVerify?: (id: string) => void;
-  onReject?: (id: string) => void;
+  onVerify?: (id: string) => void | Promise<void>;
+  onReject?: (id: string) => void | Promise<void>;
 }
 
 export function VerifyPaymentCard({ verification, role, onVerify, onReject }: VerifyPaymentCardProps) {
