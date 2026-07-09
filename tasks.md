@@ -87,8 +87,8 @@
 - [x] verify payments controller
 - [x] make client dashboard
 - [x] payment history controllers
-- [ ] make profile update system
-- [ ] update settings page to update profile and more
+- [x] make profile update system
+- [x] update settings page to update profile and more
 - [x] fix - background of verify-payments page
 - [x] continue paymentController
 - [x] add real data in payment history page
@@ -103,3 +103,6 @@
 - [ ] make controllers for client dashboard stats and data
 - [ ] Add real data to client dashboard stage 2
 - [ ] make controller for get client money stats, upcoming deadlines, client dashboard stats
+# for 11/07/2026
+- [ ] make setnew password controller for settings page
+- [ ] make notification off system for settings page
