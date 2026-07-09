@@ -368,7 +368,7 @@ export const getPaymentVerificationRequests = async (cursor?: string): Promise<A
             const getPaymentRequests = await prisma.paymentverification.findMany({
                 take: 5,
                 ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-                where: { clientId: findclient.id },
+                where: { clientId: findclient.id, status: "PENDING_VERIFICATION" },
                 select: {
                     Payment: {
                         select: {
@@ -433,7 +433,8 @@ export const getPaymentVerificationRequests = async (cursor?: string): Promise<A
                 take: 5,
                 ...(cursor && { cursor: { id: cursor }, skip: 1 }),
                 where: {
-                    freelancerId: freelancer.id
+                    freelancerId: freelancer.id,
+                    status: "PENDING_VERIFICATION"
                 },
                 select: {
                     Payment: {
