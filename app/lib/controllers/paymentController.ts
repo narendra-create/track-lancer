@@ -1,5 +1,6 @@
 import { prisma } from "@/app/lib/prisma";
 import { getSession } from "@/app/lib/session";
+import type { intiiatePaymentInput } from "../validations/PaymentValidation";
 
 export const getPaymentHistory = async (cursor?: string) => {
     const session = await getSession();
@@ -101,21 +102,91 @@ export const getPaymentHistory = async (cursor?: string) => {
     return { success: false, error: "Invalid role", status: 403 }
 }
 
-export const initiatePayment = async (paymentId: string) => {
+export const initiatePayment = async (input: intiiatePaymentInput) => {
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     const role = session.user.role.toLowerCase();
     if (role !== "client") { return { success: false, error: "Invalid Role", status: 403 } };
 
+    const findClient = await prisma.userprofile.findUnique({
+        where: { userId: session.user.id }
+    })
+    if (!findClient) {
+        return { success: false, error: "Payment not found", status: 404 }
+    };
+
     const findpayment = await prisma.payment.findFirst({
         where: {
-            id: paymentId,
+            id: input.paymentId,
             project: {
-                client: {
-                    userId: session.user.id
-                }
+                clientId: findClient?.id
             },
             payment_status: "DUE"
+        },
+        select: {
+            id: true,
+            project: {
+                select: {
+                    freelancerId: true
+                }
+            },
+            paid_amount: true,
+            total_cost: true
         }
-    })
+    });
+
+    if (!findpayment) {
+        return { success: false, error: "Payment Ledger Not found", status: 404 }
+    };
+
+    const findpaymentVerification = await prisma.paymentverification.findUnique({
+        where: {
+            txn_number: input.txn_number
+        }
+    });
+    if (findpaymentVerification) {
+        return { success: false, error: "Transaction already exists - Please continue that transaction", status: 409 }
+    };
+    const freelancerId = findpayment.project?.freelancerId;
+    if (!freelancerId) {
+        return {
+            success: false,
+            error: "This payment is not linked to a freelancer",
+            status: 409
+        };
+    }
+    const remainingAmount = findpayment.total_cost - findpayment.paid_amount;
+
+    if (remainingAmount === 0) {
+        return {
+            success: false,
+            error: "Payment is already fully paid or pending verification",
+            status: 409
+        };
+    }
+    if (remainingAmount > 0 && input.paid_amount > remainingAmount) {
+        return { success: false, error: `Amount exceeds remaining due amount: ${remainingAmount}`, status: 400 }
+    };
+
+    try {
+        const created = await prisma.paymentverification.create({
+            data: {
+                txn_number: input.txn_number,
+                paid_amount: input.paid_amount,
+                clientId: findClient.id,
+                freelancerId: freelancerId,
+                paymentid: input.paymentId,
+                status: "PENDING_VERIFICATION"
+            }
+        });
+
+        return { success: true, createdVerification: created, status: 201 }
+    }
+    catch (err) {
+        return {
+            success: false,
+            error: err instanceof Error ? err.message : "Server Error",
+            status: 500
+        };
+    }
 }
