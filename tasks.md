@@ -93,3 +93,9 @@
 - [x] continue paymentController
 - [x] add real data in payment history page
 - [x] add real data in verification requests page
+# for 10/07/2026
+- [ ] Make Payment initiate for client with qr code
+- [ ] make i have paid page where they can submit txn number and screenshot
+- [ ] Make controller for marking project completed
+- [ ] make button for marking project completed for freelancer
+- [ ] Start working on activity page for both client and freelancer
