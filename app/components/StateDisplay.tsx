@@ -31,9 +31,17 @@ export function StateDisplay({
   const defaultAction = isError ? "Try Again" : "Refresh";
 
   const Icon = isError ? AlertCircle : FileSearch;
-  const iconBg = isError
-    ? "bg-red-100 text-red-500 dark:bg-red-500/10 dark:text-red-400"
-    : "bg-blue-100 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400";
+  
+  // Theme colors based on state
+  const cardBg = isError 
+    ? "bg-[rgba(239,68,68,0.03)] border-[rgba(239,68,68,0.2)]" 
+    : "bg-[rgba(200,120,64,0.03)] border-[rgba(200,120,64,0.25)]"; 
+    
+  const iconBoxBg = isError
+    ? "bg-[rgba(239,68,68,0.1)] text-red-400 border-[rgba(239,68,68,0.2)]"
+    : "bg-[rgba(200,120,64,0.1)] text-[var(--color-dash-amber)] border-[rgba(200,120,64,0.2)]";
+
+  const titleColor = isError ? "text-red-400" : "text-[var(--color-dash-amber)]";
 
   const handleAction = () => {
     if (onAction) {
@@ -51,25 +59,38 @@ export function StateDisplay({
   );
 
   const buttonClass =
-    "inline-flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100 font-medium";
+    "inline-flex items-center justify-center gap-2 px-6 py-3 border border-[var(--color-dash-border)] rounded-md font-mono text-[11px] lg:text-[13px] tracking-[1.5px] uppercase text-[var(--color-dash-ink2)] hover:text-white hover:border-[var(--color-dash-border-hover)] bg-[var(--color-dash-surface1)] transition-all duration-300 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(200,120,64,0.15)]";
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] p-6 text-center w-full">
+    <div className="flex flex-col items-center justify-center min-h-[50vh] p-4 lg:p-8 w-full relative">
+      {/* Background glowing effects for premium feel */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10 flex items-center justify-center">
+        <div className={`w-[40%] h-[300px] rounded-full blur-[120px] opacity-20 ${isError ? 'bg-red-500' : 'bg-[var(--color-dash-amber)]'}`} />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex flex-col items-center max-w-md bg-white border border-gray-100 rounded-3xl shadow-sm dark:bg-[#0a0a0a] dark:border-gray-800 p-8"
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+        className={`flex flex-col items-center max-w-lg w-full backdrop-blur-md border rounded-2xl p-8 lg:p-12 text-center shadow-[0_8px_32px_-8px_rgba(0,0,0,0.3)] relative overflow-hidden ${cardBg}`}
       >
-        <div
-          className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${iconBg}`}
+        {/* Subtle Top Gradient Highlight inside the card */}
+        <div className={`absolute top-0 left-0 w-full h-[2px] opacity-100 bg-gradient-to-r from-transparent ${isError ? 'via-red-500' : 'via-[var(--color-dash-amber)]'} to-transparent`} />
+
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.1 }}
+          className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-8 border ${iconBoxBg} shadow-inner`}
         >
-          <Icon className="w-8 h-8" />
-        </div>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <Icon className="w-10 h-10" strokeWidth={1.5} />
+        </motion.div>
+        
+        <h3 className={`font-serif text-[24px] lg:text-[28px] mb-3 leading-tight ${titleColor}`}>
           {title || defaultTitle}
         </h3>
-        <p className="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+        
+        <p className="font-mono text-[12px] lg:text-[14px] text-[var(--color-dash-ink3)] mb-10 leading-relaxed max-w-[85%]">
           {message || defaultMessage}
         </p>
 
