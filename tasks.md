@@ -85,7 +85,7 @@
 - [x] assign navigation buttons to all newly created pages
 # for 09/07/2026
 - [x] verify payments controller
-- [ ] make client dashboard
+- [x] make client dashboard
 - [x] payment history controllers
 - [ ] make profile update system
 - [ ] update settings page to update profile and more
