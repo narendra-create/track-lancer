@@ -93,7 +93,7 @@
 - [x] continue paymentController
 - [x] add real data in payment history page
 - [x] add real data in verification requests page
-- [ ] add real data to client dashboard from existing controllers stage 1
+- [x] add real data to client dashboard from existing controllers stage 1
 # for 10/07/2026
 - [ ] Make Payment initiate for client with qr code
 - [ ] make i have paid page where they can submit txn number and screenshot
