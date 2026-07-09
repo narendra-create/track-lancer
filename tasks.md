@@ -102,3 +102,4 @@
 - [ ] Start working on activity page for both client and freelancer
 - [ ] make controllers for client dashboard stats and data
 - [ ] Add real data to client dashboard stage 2
+- [ ] make controller for get client money stats, upcoming deadlines, client dashboard stats
