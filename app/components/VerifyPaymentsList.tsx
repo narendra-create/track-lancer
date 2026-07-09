@@ -4,21 +4,78 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { VerifyPaymentCard } from "./Cards/VerifyPaymentCard";
 import type { VerifyPaymentType } from "@/types/verifypayments";
+import { useToast } from "./ToastProvider";
 
 interface VerifyPaymentsListProps {
   initialVerifications: VerifyPaymentType[];
   role: "CLIENT" | "FREELANCER";
+  cursor?: string | null;
+  onAccept?: (
+    verificationPaymentId: string,
+  ) => Promise<{ error?: string; updated?: any }>;
+  onReject?: (
+    verificationPaymentId: string,
+  ) => Promise<{ error?: string; updated?: any }>;
+  onLoadMore?: (cursor: string) => Promise<{
+    error?: string;
+    requests?: VerifyPaymentType[];
+    nextCursor?: string | null;
+  }>;
 }
 
-export function VerifyPaymentsList({ initialVerifications, role }: VerifyPaymentsListProps) {
-  const [displayCount, setDisplayCount] = useState(5);
-  
-  const visibleVerifications = initialVerifications.slice(0, displayCount);
-  const hasMore = displayCount < initialVerifications.length;
+export function VerifyPaymentsList({
+  initialVerifications,
+  role,
+  cursor,
+  onLoadMore,
+  onAccept,
+  onReject,
+}: VerifyPaymentsListProps) {
+  const [verifications, setVerifications] = useState(initialVerifications);
+  const [currentCursor, setCurrentCursor] = useState(cursor);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const { addToast } = useToast();
 
-  const handleVerify = (id: string) => {
-    // In the future this should call an API to mark as paid
-    console.log("Verified payment ID:", id);
+  const hasMore = !!currentCursor;
+
+  const handleLoadMoreClick = async () => {
+    if (!onLoadMore || !currentCursor) return;
+    setIsLoadingMore(true);
+    const result = await onLoadMore(currentCursor);
+    if (result.error) {
+      addToast({
+        message: result.error,
+        title: "Got an error",
+        type: "error",
+      });
+    } else if (result.requests) {
+      setVerifications((prev) => [...prev, ...result.requests!]);
+      setCurrentCursor(result.nextCursor);
+    }
+    setIsLoadingMore(false);
+  };
+
+  const handleVerify = async (id: string, action: "ACCEPT" | "REJECT") => {
+    if (!onAccept || !onReject) return;
+    if (action === "ACCEPT") {
+      const result = await onAccept(id);
+      if (result.error) {
+        addToast({
+          message: result.error,
+          title: "Got an error",
+          type: "error",
+        });
+      }
+    } else {
+      const result = await onReject(id);
+      if (result.error) {
+        addToast({
+          message: result.error,
+          title: "Got an error",
+          type: "error",
+        });
+      }
+    }
   };
 
   return (
@@ -48,18 +105,19 @@ export function VerifyPaymentsList({ initialVerifications, role }: VerifyPayment
             {initialVerifications.length}
           </span>
         </h2>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          {visibleVerifications.map((verification) => (
-            <VerifyPaymentCard 
-              key={verification.id} 
-              verification={verification} 
-              role={role} 
-              onVerify={handleVerify}
+          {verifications.map((verification) => (
+            <VerifyPaymentCard
+              key={verification.id}
+              verification={verification}
+              role={role}
+              onVerify={(id) => handleVerify(id, "ACCEPT")}
+              onReject={(id) => handleVerify(id, "REJECT")}
             />
           ))}
-          
-          {visibleVerifications.length === 0 && (
+
+          {verifications.length === 0 && (
             <div className="col-span-1 lg:col-span-2 text-center py-8 border border-dashed border-[var(--color-dash-border)] rounded-xl font-mono text-[11px] text-[var(--color-dash-ink3)]">
               No payments require verification right now.
             </div>
@@ -69,10 +127,11 @@ export function VerifyPaymentsList({ initialVerifications, role }: VerifyPayment
         {hasMore && (
           <div className="mt-6 flex justify-center">
             <button
-              onClick={() => setDisplayCount(prev => prev + 5)}
-              className="px-6 py-2.5 border border-[var(--color-dash-border)] rounded-md font-mono text-[11px] lg:text-[13px] tracking-[1.5px] uppercase text-[var(--color-dash-ink2)] hover:text-white hover:border-[var(--color-dash-border-hover)] bg-[var(--color-dash-surface1)] transition-colors"
+              onClick={handleLoadMoreClick}
+              disabled={isLoadingMore}
+              className="px-6 py-2.5 border border-[var(--color-dash-border)] rounded-md font-mono text-[11px] lg:text-[13px] tracking-[1.5px] uppercase text-[var(--color-dash-ink2)] hover:text-white hover:border-[var(--color-dash-border-hover)] bg-[var(--color-dash-surface1)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Load More
+              {isLoadingMore ? "Loading..." : "Load More"}
             </button>
           </div>
         )}
