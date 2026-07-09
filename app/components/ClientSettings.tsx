@@ -2,6 +2,9 @@
 import { useState } from "react";
 import { User, Bell, Shield, Camera, Check, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { useToast } from "./ToastProvider";
+import { updateProfileAction } from "@/app/lib/actions/ProfileActions";
+import type { ProfileData } from "./freelancer/FreelancerSettings";
 
 type SettingsSection = "profile" | "notifications" | "security";
 
@@ -89,14 +92,15 @@ function SaveButton({ loading, saved }: { loading: boolean; saved: boolean }) {
   );
 }
 
-function ProfileSection() {
+function ProfileSection({ initialData }: { initialData?: ProfileData }) {
+  const { addToast } = useToast();
   const [form, setForm] = useState({
-    name: "Client Tester",
-    email: "c89927187@gmail.com",
-    phone: "+91 98765 43210",
-    bio: "Looking for top-tier freelancers to build scalable and modern web applications.",
-    company: "Tech Innovations Inc.",
-    location: "San Francisco, USA",
+    name: initialData?.name || "",
+    email: initialData?.email || "",
+    phone: initialData?.phone || "",
+    bio: "Looking for top-tier freelancers to build scalable and modern web applications.", // placeholder
+    company: "Tech Innovations Inc.", // placeholder
+    location: "San Francisco, USA", // placeholder
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -114,10 +118,19 @@ function ProfileSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
+    const result = await updateProfileAction({
+      name: form.name,
+      phone: form.phone,
+    });
     setLoading(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    
+    if (result.success) {
+      setSaved(true);
+      addToast({ title: "Success", message: "Profile updated successfully!", type: "success" });
+      setTimeout(() => setSaved(false), 3000);
+    } else {
+      addToast({ title: "Error", message: result.error || "Failed to update profile", type: "error" });
+    }
   };
 
   return (
@@ -135,18 +148,18 @@ function ProfileSection() {
           </button>
         </div>
         <div>
-          <p className="font-serif text-[17px] text-white mb-0.5">
+          <p className="font-serif font-bold tracking-label text-[17px] text-white mb-0.5">
             {form.name}
           </p>
-          <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
-            {form.company}
+          <p className="font-sans font-bold text-[10px] lg:text-[12px] text-dash-ink2/60">
+            {form.email}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+          <label className="text-dash-ink2/80 font-bold lg:text-[12px] font-serif text-[10px] tracking-[1.5px] uppercase">
             Full Name
           </label>
           <input
@@ -157,19 +170,19 @@ function ProfileSection() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+          <label className="text-dash-ink2/80 font-bold lg:text-[12px] font-serif text-[10px] tracking-[1.5px] uppercase">
             Email
           </label>
           <input
             name="email"
             type="email"
             value={form.email}
-            onChange={handleChange}
-            className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
+            disabled
+            className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white/40 placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+          <label className="text-dash-ink2/80 font-bold lg:text-[12px] font-serif text-[10px] tracking-[1.5px] uppercase">
             Phone
           </label>
           <input
@@ -179,31 +192,8 @@ function ProfileSection() {
             className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
           />
         </div>
-        <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
-            Location
-          </label>
-          <input
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
-          />
-        </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
-          Bio
-        </label>
-        <textarea
-          name="bio"
-          rows={3}
-          value={form.bio}
-          onChange={handleChange}
-          className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200 resize-none"
-        />
-      </div>
 
       <div className="flex justify-end pt-2">
         <SaveButton loading={loading} saved={saved} />
@@ -446,11 +436,11 @@ function SecuritySection() {
   );
 }
 
-export function ClientSettings() {
+export function ClientSettings({ initialData }: { initialData?: ProfileData }) {
   const [active, setActive] = useState<SettingsSection>("profile");
 
   const SECTION_CONTENT: Record<SettingsSection, React.ReactNode> = {
-    profile: <ProfileSection />,
+    profile: <ProfileSection initialData={initialData} />,
     notifications: <NotificationsSection />,
     security: <SecuritySection />,
   };

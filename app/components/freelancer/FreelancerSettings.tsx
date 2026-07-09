@@ -2,8 +2,19 @@
 import { useState } from "react";
 import { User, Bell, Shield, Camera, Check, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { Categorys } from "@/app/generated/prisma/enums";
+import { formatCategory } from "@/app/lib/utilitys";
+import { useToast } from "../ToastProvider";
+import { updateProfileAction } from "@/app/lib/actions/ProfileActions";
 
 type SettingsSection = "profile" | "notifications" | "security";
+
+export type ProfileData = {
+  name: string;
+  email: string;
+  phone?: string;
+  category?: string;
+};
 
 const SECTIONS = [
   { id: "profile" as const, label: "Profile", icon: User },
@@ -96,14 +107,15 @@ function SaveButton({ loading, saved }: { loading: boolean; saved: boolean }) {
   );
 }
 
-function ProfileSection() {
+function ProfileSection({ initialData }: { initialData?: ProfileData }) {
+  const { addToast } = useToast();
   const [form, setForm] = useState({
-    name: "Narendra Dev",
-    email: "narendra@example.com",
-    phone: "+91 98765 43210",
-    bio: "Full-stack developer specializing in React, Next.js, and scalable backend systems.",
-    category: "Web Development",
-    location: "Mumbai, India",
+    name: initialData?.name || "",
+    email: initialData?.email || "",
+    phone: initialData?.phone || "",
+    bio: "Full-stack developer specializing in React, Next.js, and scalable backend systems.", // placeholder
+    category: initialData?.category || Categorys.WEB_DEV,
+    location: "Mumbai, India", // placeholder
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -121,10 +133,20 @@ function ProfileSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
+    const result = await updateProfileAction({
+      name: form.name,
+      phone: form.phone,
+      category: form.category as Categorys,
+    });
     setLoading(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    
+    if (result.success) {
+      setSaved(true);
+      addToast({ title: "Success", message: "Profile updated successfully!", type: "success" });
+      setTimeout(() => setSaved(false), 3000);
+    } else {
+      addToast({ title: "Error", message: result.error || "Failed to update profile", type: "error" });
+    }
   };
 
   return (
@@ -142,18 +164,18 @@ function ProfileSection() {
           </button>
         </div>
         <div>
-          <p className="font-serif text-[17px] text-white mb-0.5">
+          <p className="font-serif font-bold tracking-label text-[17px] text-white mb-0.5">
             {form.name}
           </p>
-          <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
-            {form.category}
+          <p className="font-mono font-bold text-[10px] lg:text-[12px] tracking-badge uppercase text-dash-ink2/60">
+            {formatCategory(form.category)}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+          <label className="text-dash-ink2/80 font-bold lg:text-[12px] font-serif text-[10px] tracking-[1.5px] uppercase">
             Full Name
           </label>
           <input
@@ -164,19 +186,20 @@ function ProfileSection() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+          <label className="text-dash-ink2/80 font-bold lg:text-[12px] font-serif text-[10px] tracking-[1.5px] uppercase">
             Email
           </label>
           <input
             name="email"
             type="email"
             value={form.email}
+            disabled
             onChange={handleChange}
-            className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
+            className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white/40 placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+          <label className="text-dash-ink2/80 font-bold lg:text-[12px] font-serif text-[10px] tracking-[1.5px] uppercase">
             Phone
           </label>
           <input
@@ -187,29 +210,32 @@ function ProfileSection() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
-            Location
+          <label className="text-[10px] tracking-[1.5px] uppercase text-dash-ink2/80 font-bold lg:text-[12px] font-serif">
+            Skill Category
           </label>
-          <input
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
-          />
+          <div className="relative">
+            <select
+              name="category"
+              value={form.category || ""}
+              onChange={handleChange}
+              className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white focus:outline-none focus:border-[var(--color-dash-ink3)] transition-all duration-200 appearance-none cursor-pointer"
+            >
+              <option value="" disabled className="bg-[#141414] text-dash-ink2/80 font-bold">
+                Select your main skill
+              </option>
+              
+              {Object.values(Categorys).map((cat) => (
+                <option key={cat} value={cat} className="bg-[#141414] text-white py-2">
+                  {formatCategory(cat)}
+                </option>
+              ))}
+            </select>
+            
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-dash-ink4)]">
+              ▼
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
-          Bio
-        </label>
-        <textarea
-          name="bio"
-          rows={3}
-          value={form.bio}
-          onChange={handleChange}
-          className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200 resize-none"
-        />
       </div>
 
       <div className="flex justify-end pt-2">
@@ -453,11 +479,11 @@ function SecuritySection() {
   );
 }
 
-export function FreelancerSettings() {
+export function FreelancerSettings({ initialData }: { initialData?: ProfileData }) {
   const [active, setActive] = useState<SettingsSection>("profile");
 
   const SECTION_CONTENT: Record<SettingsSection, React.ReactNode> = {
-    profile: <ProfileSection />,
+    profile: <ProfileSection initialData={initialData} />,
     notifications: <NotificationsSection />,
     security: <SecuritySection />,
   };

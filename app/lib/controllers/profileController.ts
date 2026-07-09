@@ -1,5 +1,7 @@
 import { prisma } from "@/app/lib/prisma";
 import type { Categorys } from "@/app/generated/prisma/enums";
+import { getSession } from "@/app/lib/session";
+import { updateProfileInput } from "../validations/ProfileValidation";
 
 export const addprofile = async (
   userId: string,
@@ -67,3 +69,131 @@ export const getFreelancerProfile = async (email: string) => {
   });
   return { success: true, profile: foundfreelancer }
 }
+
+export const updateProfile = async (data: updateProfileInput) => {
+  const session = await getSession();
+  if (!session) return { success: false, error: "Unauthorized", status: 401 };
+  const role = session.user.role.toLowerCase();
+  if (role !== "client" && role !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
+  if (role === "client") {
+    const findProfile = await prisma.userprofile.findUnique({
+      where: { userId: session.user.id }
+    });
+
+    if (!findProfile) {
+      return { success: false, error: "Profile Not found", status: 404 }
+    };
+
+    const updateData: any = {
+      ...data,
+    };
+
+    if (Object.keys(updateData).length === 0) {
+      return { success: false, error: "No data provided", status: 400 };
+    }
+
+    if (data.name !== undefined) {
+      updateData.user = {
+        update: {
+          name: data.name,
+        },
+      };
+      delete updateData.name;
+    }
+    try {
+      await prisma.userprofile.update({
+        where: { id: findProfile.id },
+        data: updateData
+      });
+
+      return { success: true, message: "Success", status: 200 };
+    }
+    catch (err) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : "Server Error",
+        status: 500
+      };
+    }
+  }
+  else {
+    const findProfile = await prisma.freelancer.findUnique({
+      where: { userId: session.user.id }
+    });
+
+    if (!findProfile) {
+      return { success: false, error: "Profile Not found", status: 404 }
+    };
+
+    const updateData: any = {
+      ...data,
+    };
+
+    if (Object.keys(updateData).length === 0) {
+      return { success: false, error: "No data provided", status: 400 };
+    }
+
+    if (data.name !== undefined) {
+      updateData.user = {
+        update: {
+          name: data.name,
+        },
+      };
+      delete updateData.name;
+    }
+    try {
+      await prisma.freelancer.update({
+        where: { id: findProfile.id },
+        data: updateData
+      });
+
+      return { success: true, message: "Success", status: 200 };
+    }
+    catch (err) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : "Server Error",
+        status: 500
+      };
+    }
+  }
+}
+
+export const getSettingsProfile = async () => {
+  const session = await getSession();
+  if (!session) return { success: false, error: "Unauthorized" };
+
+  const role = session.user.role.toLowerCase();
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: {
+      Freelancer: true,
+      userprofiles: true,
+    },
+  });
+
+  if (!user) return { success: false, error: "User not found" };
+
+  if (role === "client") {
+    return {
+      success: true,
+      data: {
+        name: user.name,
+        email: user.email,
+        phone: user.userprofiles?.phone || "",
+        // bio, company, location etc. can be added here if added to schema later
+      },
+    };
+  } else {
+    return {
+      success: true,
+      data: {
+        name: user.name,
+        email: user.email,
+        phone: user.Freelancer?.phone || "",
+        category: user.Freelancer?.category || "",
+      },
+    };
+  }
+};
