@@ -2,6 +2,7 @@ import { NewProjectForm } from "@/app/components/NewProjectForm";
 import { createNewProject } from "@/app/lib/controllers/ProjectController";
 import { newProjectSchema } from "@/app/lib/validations/ProjectValidation";
 import type { newProjectInput } from "@/app/lib/validations/ProjectValidation";
+import { getProfileAction, updateUPIDetailsAction } from "@/app/lib/actions/ProfileActions";
 
 export type NewProjectType = {
   title: string;
@@ -10,7 +11,10 @@ export type NewProjectType = {
   description?: string;
 };
 
-const NewProject = () => {
+const NewProject = async () => {
+  const profileResponse = await getProfileAction();
+  const hasUpi = !!(profileResponse.success && profileResponse.data && profileResponse.data.upiId);
+
   const createNew = async (form: NewProjectType) => {
     "use server";
     const payload: newProjectInput = {
@@ -33,7 +37,11 @@ const NewProject = () => {
 
   return (
     <div className="lg:pl-11 lg:pt-14 mx-4">
-      <NewProjectForm handleCreate={createNew} />
+      <NewProjectForm 
+        handleCreate={createNew} 
+        hasUpi={hasUpi} 
+        updateUPI={updateUPIDetailsAction} 
+      />
     </div>
   );
 };
