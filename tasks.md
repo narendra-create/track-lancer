@@ -102,6 +102,7 @@
 - [ ] make notification off system for settings page
 - [ ] make a function to archive projects from freelancer or from client side
 - [ ] make project cancelled button
+- [ ] make getdeadlinecontroller for client dashboard
 
 
 ## additionals
