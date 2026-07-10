@@ -525,3 +525,53 @@ export const searchProject = async (projectCode: string) => {
 
     return { success: true, project: findProject, status: 200 }
 }
+
+export const markProjectCompleted = async (projectId: string) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
+
+    const freelancerProfile = await prisma.freelancer.findFirst({
+        where: { userId: session.user.id },
+        select: {
+            id: true,
+            user: {
+                select: { email: true }
+            }
+        }
+    });
+    if (!freelancerProfile) {
+        return { success: false, error: "freelancer Account does not exist", status: 404 }
+    };
+
+    const findProject = await prisma.project.findUnique({
+        where: { id: projectId }
+    });
+    if (!findProject) {
+        return { success: false, error: "Project Not found", status: 404 }
+    };
+    if (!findProject.clientId) {
+        return { success: false, error: "Project is Not started", status: 403 }
+    }
+
+    try {
+        const completedProject = await prisma.project.update({
+            where: { id: findProject.id },
+            data: {
+                status: "COMPLETED"
+            },
+            select: {
+                id: true
+            }
+        });
+
+        return { success: true, Project: completedProject, status: 200 };
+    }
+    catch (err: any) {
+        if (err.error) {
+            return { success: false, error: err.error, status: err.status }
+        }
+        console.log(err, "From acceptProject")
+        return { success: false, error: "Server Error", status: 500 }
+    }
+}
