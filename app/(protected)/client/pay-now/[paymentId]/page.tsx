@@ -8,7 +8,7 @@ import {
 } from "@/app/lib/controllers/paymentController";
 import { PayNowView } from "@/app/components/client/PayNowView";
 import { PayNowError } from "@/app/components/client/PayNowError";
-import { formatDate, formatMoney } from "@/app/lib/utilitys";
+import { formatDate } from "@/app/lib/utilitys";
 
 type Props = {
   params: Promise<{
@@ -71,9 +71,12 @@ const PaymentPage = async ({ params }: Props) => {
   return (
     <PayNowView
       projectTitle={detailresult.details.title}
-      freelancerName={detailresult.details.freelancer.user.name}
+      freelancerName={
+        detailresult.details.freelancer.AccountHolderName ??
+        detailresult.details.freelancer.user.name
+      }
       upiId={detailresult.details.freelancer.upiId}
-      amount={detailresult.details.totalDue}
+      amount={"custom"}
       dueDate={formatDate(detailresult.details.due_date)}
       status={detailresult.details.payment_status}
       backHref={BACK_HREF}
