@@ -91,11 +91,8 @@
 - [x] make i have paid page where they can submit txn number and screenshot
 - [x] Make controller for marking project completed
 - [x] make button for marking project completed for freelancer
-- [ ] Start working on activity page for both client and freelancer
-- [ ] make controllers for client dashboard stats and data
-- [ ] Add real data to client dashboard stage 2
-- [ ] make controller for get client money stats, upcoming deadlines, client dashboard stats
-- [ ] API/REALDATA: Fetch paginated list of projects for Client dashboard
+- [x] Start working on activity page for both client and freelancer
+- [x] make controllers for client dashboard stats and data
 - [x] make upi code submit system for freelancer
 # for 11/07/2026
 - [ ] make setnew password controller for settings page
@@ -103,7 +100,12 @@
 - [ ] make a function to archive projects from freelancer or from client side
 - [ ] make project cancelled button
 - [ ] make getdeadlinecontroller for client dashboard
-
+- [ ] continue on client dashboard real data
+- [ ] make controller for get client money stats, upcoming deadlines, client dashboard stats
+- [ ] Add real data to client dashboard stage 2
+- [ ] API/REALDATA: Fetch paginated list of projects for Client dashboard
+- [ ] create model for activity feature
+- [ ] continue activity feature
 
 ## additionals
 - [ ] ADDITIONAL: Set up email notifications or in-app alerts for milestone status changes
