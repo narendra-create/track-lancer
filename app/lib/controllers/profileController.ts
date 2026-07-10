@@ -181,8 +181,7 @@ export const getSettingsProfile = async () => {
       data: {
         name: user.name,
         email: user.email,
-        phone: user.userprofiles?.phone || "",
-        // bio, company, location etc. can be added here if added to schema later
+        phone: user.userprofiles?.phone || ""
       },
     };
   } else {
@@ -193,7 +192,57 @@ export const getSettingsProfile = async () => {
         email: user.email,
         phone: user.Freelancer?.phone || "",
         category: user.Freelancer?.category || "",
+        upiId: user.Freelancer?.upiId || undefined,
+        AccountHolderName: user.Freelancer?.AccountHolderName || undefined
       },
     };
   }
 };
+
+export const updateUPIDetails = async (data: { upiId: string, AccountHolderName: string }) => {
+  const isValidSyntax = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(data.upiId);
+  if (!isValidSyntax) {
+    return { success: false, error: "Enter valid upi id please", status: 400 }
+  };
+  if (data.AccountHolderName.length <= 3) {
+    return { success: false, error: "Account holder name is too short", status: 400 }
+  };
+  const session = await getSession();
+  if (!session) return { success: false, error: "Unauthorized" };
+  const role = session.user.role.toLowerCase();
+  if (role !== "freelancer") { return { success: false, error: "Invalid Role", status: 403 } };
+
+
+  const findProfile = await prisma.freelancer.findUnique({
+    where: { userId: session.user.id }
+  });
+
+  if (!findProfile) {
+    return { success: false, error: "Profile Not found", status: 404 }
+  };
+
+  const updateData: any = {
+    ...data,
+  };
+
+  if (Object.keys(updateData).length === 0) {
+    return { success: false, error: "No data provided", status: 400 };
+  }
+
+  try {
+    await prisma.freelancer.update({
+      where: { id: findProfile.id },
+      data: updateData
+    });
+
+    return { success: true, message: "Success", status: 200 };
+  }
+  catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Server Error",
+      status: 500
+    };
+  }
+
+}
