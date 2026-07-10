@@ -89,18 +89,19 @@
 # for 10/07/2026
 - [x] Make Payment initiate for client with qr code
 - [x] make i have paid page where they can submit txn number and screenshot
-- [ ] Make controller for marking project completed
-- [ ] make button for marking project completed for freelancer
+- [x] Make controller for marking project completed
+- [x] make button for marking project completed for freelancer
 - [ ] Start working on activity page for both client and freelancer
 - [ ] make controllers for client dashboard stats and data
 - [ ] Add real data to client dashboard stage 2
 - [ ] make controller for get client money stats, upcoming deadlines, client dashboard stats
 - [ ] API/REALDATA: Fetch paginated list of projects for Client dashboard
-- [ ] make upi code submit system for freelancer
+- [x] make upi code submit system for freelancer
 # for 11/07/2026
 - [ ] make setnew password controller for settings page
 - [ ] make notification off system for settings page
 - [ ] make a function to archive projects from freelancer or from client side
+- [ ] make project cancelled button
 
 
 ## additionals
