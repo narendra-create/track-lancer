@@ -12,7 +12,7 @@ import type { PaymentHistory } from "@/types/payment";
 import { formatDate } from "@/app/lib/utilitys";
 import Link from "next/link";
 import { Paymentstatus } from "@/app/generated/prisma/enums";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const STATUS_CONFIG: Record<
   Paymentstatus,
@@ -56,6 +56,7 @@ export function PaymentHistoryCard({
   index,
   role,
 }: PaymentHistoryCardProps) {
+  const router = useRouter();
   const cfg = STATUS_CONFIG[payment.payment_status];
   const isPaid = payment.payment_status === "PAID";
   const isDue = payment.payment_status === "DUE";
@@ -70,7 +71,7 @@ export function PaymentHistoryCard({
       {/* Card Content - Clickable */}
       <div
         onClick={() => {
-          redirect(`${role.toLowerCase()}/payment-details/${payment.id}`);
+          router.push(`/${role.toLowerCase()}/payment-details/${payment.id}`);
         }}
         className={`relative flex-1 flex flex-col justify-between mb-6 border rounded-xl p-4 lg:p-6 transition-all duration-300 cursor-pointer group overflow-hidden ${
           isDue

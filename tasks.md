@@ -94,6 +94,8 @@
 - [x] Start working on activity page for both client and freelancer
 - [x] make controllers for client dashboard stats and data
 - [x] make upi code submit system for freelancer
+- [ ] update terms page
+- [x] link payment details component with history cards
 # for 11/07/2026
 - [ ] make setnew password controller for settings page
 - [ ] make notification off system for settings page

@@ -1,9 +1,9 @@
-import prisma from "@/prisma/prisma.config";
-import { getSession } from "@/auth";
+import { prisma } from "@/app/lib/prisma";
+import { getSession } from "@/app/lib/session";
 
 export const PaymentDetailUiController = async (paymentId: string) => {
     const session = await getSession();
-    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (!session) return { success: false as const, error: "Unauthorized", status: 401 };
     
     // Allow both client and freelancer to view? The original controller only allowed client.
     // The user's page says: role="CLIENT" but if there is a freelancer page we could check both.
@@ -11,7 +11,7 @@ export const PaymentDetailUiController = async (paymentId: string) => {
     // Original checked `if (role !== "client")`.
     const role = session.user.role.toLowerCase();
     if (role !== "client" && role !== "freelancer") {
-        return { success: false, error: "This account cannot view payment details", status: 403 };
+        return { success: false as const, error: "This account cannot view payment details", status: 403 };
     }
 
     const findPayment = await prisma.payment.findUnique({
@@ -30,6 +30,7 @@ export const PaymentDetailUiController = async (paymentId: string) => {
                     description: true,
                     freelancer: {
                         select: {
+                            userId: true,
                             user: {
                                 select: {
                                     name: true,
@@ -57,16 +58,18 @@ export const PaymentDetailUiController = async (paymentId: string) => {
     });
 
     if (!findPayment) {
-        return { success: false, error: "Payment Ledger Not found", status: 404 }
+        return { success: false as const, error: "Payment Ledger Not found", status: 404 }
     };
 
     // Client authorization check
     if (role === "client" && findPayment.project?.client?.userId !== session.user.id) {
-        return { success: false, error: "This payment ledger is not associated with you", status: 409 }
+        return { success: false as const, error: "This payment ledger is not associated with you", status: 409 }
     };
     
-    // Freelancer authorization check - if you plan to reuse this for freelancers
-    // if (role === "freelancer" && findPayment.project?.freelancer?.userId !== session.user.id) { ... }
+    // Freelancer authorization check
+    if (role === "freelancer" && findPayment.project?.freelancer?.userId !== session.user.id) {
+        return { success: false as const, error: "This payment ledger is not associated with you", status: 409 }
+    };
 
     const totalDuesum = findPayment.total_cost - findPayment.paid_amount;
     const totalDue = totalDuesum <= 0 ? 0 : totalDuesum;
@@ -94,7 +97,7 @@ export const PaymentDetailUiController = async (paymentId: string) => {
         }
     };
 
-    return { success: true, details: returningObject, status: 200 }
+    return { success: true as const, details: returningObject, status: 200 }
 };
 
 export type PaymentDetailUiControllerResponse = Awaited<
