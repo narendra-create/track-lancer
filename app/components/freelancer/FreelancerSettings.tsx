@@ -1,25 +1,28 @@
 "use client";
 import { useState } from "react";
-import { User, Bell, Shield, Camera, Check, ExternalLink } from "lucide-react";
+import { User, Bell, Shield, Camera, Check, ExternalLink, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { Categorys } from "@/app/generated/prisma/enums";
 import { formatCategory } from "@/app/lib/utilitys";
 import { useToast } from "../ToastProvider";
 import { updateProfileAction } from "@/app/lib/actions/ProfileActions";
 
-type SettingsSection = "profile" | "notifications" | "security";
+type SettingsSection = "profile" | "notifications" | "security" | "payment";
 
 export type ProfileData = {
   name: string;
   email: string;
   phone?: string;
   category?: string;
+  upiId?: string;
+  AccountHolderName?: string;
 };
 
 const SECTIONS = [
   { id: "profile" as const, label: "Profile", icon: User },
   { id: "notifications" as const, label: "Notifications", icon: Bell },
   { id: "security" as const, label: "Security", icon: Shield },
+  { id: "payment" as const, label: "Payment Details", icon: CreditCard },
 ];
 
 function SectionNav({
@@ -479,13 +482,147 @@ function SecuritySection() {
   );
 }
 
-export function FreelancerSettings({ initialData }: { initialData?: ProfileData }) {
+function PaymentDetailsSection({ initialData, onUpdateUPI }: { initialData?: ProfileData, onUpdateUPI: (data: { upiId: string, AccountHolderName: string }) => Promise<{ success: boolean, error?: string }> }) {
+  const { addToast } = useToast();
+  const [form, setForm] = useState({ upiId: initialData?.upiId || "", holderName: initialData?.AccountHolderName || "" });
+  const [checkSuccess, setCheckSuccess] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setCheckSuccess(false);
+    setIsConfirmed(false);
+  };
+
+  const handleCheck = () => {
+    if (!form.upiId || !form.holderName) {
+      addToast({ title: "Error", message: "Both UPI ID and Holder Name are required", type: "error" });
+      return;
+    }
+    const isValidSyntax = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(form.upiId);
+    if (isValidSyntax) {
+      setCheckSuccess(true);
+    } else {
+      setCheckSuccess(false);
+      addToast({ title: "Error", message: "Invalid UPI ID format", type: "error" });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!checkSuccess || !isConfirmed) return;
+    
+    setLoading(true);
+    const result = await onUpdateUPI({
+      upiId: form.upiId,
+      AccountHolderName: form.holderName
+    });
+    
+    setLoading(false);
+    if (result.success) {
+      setSaved(true);
+      addToast({ title: "Success", message: "Payment details updated successfully!", type: "success" });
+      setTimeout(() => setSaved(false), 3000);
+    } else {
+      addToast({ title: "Error", message: result.error || "Failed to update payment details", type: "error" });
+    }
+  };
+
+  // Using a free QR generation API to show how it will look
+  const qrDataUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${form.upiId}&pn=${form.holderName}`)}`;
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div>
+        <p className="font-serif text-[16px] text-white mb-1">
+          UPI Payment Details
+        </p>
+        <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+          Add your UPI ID to receive payments from clients
+        </p>
+      </div>
+      <div className="w-full h-px bg-[var(--color-dash-border)]" />
+      
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-2">
+          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+            Account Holder Name
+          </label>
+          <input
+            name="holderName"
+            value={form.holderName}
+            onChange={handleChange}
+            placeholder="John Doe"
+            className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+            UPI ID
+          </label>
+          <div className="flex gap-3">
+            <input
+              name="upiId"
+              value={form.upiId}
+              onChange={handleChange}
+              placeholder="username@bankname"
+              className="flex-1 bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white placeholder:text-[var(--color-dash-ink4)] focus:outline-none focus:border-[var(--color-dash-ink3)] duration-200"
+            />
+            <button
+              type="button"
+              onClick={handleCheck}
+              className="px-6 py-2.5 bg-[var(--color-dash-surface3)] border border-[var(--color-dash-border-hover)] rounded-md text-white font-mono text-[11px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-surface2)] hover:border-[var(--color-dash-ink3)] transition-all duration-200"
+            >
+              Check
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {checkSuccess && (
+        <div className="mt-2 border border-[var(--color-dash-border)] rounded-xl p-6 bg-[var(--color-dash-surface2)] flex flex-col items-center">
+          <p className="font-serif text-[16px] text-white mb-4 text-center">
+            Confirm your UPI ID
+          </p>
+          <div className="bg-white p-3 rounded-lg mb-4">
+            <img src={qrDataUrl} alt="UPI QR Code" className="w-[120px] h-[120px]" />
+          </div>
+          <p className="text-center text-[var(--color-dash-ink3)] font-sans text-[12px] mb-6 max-w-[280px]">
+            Scan this QR code with your UPI app to verify that it shows your name correctly. 
+            (Do not pay, just verify the name).
+          </p>
+          
+          {!isConfirmed ? (
+            <button
+              type="button"
+              onClick={() => setIsConfirmed(true)}
+              className="px-6 py-2.5 bg-[var(--color-dash-green-bg)] border border-[var(--color-status-paid-border)] rounded-md text-[var(--color-dash-green)] font-mono text-[11px] uppercase tracking-[1.5px] hover:bg-opacity-80 transition-all duration-200 flex items-center gap-2"
+            >
+              <Check size={14} />
+              Yes, it is correct
+            </button>
+          ) : (
+            <form onSubmit={handleSubmit} className="w-full pt-4 border-t border-[var(--color-dash-border)] flex justify-end">
+              <SaveButton loading={loading} saved={saved} />
+            </form>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function FreelancerSettings({ initialData, onUpdateUPI }: { initialData?: ProfileData, onUpdateUPI: (data: { upiId: string, AccountHolderName: string }) => Promise<{ success: boolean, error?: string }> }) {
   const [active, setActive] = useState<SettingsSection>("profile");
 
   const SECTION_CONTENT: Record<SettingsSection, React.ReactNode> = {
     profile: <ProfileSection initialData={initialData} />,
     notifications: <NotificationsSection />,
     security: <SecuritySection />,
+    payment: <PaymentDetailsSection initialData={initialData} onUpdateUPI={onUpdateUPI} />,
   };
 
   const activeLabel = SECTIONS.find((s) => s.id === active)?.label ?? "";
