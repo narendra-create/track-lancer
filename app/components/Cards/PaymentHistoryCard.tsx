@@ -12,6 +12,7 @@ import type { PaymentHistory } from "@/types/payment";
 import { formatDate } from "@/app/lib/utilitys";
 import Link from "next/link";
 import { Paymentstatus } from "@/app/generated/prisma/enums";
+import { redirect } from "next/navigation";
 
 const STATUS_CONFIG: Record<
   Paymentstatus,
@@ -59,11 +60,6 @@ export function PaymentHistoryCard({
   const isPaid = payment.payment_status === "PAID";
   const isDue = payment.payment_status === "DUE";
 
-  const handleCardClick = () => {
-    // Placeholder for future action
-    console.log("Card clicked:", payment.id);
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -73,7 +69,9 @@ export function PaymentHistoryCard({
     >
       {/* Card Content - Clickable */}
       <div
-        onClick={handleCardClick}
+        onClick={() => {
+          redirect(`${role.toLowerCase()}/payment-details/${payment.id}`);
+        }}
         className={`relative flex-1 flex flex-col justify-between mb-6 border rounded-xl p-4 lg:p-6 transition-all duration-300 cursor-pointer group overflow-hidden ${
           isDue
             ? "bg-[rgba(200,169,110,0.02)] backdrop-blur-md border-[rgba(200,169,110,0.15)] hover:border-[rgba(200,169,110,0.4)] hover:shadow-[0_8px_32px_-8px_rgba(200,169,110,0.15)] hover:-translate-y-1"

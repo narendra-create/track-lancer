@@ -1,22 +1,23 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
-import { 
-  ArrowLeft, 
-  Check, 
-  Clock, 
-  Zap, 
-  CreditCard, 
-  CheckCircle, 
-  Receipt, 
-  User, 
-  Mail, 
-  FileText, 
+import {
+  ArrowLeft,
+  Check,
+  Clock,
+  Zap,
+  CreditCard,
+  CheckCircle,
+  Receipt,
+  User,
+  Mail,
+  FileText,
   Hash,
-  Briefcase
+  Briefcase,
 } from "lucide-react";
 import { formatDate } from "@/app/lib/utilitys";
 import { Paymentstatus } from "@/app/generated/prisma/enums";
+import { PaymentDetailUiType } from "../lib/controllers/PaymentDetailUiController";
 
 // Dummy data for demonstration
 const DUMMY_PAYMENT = {
@@ -28,7 +29,8 @@ const DUMMY_PAYMENT = {
   createdAt: new Date("2026-07-01T10:00:00Z"),
   project: {
     title: "E-Commerce Website Redesign",
-    description: "Complete overhaul of the existing e-commerce platform using Next.js and Tailwind CSS. Includes new checkout flow and product pages. The goal is to improve conversion rates and overall performance.",
+    description:
+      "Complete overhaul of the existing e-commerce platform using Next.js and Tailwind CSS. Includes new checkout flow and product pages. The goal is to improve conversion rates and overall performance.",
   },
   client: {
     name: "Acme Corp",
@@ -37,7 +39,7 @@ const DUMMY_PAYMENT = {
   freelancer: {
     name: "John Doe",
     email: "john.doe@example.com",
-  }
+  },
 };
 
 const STATUS_CONFIG: Record<
@@ -73,12 +75,13 @@ const STATUS_ICON: Record<Paymentstatus, React.ReactNode> = {
 
 interface PaymentDetailsProps {
   role: "CLIENT" | "FREELANCER";
+  paymentdetail: PaymentDetailUiType;
 }
 
-export function PaymentDetails({ role }: PaymentDetailsProps) {
+export function PaymentDetails({ role, paymentdetail }: PaymentDetailsProps) {
   const router = useRouter();
-  const payment = DUMMY_PAYMENT;
-  
+  const payment = paymentdetail;
+
   const cfg = STATUS_CONFIG[payment.status];
   const isPaid = payment.status === "PAID";
   const isDue = payment.status === "DUE";
@@ -90,8 +93,13 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
         onClick={() => router.back()}
         className="flex items-center gap-2 text-[var(--color-dash-ink3)] hover:text-white transition-colors mb-8 group"
       >
-        <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-        <span className="font-mono text-[10px] tracking-[1.5px] uppercase">Back to Payments</span>
+        <ArrowLeft
+          size={14}
+          className="group-hover:-translate-x-1 transition-transform"
+        />
+        <span className="font-mono text-[10px] tracking-[1.5px] uppercase">
+          Back to Payments
+        </span>
       </button>
 
       <motion.div
@@ -118,7 +126,16 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
             </h1>
             <div className="flex items-center gap-2 font-mono text-[11px] tracking-[1px] text-[var(--color-dash-ink3)]">
               <Clock size={12} />
-              <span>Initiated on {formatDate(payment.createdAt, { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+              <span>
+                Initiated on{" "}
+                {formatDate(payment.createdAt, {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             </div>
           </div>
 
@@ -147,20 +164,28 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
             </p>
           </div>
 
-          <div className={`border rounded-xl p-6 relative overflow-hidden ${isPaid ? "bg-[rgba(16,185,129,0.03)] border-[rgba(16,185,129,0.2)]" : "bg-[var(--color-dash-surface1)] border-[var(--color-dash-border)]"}`}>
+          <div
+            className={`border rounded-xl p-6 relative overflow-hidden ${isPaid ? "bg-[rgba(16,185,129,0.03)] border-[rgba(16,185,129,0.2)]" : "bg-[var(--color-dash-surface1)] border-[var(--color-dash-border)]"}`}
+          >
             <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)] mb-2">
               Paid Amount
             </p>
-            <p className={`font-serif text-[24px] tabular-nums ${isPaid ? "text-dash-green" : "text-white"}`}>
+            <p
+              className={`font-serif text-[24px] tabular-nums ${isPaid ? "text-dash-green" : "text-white"}`}
+            >
               ₹{isPaid ? payment.paid_amount.toLocaleString("en-IN") : "0"}
             </p>
           </div>
 
-          <div className={`border rounded-xl p-6 relative overflow-hidden ${isDue ? "bg-[rgba(200,169,110,0.03)] border-[rgba(200,169,110,0.2)]" : "bg-[var(--color-dash-surface1)] border-[var(--color-dash-border)]"}`}>
+          <div
+            className={`border rounded-xl p-6 relative overflow-hidden ${isDue ? "bg-[rgba(200,169,110,0.03)] border-[rgba(200,169,110,0.2)]" : "bg-[var(--color-dash-surface1)] border-[var(--color-dash-border)]"}`}
+          >
             <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)] mb-2">
               Due Amount
             </p>
-            <p className={`font-serif text-[24px] tabular-nums ${isDue ? "text-[var(--color-dash-gold)]" : "text-white"}`}>
+            <p
+              className={`font-serif text-[24px] tabular-nums ${isDue ? "text-[var(--color-dash-gold)]" : "text-white"}`}
+            >
               ₹{isDue ? payment.due_amount.toLocaleString("en-IN") : "0"}
             </p>
           </div>
@@ -178,14 +203,22 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">Name</p>
-                  <p className="font-sans text-[14px] text-white">{payment.client.name}</p>
+                  <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">
+                    Name
+                  </p>
+                  <p className="font-sans text-[14px] text-white">
+                    {payment.client.name}
+                  </p>
                 </div>
                 <div>
-                  <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">Email</p>
+                  <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">
+                    Email
+                  </p>
                   <div className="flex items-center gap-2 text-[var(--color-dash-ink2)]">
                     <Mail size={12} />
-                    <span className="font-sans text-[13px]">{payment.client.email}</span>
+                    <span className="font-sans text-[13px]">
+                      {payment.client.email}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -198,14 +231,22 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">Name</p>
-                  <p className="font-sans text-[14px] text-white">{payment.freelancer.name}</p>
+                  <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">
+                    Name
+                  </p>
+                  <p className="font-sans text-[14px] text-white">
+                    {payment.freelancer.name}
+                  </p>
                 </div>
                 <div>
-                  <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">Email</p>
+                  <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">
+                    Email
+                  </p>
                   <div className="flex items-center gap-2 text-[var(--color-dash-ink2)]">
                     <Mail size={12} />
-                    <span className="font-sans text-[13px]">{payment.freelancer.email}</span>
+                    <span className="font-sans text-[13px]">
+                      {payment.freelancer.email}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -220,10 +261,14 @@ export function PaymentDetails({ role }: PaymentDetailsProps) {
             </h3>
             <div className="space-y-5">
               <div>
-                <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">Project Title</p>
-                <p className="font-sans text-[15px] text-white leading-relaxed">{payment.project.title}</p>
+                <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-1">
+                  Project Title
+                </p>
+                <p className="font-sans text-[15px] text-white leading-relaxed">
+                  {payment.project.title}
+                </p>
               </div>
-              
+
               {payment.project.description && (
                 <div>
                   <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink4)] mb-2 flex items-center gap-1.5">
