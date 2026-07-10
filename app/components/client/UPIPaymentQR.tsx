@@ -5,6 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { motion, AnimatePresence } from "motion/react";
 import { AlertTriangle, ScanLine, ShieldCheck } from "lucide-react";
 import { VerificationPopup } from "@/app/components/client/VerificationPopup";
+import Image from "next/image";
 
 interface UPIPaymentQRProps {
   upiId: string | null;
@@ -41,9 +42,11 @@ export function UPIPaymentQR({
 
   const upiLink = useMemo(() => {
     if (!resolvedAmount || !upiId) return null;
-    return `upi://pay?pa=${upiId}&pn=${encodeURIComponent(label)}&am=${resolvedAmount}&cu=INR`;
+    return `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(label)}&am=${resolvedAmount}&cu=INR`.replace(
+      /\s/g,
+      "",
+    );
   }, [resolvedAmount, upiId, label]);
-
   const isButtonEnabled = txnId.trim().length >= 6;
 
   async function handleVerify() {
@@ -144,6 +147,110 @@ export function UPIPaymentQR({
             </div>
           ) : (
             <div>
+              {upiId && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="mb-7"
+                >
+                  <div className="relative overflow-hidden rounded-2xl border border-[var(--color-dash-border)] bg-[linear-gradient(180deg,#171717,#111111)] p-4 sm:p-5">
+                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(200,169,110,0.08),transparent_60%)]" />
+
+                    <div className="relative text-center">
+                      <p className="font-serif text-lg text-[var(--color-dash-ink)]">
+                        Pay Instantly
+                      </p>
+                      <p className="mt-1 text-xs uppercase tracking-[2px] text-dash-ink2/60">
+                        Supports all major UPI apps
+                      </p>
+                    </div>
+
+                    <div className="relative mt-5 flex flex-wrap justify-center gap-2 sm:gap-3">
+                      {[
+                        { name: "Google Pay", logo: "/upi/gpay.png" },
+                        { name: "PhonePe", logo: "/upi/phonepe.png" },
+                        { name: "Paytm", logo: "/upi/paytm.png" },
+                        { name: "BHIM", logo: "/upi/bhim.png" },
+                        { name: "Amazon Pay", logo: "/upi/amazon-pay.png" },
+                      ].map((app) => (
+                        <motion.div
+                          key={app.name}
+                          whileHover={{ y: -3, scale: 1.08 }}
+                          transition={{ duration: 0.15 }}
+                          title={app.name}
+                          className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md hover:border-[var(--color-dash-gold)] hover:bg-white/10"
+                        >
+                          <Image
+                            src={app.logo}
+                            alt={app.name}
+                            width={38}
+                            height={38}
+                            className="object-contain"
+                          />
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={!upiLink}
+                      onClick={() => upiLink && window.location.assign(upiLink)}
+                      className="
+      group
+      relative
+      mt-6
+      flex
+      min-h-[54px]
+      w-full
+      items-center
+      justify-center
+      gap-2
+      overflow-hidden
+      rounded-xl
+      border
+      border-[var(--color-dash-gold)]
+      bg-[linear-gradient(135deg,#d9ba82,#c8a96e,#af8d53)]
+      px-5
+      py-3
+      font-bold
+      tracking-wide
+      text-[#111]
+      transition-all
+      hover:scale-[1.015]
+      hover:shadow-[0_0_30px_rgba(200,169,110,.35)]
+      active:scale-[.98]
+      disabled:cursor-not-allowed
+      disabled:opacity-40
+      disabled:hover:scale-100
+      disabled:hover:shadow-none
+      "
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className="transition-transform group-hover:translate-x-1"
+                      >
+                        <path
+                          d="M5 12h14M13 4l8 8-8 8"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      Pay with UPI App
+                      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                    </button>
+
+                    <p className="mt-3 text-center text-[11px] sm:text-xs text-dash-ink2/60">
+                      Opens any installed UPI app
+                    </p>
+                  </div>
+                </motion.div>
+              )}
               <p className="font-sans text-[11px] uppercase text-dash-ink2/60 font-semibold mb-3">
                 Enter Amount
               </p>
