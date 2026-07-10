@@ -111,10 +111,12 @@ model Paymentverification {
 }
 
 model Freelancer {
-  id       String    @id @default(cuid())
-  userId   String    @unique
-  category Categorys
-  phone    String?
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  category          Categorys
+  phone             String?
+  AccountHolderName String?
+  upiId             String?
 
   user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   projects             Project[]
