@@ -17,11 +17,10 @@ import {
   delayMilestoneInput,
   delayMilestoneSchema,
 } from "@/app/lib/validations/MilestoneValidation";
-import {
-  createBudgetRequestSchema,
-  createBudgetInput,
-} from "@/app/lib/validations/Budgetrequest";
+import { createBudgetRequestSchema, createBudgetInput } from "@/app/lib/validations/Budgetrequest";
 import { raiseBudgetRequest } from "@/app/lib/controllers/BudgetController";
+import { getProfileAction, updateUPIDetailsAction } from "@/app/lib/actions/ProfileActions";
+import { markProjectCompleted } from "@/app/lib/controllers/ProjectController";
 
 type Props = {
   params: Promise<{
@@ -54,6 +53,9 @@ const Milestones = async ({ params }: Props) => {
   if (!result.project) {
     return redirect("/freelancer/dashboard");
   }
+
+  const profileResponse = await getProfileAction();
+  const hasUpi = !!(profileResponse.success && profileResponse.data && profileResponse.data.upiId);
 
   const handleCreate = async (data: createMilestoneInput) => {
     "use server";
@@ -116,6 +118,16 @@ const Milestones = async ({ params }: Props) => {
     return { updated: result.milestone };
   };
 
+  const handleProjectComplete = async (projectId: string) => {
+    "use server";
+    const result = await markProjectCompleted(projectId);
+    if (!result.success) {
+      return { error: `${result.error ?? "Failed to mark project as completed"} - ${result.status}` };
+    }
+    revalidatePath(`/freelancer/milestones/${projectId}`);
+    return { updated: result.Project };
+  };
+
   return (
     <main>
       <FreelancerMilestones
@@ -127,7 +139,10 @@ const Milestones = async ({ params }: Props) => {
         projectTitle={result.project.title}
         projectStatus={result.project.status}
         onCompleteMilestone={handleComplete}
+        onComplete={handleProjectComplete}
         role="FREELANCER"
+        hasUpi={hasUpi}
+        updateUPI={updateUPIDetailsAction}
       />
     </main>
   );
