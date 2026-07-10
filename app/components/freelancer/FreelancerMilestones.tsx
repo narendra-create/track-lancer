@@ -297,6 +297,9 @@ interface FreelancerMilestonesProps {
     data: createBudgetInput,
     projectId: string,
   ) => Promise<any>;
+  hasUpi?: boolean;
+  updateUPI?: (data: { upiId: string, AccountHolderName: string }) => Promise<{ success: boolean; error?: string }>;
+  onComplete?: (projectId: string) => Promise<any>;
 }
 
 export function FreelancerMilestones({
@@ -309,13 +312,40 @@ export function FreelancerMilestones({
   onCompleteMilestone,
   onDelayMilestone,
   onBudgetRaiseRequest,
+  hasUpi,
+  updateUPI,
+  onComplete,
 }: FreelancerMilestonesProps) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showFlagModal, setShowFlagModal] = useState<string | null>(null);
   const [showStopModal, setShowStopModal] = useState(false);
   const [showBudgetrequestModal, setshowBudgetrequestModal] = useState(false);
+  const [showUpiBlockModal, setShowUpiBlockModal] = useState(false);
+  const [pendingMilestoneId, setPendingMilestoneId] = useState<string | null>(null);
+  const [upiData, setUpiData] = useState({ upiId: "", AccountHolderName: "" });
+  const [upiLoading, setUpiLoading] = useState(false);
+  const [checkSuccess, setCheckSuccess] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  
+  const isValidUpi = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(upiData.upiId);
+
   const { addToast } = useToast();
   const router = useRouter();
+
+  const handleCheck = () => {
+    if (!upiData.upiId || !upiData.AccountHolderName) {
+      addToast({ title: "Error", message: "Both UPI ID and Holder Name are required", type: "error" });
+      return;
+    }
+    if (isValidUpi) {
+      setCheckSuccess(true);
+    } else {
+      setCheckSuccess(false);
+      addToast({ title: "Error", message: "Invalid UPI ID format", type: "error" });
+    }
+  };
+
+  const qrDataUrl = checkSuccess ? `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${upiData.upiId}&pn=${upiData.AccountHolderName}`)}` : "";
 
   const totalEarned =
     project.payments?.reduce((acc, p) => acc + (p.paid_amount || 0), 0) ?? 0;
@@ -397,6 +427,155 @@ export function FreelancerMilestones({
             onSubmit={onBudgetRaiseRequest}
             projectId={project.id}
           />
+        )}
+        {showUpiBlockModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              transition={{ duration: 0.18 }}
+              className="bg-[#1e1e1e] border border-[#2a2a2a] rounded-xl p-8 max-w-md w-full shadow-2xl relative"
+            >
+              <button
+                onClick={() => {
+                  setShowUpiBlockModal(false);
+                  setPendingMilestoneId(null);
+                }}
+                className="absolute top-4 right-4 text-[#7a7570] hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+              
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/20">
+                  <Check className="text-green-500" size={24} />
+                </div>
+                <h2 className="font-serif text-2xl text-white mb-2">Almost Done!</h2>
+                <p className="font-sans text-sm text-[#7a7570]">
+                  Great job finishing the work! To generate the payment QR code for the client, you must enter your UPI ID.
+                </p>
+              </div>
+              
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                if (!updateUPI || !pendingMilestoneId || !onCompleteMilestone || !isConfirmed) return;
+                setUpiLoading(true);
+                const result = await updateUPI(upiData);
+                setUpiLoading(false);
+                
+                if (result.error) {
+                  addToast({ title: "Error", message: result.error, type: "error" });
+                  return;
+                }
+                
+                setShowUpiBlockModal(false);
+                try {
+                  const completeResult = await onCompleteMilestone(pendingMilestoneId, project.id);
+                  if (completeResult?.error) {
+                    addToast({ title: "Error", message: String(completeResult.error), type: "error" });
+                  } else {
+                    addToast({ title: "Success", message: "Milestone marked as completed", type: "success" });
+                  }
+                } catch (err: any) {
+                  addToast({ title: "Error", message: err?.message || "An unexpected error occurred", type: "error" });
+                }
+                setPendingMilestoneId(null);
+              }} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="AccountHolderName" className="font-mono text-[10px] tracking-[1.5px] uppercase text-[#7a7570]">
+                    Account Holder Name
+                  </label>
+                  <input
+                    id="AccountHolderName"
+                    type="text"
+                    placeholder="John Doe"
+                    value={upiData.AccountHolderName}
+                    onChange={(e) => {
+                      setUpiData({ ...upiData, AccountHolderName: e.target.value });
+                      setCheckSuccess(false);
+                      setIsConfirmed(false);
+                    }}
+                    required
+                    className="w-full bg-black/40 border border-[#2a2a2a] rounded-md px-4 py-3 font-sans text-[14px] text-white focus:outline-none focus:border-[#7a7570] duration-200"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2 relative">
+                  <label htmlFor="upiId" className="font-mono text-[10px] tracking-[1.5px] uppercase text-[#7a7570]">
+                    UPI ID
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      id="upiId"
+                      type="text"
+                      placeholder="name@okbank"
+                      value={upiData.upiId}
+                      onChange={(e) => {
+                        setUpiData({ ...upiData, upiId: e.target.value });
+                        setCheckSuccess(false);
+                        setIsConfirmed(false);
+                      }}
+                      required
+                      className={`flex-1 min-w-0 bg-black/40 border ${upiData.upiId && !isValidUpi ? 'border-red-500/50' : 'border-[#2a2a2a]'} rounded-md px-4 py-3 font-sans text-[14px] text-white focus:outline-none focus:border-[#7a7570] duration-200`}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCheck}
+                      className="px-4 py-2.5 bg-[#2a2a2a] border border-[#3a3a3a] rounded-md text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[#3a3a3a] transition-colors"
+                    >
+                      Check
+                    </button>
+                  </div>
+                  {upiData.upiId && !isValidUpi && (
+                    <span className="text-[10px] text-red-500 absolute -bottom-5 left-0">
+                      Invalid UPI ID format
+                    </span>
+                  )}
+                </div>
+
+                {checkSuccess && (
+                  <div className="mt-3 border border-[#2a2a2a] rounded-xl p-5 bg-[#1e1e1e] flex flex-col items-center animate-in fade-in zoom-in-95 duration-200">
+                    <p className="font-serif text-[15px] text-white mb-3 text-center">
+                      Confirm your UPI ID
+                    </p>
+                    <div className="bg-white p-2 rounded-lg mb-4">
+                      <img src={qrDataUrl} alt="UPI QR Code" className="w-[100px] h-[100px]" />
+                    </div>
+                    <p className="text-center text-[#7a7570] font-sans text-[11px] mb-5 max-w-[240px]">
+                      Scan this QR code with your UPI app to verify that it shows your name correctly. 
+                    </p>
+                    
+                    {!isConfirmed ? (
+                      <button
+                        type="button"
+                        onClick={() => setIsConfirmed(true)}
+                        className="px-5 py-2.5 bg-green-500/10 border border-green-500/30 rounded-md text-green-500 font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-green-500/20 transition-all duration-200 flex items-center gap-2"
+                      >
+                        <Check size={14} />
+                        Yes, it is correct
+                      </button>
+                    ) : (
+                      <div className="px-5 py-2.5 bg-transparent border border-green-500/30 rounded-md text-green-500 font-mono text-[10px] uppercase tracking-[1.5px] flex items-center gap-2">
+                        <Check size={14} />
+                        Confirmed
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="mt-6">
+                  <button
+                    type="submit"
+                    disabled={upiLoading || !isValidUpi || upiData.AccountHolderName.length <= 3 || !isConfirmed}
+                    className="w-full px-6 py-3 bg-brand-surface border border-transparent rounded-md text-ink font-mono text-[11px] uppercase tracking-[1.5px] hover:bg-brand-surface/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {upiLoading ? "Saving..." : "Save UPI ID & Complete Milestone"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
@@ -588,29 +767,72 @@ export function FreelancerMilestones({
           </motion.div>
 
           {role === "FREELANCER" ? (
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.22, delay: 0.14 }}
-              onClick={() => {
-                const inProgress = project.milestones.find(
-                  (m) => m.status === "IN_PROGRESS",
-                );
-                if (inProgress) {
-                  setShowFlagModal(inProgress.id);
-                } else {
-                  addToast({
-                    title: "Error",
-                    message: "No active milestone in progress to flag",
-                    type: "error",
-                  });
-                }
-              }}
-              className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-amber-bg)] hover:border-[rgba(200,120,64,0.35)] hover:text-[var(--color-dash-amber)] transition-all duration-200 flex items-center justify-center gap-2"
-            >
-              <Flag size={12} />
-              Flag a Delay
-            </motion.button>
+            <div className="flex flex-col gap-3">
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.22, delay: 0.14 }}
+                onClick={() => {
+                  const inProgress = project.milestones.find(
+                    (m) => m.status === "IN_PROGRESS",
+                  );
+                  if (inProgress) {
+                    setShowFlagModal(inProgress.id);
+                  } else {
+                    addToast({
+                      title: "Error",
+                      message: "No active milestone in progress to flag",
+                      type: "error",
+                    });
+                  }
+                }}
+                className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-amber-bg)] hover:border-[rgba(200,120,64,0.35)] hover:text-[var(--color-dash-amber)] transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Flag size={12} />
+                Flag a Delay
+              </motion.button>
+              
+              {onComplete && (
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22, delay: 0.15 }}
+                  onClick={async () => {
+                    const allMilestonesDone = project.milestones.every(
+                      (m) => m.status === "COMPLETED" || m.status === "STOPPED"
+                    );
+                    
+                    if (!allMilestonesDone) {
+                      addToast({
+                        title: "Action Not Allowed",
+                        message: "All milestones must be either completed or stopped before marking the project as completed.",
+                        type: "error",
+                      });
+                      return;
+                    }
+
+                    const result = await onComplete(project.id);
+                    if (result?.error) {
+                      addToast({
+                        title: "Error",
+                        message: String(result.error),
+                        type: "error",
+                      });
+                    } else {
+                      addToast({
+                        title: "Success",
+                        message: "Project marked as completed",
+                        type: "success",
+                      });
+                    }
+                  }}
+                  className="w-full h-[42px] px-5 bg-[var(--color-dash-green)]/10 border border-[var(--color-dash-green)]/30 rounded-xl text-[var(--color-dash-green)] font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-green)]/20 transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  <Check size={12} />
+                  Project Completed
+                </motion.button>
+              )}
+            </div>
           ) : (
             <motion.button
               initial={{ opacity: 0, y: 10 }}
@@ -685,6 +907,11 @@ export function FreelancerMilestones({
                   onComplete={
                     onCompleteMilestone
                       ? async (milestoneId) => {
+                          if (hasUpi === false) {
+                            setPendingMilestoneId(milestoneId);
+                            setShowUpiBlockModal(true);
+                            return;
+                          }
                           try {
                             const result = await onCompleteMilestone(
                               milestoneId,
