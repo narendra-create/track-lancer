@@ -4,6 +4,13 @@ import { getInitials } from "../utilitys";
 // getClientMoneyStats(clientProfileId: string)
 //getClientUpcomingDeadlines(clientProfileId: string)
 // ClientDashboardStats.ts
+export type ClientDeadlineItem = {
+    id: string;             // Milestone ID
+    projectTitle: string;   // The title of the project this milestone belongs to
+    milestoneTitle: string; // The title of the milestone itself
+    deadline: Date;         // Javascript Date object
+    cost: number;           // The cost of this specific milestone
+};
 type successtype = {
     success: true,
     stats: {
@@ -15,21 +22,71 @@ type successtype = {
     }
 };
 type errorType = {
-    success: boolean
-    error: string
-    status: number
+    success: false;
+    error: string;
+    status: number;
 }
 
 export type MoneyStatsType = errorType | successtype;
 
 export const getDeadlines = async (clientId: string, cursor?: string) => {
-    // export type ClientDeadlineItem = {
-    //   id: string;             // Milestone ID
-    //   projectTitle: string;   // The title of the project this milestone belongs to
-    //   milestoneTitle: string; // The title of the milestone itself
-    //   deadline: Date;         // Javascript Date object
-    //   cost: number;           // The cost of this specific milestone
-    // };
+    if (!clientId) {
+        return { success: false, error: "Invalid Client id", status: 400 }
+    };
+    const clientProfile = await prisma.userprofile.findUnique({
+        where: { id: clientId },
+        select: {
+            id: true
+        }
+    });
+
+    if (!clientProfile) return { success: false, error: "client Not found", status: 404 };
+
+    const now = new Date();
+    const dateAfter5Days = new Date(
+        now.getTime() + 5 * 24 * 60 * 60 * 1000
+    );
+
+    const findMilestones = await prisma.milestone.findMany({
+        take: 6,
+        ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+        where: {
+            project: { clientId: clientProfile.id, status: { notIn: ["CANCELLED", "PENDING"] } },
+            deadline: {
+                gte: now,
+                lte: dateAfter5Days
+            },
+            status: { not: "COMPLETED" }
+        },
+        include: {
+            project: {
+                select: {
+                    title: true
+                }
+            }
+        }
+    });
+    if (findMilestones.length === 0) {
+        return { success: false, error: "Your project doesn't have milestones yet", status: 404 }
+    };
+    const returnObject: ClientDeadlineItem[] = findMilestones.map((milestone) => {
+        return {
+            id: milestone.id,
+            projectTitle: milestone.project?.title! ?? "no title",
+            milestoneTitle: milestone.title ?? "no milestonetitle",
+            deadline: milestone.deadline ?? "no deadline",
+            cost: milestone.milestonecost ?? "no cost"
+        }
+    });
+
+    const nextCursor = findMilestones.length === 6 ? findMilestones[findMilestones.length - 1].id : null;
+
+    return {
+        success: true,
+        milestones: returnObject,
+        status: 200,
+        nextCursor
+    }
 }
 
 export const getClientMoneyStats = async (clientId: string): Promise<MoneyStatsType> => {
@@ -188,4 +245,4 @@ export const getClientCurrentProjects = async (clientId: string, cursor?: string
     const nextCursor = projects.length === 4 ? projects[projects.length - 1].id : null;
 
     return { success: true, projects: projects, nextCursor }
-}
+};

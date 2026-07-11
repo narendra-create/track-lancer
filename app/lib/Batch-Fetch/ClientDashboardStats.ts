@@ -5,7 +5,7 @@ import { getSession } from "@/app/lib/session";
 import type { DashboardStatsResponse } from "@/types/dashboard";
 import type { ClientDashboardData } from "@/app/Features/Client/Client-dashboard";
 import { getAllProjects } from "@/app/lib/controllers/ProjectController";
-import { getClientMoneyStats } from "../controllers/clientStatsController";
+import { getClientCurrentProjects, getClientMoneyStats, getDeadlines } from "../controllers/clientStatsController";
 
 export const getClientStats = async () => {
     const session = await getSession();
@@ -21,24 +21,47 @@ export const getClientStats = async () => {
     });
     if (!clientProfile) return { success: false, error: "Freelancer profile not found", status: 404 };
     try {
-        const [activeProjectsResult, moneyStatsResult] = await Promise.all([
+        const [activeProjectsResult, moneyStatsResult, currentProjectsRestult, deadlinesResult] = await Promise.all([
             getAllProjects(clientProfile.id, "CLIENT"),
-            getClientMoneyStats(clientProfile.id)
+            getClientMoneyStats(clientProfile.id),
+            getClientCurrentProjects(clientProfile.id),
+            getDeadlines(clientProfile.id)
         ]);
 
-        //         export type ClientDashboardData = {
-        //   name: string; // The client's name (e.g. "Narendra")
-        //   stats: {
-        //     activeCount: number;      // Total number of active projects this client has
-        //     totalPaid: number;        // Total money paid by this client across all time
-        //     pendingAmount: number;    // Total amount currently due to be paid
-        //     pendingDueCount: number;  // Number of individual payments in "DUE" status
-        //     completedCount: number;   // Total number of completed projects
-        //   };
-        //   activeProjects: ClientDashboardProject[]; // Array of active projects (max 4 for dashboard)
-        //   deadlines: ClientDeadlineItem[];          // Array of upcoming milestones across all projects
-        //   activity: ClientActivityItem[];           // Array of recent activities (you can pass [] for now)
-        // };
+        const returnObject: ClientDashboardData = {
+            name: clientProfile.user.name,
+            stats: moneyStatsResult.success ? {
+                activeCount: (moneyStatsResult as any).stats.activeCount,
+                totalPaid: (moneyStatsResult as any).stats.totalPaid,
+                pendingAmount: (moneyStatsResult as any).stats.pendingAmount,
+                pendingDueCount: (moneyStatsResult as any).stats.pendingDueCount,
+                completedCount: (moneyStatsResult as any).stats.completedCount
+            } : {
+                activeCount: 0,
+                totalPaid: 0,
+                pendingAmount: 0,
+                pendingDueCount: 0,
+                completedCount: 0
+            },
+            activeProjects: currentProjectsRestult.success ? (currentProjectsRestult as any).projects.map((p: any) => ({
+                id: p.id,
+                title: p.title,
+                projectcode: p.id.substring(0, 8),
+                status: p.status,
+                agreedCost: p.money?.totalAmount || 0,
+                deadline: p.deadline ? new Date(p.deadline).toISOString() : new Date().toISOString(),
+                freelancerName: p.freelancerName,
+                freelancerInitials: p.freelancerInitials,
+                freelancerCategory: p.freelancerCategory,
+                paid: p.money?.received || 0,
+                remaining: p.money?.remaining || 0,
+                milestones: []
+            })) : [],
+            deadlines: deadlinesResult.success ? (deadlinesResult as any).milestones : [],
+            activity: []
+        };
+
+        return { success: true, data: returnObject };
     }
     catch (err) {
         console.error("Dashboard fetch failed:", err);
