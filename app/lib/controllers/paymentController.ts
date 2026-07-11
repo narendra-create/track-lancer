@@ -276,14 +276,28 @@ export const markVerifiedPayment = async (verificationPaymentId: string) => {
                 }
             });
 
-            await tx.payment.update({
-                where: { id: findverification.paymentid },
-                data: {
-                    paid_amount: {
-                        increment: findverification.paid_amount
+            if (remaining === 0) {
+                await tx.payment.update({
+                    where: { id: findverification.paymentid },
+                    data: {
+                        paid_amount: {
+                            increment: findverification.paid_amount
+                        },
+                        payment_status: "PAID",
+                        completedAt: new Date()
                     }
-                }
-            });
+                });
+            }
+            else {
+                await tx.payment.update({
+                    where: { id: findverification.paymentid },
+                    data: {
+                        paid_amount: {
+                            increment: findverification.paid_amount
+                        }
+                    }
+                });
+            }
 
             return { status: verificationUpdated.status, id: verificationUpdated.id }
         });
