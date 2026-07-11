@@ -316,6 +316,7 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
             select: {
                 id: true,
                 title: true,
+                deadline: true,
                 client: {
                     select: {
                         user: {
@@ -345,7 +346,8 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                         deadline: "desc"
                     }
                 },
-                createdAt: true
+                createdAt: true,
+                hasCancelRequest: true
             }
         });
 
@@ -363,8 +365,7 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                         (completedMilestones / totalMilestones) * 100
                     );
 
-            const lastMilestone = project.milestones[0];
-            const projectDeadline = lastMilestone?.deadline;
+            const projectDeadline = project.deadline;
 
             //Payments
             const totalAmount = project.payments.reduce((sum, p) => sum + p.total_cost, 0);
@@ -397,8 +398,8 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                     completedMilestones,
                     progress,
                     projectDeadline
-                }
-
+                },
+                hasCancelRequest: project.hasCancelRequest
             }
 
         });
@@ -418,6 +419,7 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
             select: {
                 id: true,
                 title: true,
+                deadline: true,
                 freelancer: {
                     select: {
                         user: {
@@ -447,7 +449,8 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                         deadline: "desc"
                     }
                 },
-                createdAt: true
+                createdAt: true,
+                hasCancelRequest: true,
             }
         });
 
@@ -465,8 +468,7 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                         (completedMilestones / totalMilestones) * 100
                     );
 
-            const lastMilestone = project.milestones[0];
-            const projectDeadline = lastMilestone?.deadline;
+            const projectDeadline = project.deadline;
 
             //Payments
             const totalAmount = project.payments.reduce((sum, p) => sum + p.total_cost, 0);
@@ -499,8 +501,8 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                     completedMilestones,
                     progress,
                     projectDeadline
-                }
-
+                },
+                hasCancelRequest: project.hasCancelRequest
             }
 
         });
@@ -575,3 +577,339 @@ export const markProjectCompleted = async (projectId: string) => {
         return { success: false, error: "Server Error", status: 500 }
     }
 }
+
+export const raiseCancellRequest = async (projectId: string) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    const role = session.user.role.toLowerCase()
+    if (role !== "freelancer" && role !== "client") return { success: false, error: "Forbidden", status: 403 };
+
+    if (role === "client") {
+        const findclient = await prisma.userprofile.findUnique({
+            where: { userId: session.user.id }
+        });
+        if (!findclient) {
+            return { success: false, error: "No client account found", status: 404 }
+        };
+
+        const findproject = await prisma.project.findFirst({
+            where: { id: projectId, clientId: findclient.id, status: { in: ["ACTIVE", "STOPPED"] } }
+        });
+
+        if (!findproject) {
+            return { success: false, error: "Project Not found", status: 404 }
+        };
+        if (!findproject.freelancerId) {
+            return { success: false, error: "Project is not Assigned to freelancer" }
+        }
+        const findcancellRequest = await prisma.cancellRequest.findUnique({
+            where: { projectId: findproject.id }
+        });
+        if (findcancellRequest?.clientApproved) {
+            return { success: false, error: "I think you clicked Cancel Button two times", status: 409 }
+        }
+
+        try {
+            if (findcancellRequest && findcancellRequest.freelancerApproved) {
+                const updated = await prisma.$transaction(async (tx) => {
+                    const updatedProject = await tx.project.update({
+                        where: { id: findproject.id },
+                        data: {
+                            status: "CANCELLED",
+                            hasCancelRequest: false
+                        }
+                    });
+                    const updatedRequest = await tx.cancellRequest.update({
+                        where: { id: findcancellRequest.id },
+                        data: {
+                            acceptedById: session.user.id,
+                            clientApproved: true,
+                            approvedAt: new Date()
+                        }
+                    });
+
+                    return { updatedProject, updatedRequest }
+                })
+
+                return { success: true, updatedProject: updated.updatedProject, updatedRequest: updated.updatedRequest, status: 200 }
+            }
+            else {
+                const raisedRequest = await prisma.$transaction(async (tx) => {
+                    await tx.project.update({
+                        where: { id: findproject.id },
+                        data: {
+                            hasCancelRequest: true,
+                        }
+                    });
+                    return await tx.cancellRequest.create({
+                        data: {
+                            projectId: findproject.id,
+                            raiesdByuserId: session.user.id,
+                            clientId: findclient.id,
+                            clientApproved: true,
+                            freelancerId: findproject.freelancerId!,
+                            freelancerApproved: false
+                        }
+                    })
+                })
+
+                return { success: true, request: raisedRequest, status: 200 }
+            }
+        }
+        catch (err) {
+            return {
+                success: false,
+                error: err instanceof Error ? err.message : "Server Error",
+                status: 500
+            };
+        }
+    }
+    else if (role === "freelancer") {
+        const findfreelancer = await prisma.freelancer.findUnique({
+            where: { userId: session.user.id }
+        });
+        if (!findfreelancer) {
+            return { success: false, error: "No freelancer account found", status: 404 }
+        };
+
+        const findproject = await prisma.project.findFirst({
+            where: { id: projectId, freelancerId: findfreelancer.id, status: { in: ["ACTIVE", "STOPPED"] } }
+        });
+
+        if (!findproject) {
+            return { success: false, error: "Project Not found", status: 404 }
+        };
+        if (!findproject.clientId) {
+            return { success: false, error: "Project is not Assigned to client" }
+        }
+        const findcancellRequest = await prisma.cancellRequest.findUnique({
+            where: { projectId: findproject.id }
+        })
+        if (findcancellRequest?.freelancerApproved) {
+            return { success: false, error: "I think you clicked Cancel Button two times", status: 409 }
+        }
+
+        try {
+            if (findcancellRequest && findcancellRequest.clientApproved) {
+                const updated = await prisma.$transaction(async (tx) => {
+                    const updatedProject = await tx.project.update({
+                        where: { id: findproject.id },
+                        data: {
+                            status: "CANCELLED",
+                            hasCancelRequest: false
+                        }
+                    });
+                    const updatedRequest = await tx.cancellRequest.update({
+                        where: { id: findcancellRequest.id },
+                        data: {
+                            acceptedById: session.user.id,
+                            freelancerApproved: true,
+                            approvedAt: new Date()
+                        }
+                    });
+
+                    return { updatedProject, updatedRequest }
+                })
+
+                return { success: true, updatedProject: updated.updatedProject, updatedRequest: updated.updatedRequest, status: 200 }
+            }
+            else {
+                const raisedRequest = await prisma.$transaction(async (tx) => {
+                    await tx.project.update({
+                        where: { id: findproject.id },
+                        data: {
+                            hasCancelRequest: true,
+                        }
+                    });
+                    return await tx.cancellRequest.create({
+                        data: {
+                            projectId: findproject.id,
+                            raiesdByuserId: session.user.id,
+                            clientId: findproject.clientId!,
+                            clientApproved: false,
+                            freelancerId: findproject.freelancerId!,
+                            freelancerApproved: true
+                        }
+                    })
+                })
+
+                return { success: true, request: raisedRequest, status: 200 }
+            }
+        }
+        catch (err) {
+            return {
+                success: false,
+                error: err instanceof Error ? err.message : "Server Error",
+                status: 500
+            };
+        }
+    }
+
+    return { success: false, error: "Invalid role", status: 403 }
+}
+
+export const processCancellRequest = async (projectId: string, type: "APPROVE" | "REJECT") => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    const role = session.user.role.toLowerCase()
+    if (role !== "freelancer" && role !== "client") return { success: false, error: "Forbidden", status: 403 };
+
+    const findcancellRequest = await prisma.cancellRequest.findFirst({
+        where: { projectId: projectId, isRejected: false }
+    });
+
+    if (!findcancellRequest) {
+        return { success: false, error: "Request Not found", status: 404 }
+    };
+
+    if (role === "client") {
+        const findclient = await prisma.userprofile.findUnique({
+            where: { userId: session.user.id }
+        });
+        if (!findclient) {
+            return { success: false, error: "No client account found", status: 404 }
+        };
+        if (findcancellRequest.clientApproved) {
+            return { success: false, error: "This request is already approved", status: 409 }
+        }
+        if (findclient.id !== findcancellRequest.clientId) {
+            return { success: false, error: "This request is not for you", status: 403 }
+        };
+
+        const findproject = await prisma.project.findFirst({
+            where: { id: findcancellRequest.projectId, clientId: findclient.id, hasCancelRequest: true, status: { in: ["ACTIVE", "STOPPED"] } }
+        });
+
+        if (!findproject) {
+            return { success: false, error: "Project Not found", status: 404 }
+        };
+        if (!findproject.freelancerId) {
+            return { success: false, error: "Project is not Assigned to freelancer" }
+        };
+        if (findproject.status === "CANCELLED") {
+            return { success: false, error: "This Project is already cancelled", status: 409 }
+        }
+        if (findproject.clientId !== findclient.id) {
+            return { success: false, error: "This project is not Assigned to you", status: 403 }
+        }
+
+        try {
+            const updated = await prisma.$transaction(async (tx) => {
+                const updatedProject = await tx.project.update({
+                    where: { id: findproject.id },
+                    data: {
+                        status: type === "APPROVE" ? "CANCELLED" : findproject.status,
+                        hasCancelRequest: false
+                    }
+                });
+                let updatedRequest;
+                if (type === "APPROVE") {
+                    updatedRequest = await tx.cancellRequest.update({
+                        where: { id: findcancellRequest.id },
+                        data: {
+                            acceptedById: session.user.id,
+                            clientApproved: true,
+                            approvedAt: new Date()
+                        }
+                    });
+                } else {
+                    updatedRequest = await tx.cancellRequest.update({
+                        where: { id: findcancellRequest.id },
+                        data: {
+                            acceptedById: session.user.id,
+                            clientApproved: false,
+                            isRejected: true
+                        }
+                    });
+                }
+
+                return { updatedProject, updatedRequest }
+            })
+
+            return { success: true, updatedProject: updated.updatedProject, updatedRequest: updated.updatedRequest, status: 200 }
+        }
+        catch (err) {
+            return {
+                success: false,
+                error: err instanceof Error ? err.message : "Server Error",
+                status: 500
+            };
+        }
+    }
+    else {
+        const findfreelancer = await prisma.freelancer.findUnique({
+            where: { userId: session.user.id }
+        });
+        if (!findfreelancer) {
+            return { success: false, error: "No client account found", status: 404 }
+        };
+        if (findcancellRequest.freelancerApproved) {
+            return { success: false, error: "This request is already approved", status: 409 }
+        }
+        if (findfreelancer.id !== findcancellRequest.freelancerId) {
+            return { success: false, error: "This request is not for you", status: 403 }
+        };
+
+        const findproject = await prisma.project.findFirst({
+            where: { id: findcancellRequest.projectId, freelancerId: findfreelancer.id, hasCancelRequest: true, status: { in: ["ACTIVE", "STOPPED"] } }
+        });
+
+        if (!findproject) {
+            return { success: false, error: "Project Not found", status: 404 }
+        };
+        if (!findproject.clientId) {
+            return { success: false, error: "Project is not Assigned to client" }
+        };
+        if (findproject.status === "CANCELLED") {
+            return { success: false, error: "This Project is already cancelled", status: 409 }
+        };
+
+        if (findproject.freelancerId !== findfreelancer.id) {
+            return { success: false, error: "This project is not Assigned to you", status: 403 }
+        }
+
+        try {
+            const updated = await prisma.$transaction(async (tx) => {
+                const updatedProject = await tx.project.update({
+                    where: { id: findproject.id },
+                    data: {
+                        status: type === "APPROVE" ? "CANCELLED" : findproject.status,
+                        hasCancelRequest: false
+                    }
+                });
+                let updatedRequest;
+                if (type === "APPROVE") {
+                    updatedRequest = await tx.cancellRequest.update({
+                        where: { id: findcancellRequest.id },
+                        data: {
+                            acceptedById: session.user.id,
+                            freelancerApproved: true,
+                            approvedAt: new Date()
+                        }
+                    });
+                }
+                else {
+                    updatedRequest = await tx.cancellRequest.update({
+                        where: { id: findcancellRequest.id },
+                        data: {
+                            acceptedById: session.user.id,
+                            freelancerApproved: false,
+                            isRejected: true
+                        }
+                    });
+                }
+
+                return { updatedProject, updatedRequest }
+            })
+
+            return { success: true, updatedProject: updated.updatedProject, updatedRequest: updated.updatedRequest, status: 200 }
+        }
+        catch (err) {
+            return {
+                success: false,
+                error: err instanceof Error ? err.message : "Server Error",
+                status: 500
+            };
+        }
+    }
+};
