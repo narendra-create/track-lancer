@@ -208,6 +208,14 @@ function ProjectCard({
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {project.hasCancelRequest && (
+            <span
+              className="font-mono text-[9px] lg:text-[11px] font-bold tracking-[1px] uppercase px-2 py-0.75 rounded-md border border-[var(--color-dash-red)] text-[var(--color-dash-red)]"
+              title="Cancel Request Pending"
+            >
+              Cancel Req
+            </span>
+          )}
           <span
             className={`font-mono text-[9px] lg:text-[11px] font-bold tracking-[1.5px] uppercase px-3 py-0.75 rounded-md ${style.bg} ${style.text}`}
           >
