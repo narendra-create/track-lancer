@@ -1,12 +1,19 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronRight, AlertTriangle } from "lucide-react";
+import { ChevronRight, AlertTriangle, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { AvatarInitials } from "@/app/components/Initials";
 import { ClientProgressBar } from "@/app/components/Currentclientprogressbar";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 
-type ProjectStatus = "ACTIVE" | "PENDING" | "STOPPED" | "CANCELLED" | "COMPLETED";
+type ProjectStatus =
+  | "ACTIVE"
+  | "PENDING"
+  | "STOPPED"
+  | "CANCELLED"
+  | "COMPLETED";
 
 type MilestoneStatus = "COMPLETED" | "NOT_STARTED" | "IN_PROGRESS" | "STOPPED";
 
@@ -33,12 +40,35 @@ export type ClientDashboardProject = {
   milestones: Milestone[];
 };
 
-const STATUS_STYLE: Record<ProjectStatus, { dot: string; text: string; bg: string }> = {
-  ACTIVE: { dot: "bg-dash-green", text: "text-dash-green", bg: "bg-dash-green-bg" },
-  PENDING: { dot: "bg-dash-gold", text: "text-dash-gold", bg: "bg-dash-gold-glow2" },
-  STOPPED: { dot: "bg-dash-amber", text: "text-dash-amber", bg: "bg-dash-amber-bg" },
-  CANCELLED: { dot: "bg-dash-red", text: "text-dash-red", bg: "bg-dash-red-bg" },
-  COMPLETED: { dot: "bg-dash-green", text: "text-dash-green", bg: "bg-dash-green-bg" },
+const STATUS_STYLE: Record<
+  ProjectStatus,
+  { dot: string; text: string; bg: string }
+> = {
+  ACTIVE: {
+    dot: "bg-dash-green",
+    text: "text-dash-green",
+    bg: "bg-dash-green-bg",
+  },
+  PENDING: {
+    dot: "bg-dash-gold",
+    text: "text-dash-gold",
+    bg: "bg-dash-gold-glow2",
+  },
+  STOPPED: {
+    dot: "bg-dash-amber",
+    text: "text-dash-amber",
+    bg: "bg-dash-amber-bg",
+  },
+  CANCELLED: {
+    dot: "bg-dash-red",
+    text: "text-dash-red",
+    bg: "bg-dash-red-bg",
+  },
+  COMPLETED: {
+    dot: "bg-dash-green",
+    text: "text-dash-green",
+    bg: "bg-dash-green-bg",
+  },
 };
 
 const MILESTONE_DOT: Record<MilestoneStatus, string> = {
@@ -48,7 +78,13 @@ const MILESTONE_DOT: Record<MilestoneStatus, string> = {
   STOPPED: "bg-dash-red",
 };
 
-function MilestoneRow({ milestone, index }: { milestone: Milestone; index: number }) {
+function MilestoneRow({
+  milestone,
+  index,
+}: {
+  milestone: Milestone;
+  index: number;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -4 }}
@@ -56,7 +92,9 @@ function MilestoneRow({ milestone, index }: { milestone: Milestone; index: numbe
       transition={{ duration: 0.16, delay: index * 0.04 }}
       className="flex items-center gap-3 py-[9px] border-b border-dash-border last:border-b-0"
     >
-      <div className={`w-[6px] h-[6px] rounded-full shrink-0 ${MILESTONE_DOT[milestone.status]}`} />
+      <div
+        className={`w-[6px] h-[6px] rounded-full shrink-0 ${MILESTONE_DOT[milestone.status]}`}
+      />
       <span className="flex-1 font-sans text-[12px] lg:text-[14px] text-dash-ink2 truncate">
         {milestone.title}
       </span>
@@ -67,12 +105,23 @@ function MilestoneRow({ milestone, index }: { milestone: Milestone; index: numbe
   );
 }
 
-function ProjectCard({ project, index }: { project: ClientDashboardProject; index: number }) {
+function ProjectCard({
+  project,
+  index,
+}: {
+  project: ClientDashboardProject;
+  index: number;
+}) {
   const [expanded, setExpanded] = useState(false);
   const style = STATUS_STYLE[project.status];
   const totalMilestones = project.milestones.length;
-  const completedMilestones = project.milestones.filter((m) => m.status === "COMPLETED").length;
-  const progress = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
+  const completedMilestones = project.milestones.filter(
+    (m) => m.status === "COMPLETED",
+  ).length;
+  const progress =
+    totalMilestones > 0
+      ? Math.round((completedMilestones / totalMilestones) * 100)
+      : 0;
 
   const formattedDeadline = new Intl.DateTimeFormat("en-IN", {
     day: "2-digit",
@@ -80,8 +129,10 @@ function ProjectCard({ project, index }: { project: ClientDashboardProject; inde
     year: "numeric",
   }).format(new Date(project.deadline));
 
-  const isOverdue = project.status === "ACTIVE" && new Date(project.deadline) < new Date();
-  const progressVariant = project.status === "STOPPED" ? "amber" : progress >= 50 ? "green" : "gold";
+  const isOverdue =
+    project.status === "ACTIVE" && new Date(project.deadline) < new Date();
+  const progressVariant =
+    project.status === "STOPPED" ? "amber" : progress >= 50 ? "green" : "gold";
 
   return (
     <motion.div
@@ -90,11 +141,17 @@ function ProjectCard({ project, index }: { project: ClientDashboardProject; inde
       transition={{ duration: 0.2, delay: index * 0.06 }}
       className="bg-dash-surface1 border border-dash-border rounded-md overflow-hidden hover:border-brand-surface transition-all ease-in-out duration-200"
     >
-      <div className="p-5 lg:p-4 cursor-pointer" onClick={() => setExpanded((v) => !v)}>
+      <div
+        className="p-5 lg:p-4 cursor-pointer"
+        onClick={() => setExpanded((v) => !v)}
+      >
         <div className="flex justify-between mb-3">
           <div className="flex gap-3 items-start">
             <div className="mt-1">
-              <AvatarInitials initials={project.freelancerInitials} variant="gold" />
+              <AvatarInitials
+                initials={project.freelancerInitials}
+                variant="gold"
+              />
             </div>
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-2">
@@ -108,7 +165,8 @@ function ProjectCard({ project, index }: { project: ClientDashboardProject; inde
               <p className="font-serif py-1 text-[10px] lg:text-[12px] tracking-[1px] text-dash-ink2/80 font-semibold truncate">
                 {project.freelancerName}
                 <span className="text-dash-ink3/90">
-                  {" "}· {project.freelancerCategory.replace("_", " ")}
+                  {" "}
+                  · {project.freelancerCategory.replace("_", " ")}
                 </span>
               </p>
             </div>
@@ -132,19 +190,25 @@ function ProjectCard({ project, index }: { project: ClientDashboardProject; inde
             <h3 className="text-lg lg:text-xl text-accent font-serif">
               ₹{(project.agreedCost / 1000).toFixed(0)}K
             </h3>
-            <p className="text-sm lg:text-[11px] text-ink-muted font-sans">BUDGET</p>
+            <p className="text-sm lg:text-[11px] text-ink-muted font-sans">
+              BUDGET
+            </p>
           </div>
           <div className="flex flex-col items-center justify-center">
             <h3 className="text-lg lg:text-xl text-dash-green font-serif">
               ₹{(project.paid / 1000).toFixed(0)}K
             </h3>
-            <p className="text-sm lg:text-[11px] text-ink-muted font-sans">PAID</p>
+            <p className="text-sm lg:text-[11px] text-ink-muted font-sans">
+              PAID
+            </p>
           </div>
           <div className="flex flex-col items-center justify-center">
             <h3 className="text-lg lg:text-xl text-dash-amber font-serif">
               ₹{(project.remaining / 1000).toFixed(0)}K
             </h3>
-            <p className="text-sm lg:text-[11px] text-ink-muted font-sans">DUE</p>
+            <p className="text-sm lg:text-[11px] text-ink-muted font-sans">
+              DUE
+            </p>
           </div>
         </div>
 
@@ -169,14 +233,37 @@ function ProjectCard({ project, index }: { project: ClientDashboardProject; inde
             className="overflow-hidden"
           >
             <div className="border-t border-dash-border px-5 pb-4">
-              <p className="font-mono text-[9px] lg:text-[11px] uppercase tracking-[2px] text-dash-ink4 pt-3 mb-1">
-                Milestones
-              </p>
+              <div className="flex justify-between items-center pt-3 mb-1">
+                <p className="font-mono text-[9px] lg:text-[11px] uppercase tracking-[2px] text-dash-ink4">
+                  Milestones
+                </p>
+                <Link
+                  href={`/client/milestones/${project.id}`}
+                  className="text-[10px] text-dash-ink3 hover:text-white flex items-center gap-1.5 transition-colors group"
+                >
+                  Manage{" "}
+                  <ExternalLink
+                    size={10}
+                    className="group-hover:text-dash-amber transition-colors"
+                  />
+                </Link>
+              </div>
               {project.milestones
                 .sort((a, b) => a.position - b.position)
+                .slice(0, 3)
                 .map((m, i) => (
                   <MilestoneRow key={m.id} milestone={m} index={i} />
                 ))}
+              {project.milestones.length > 3 && (
+                <div className="mt-3 flex justify-center">
+                  <Link
+                    href={`/client/milestones/${project.id}`}
+                    className="text-[10px] lg:text-[12px] font-mono uppercase tracking-[1px] text-dash-ink2 font-bold hover:text-white transition-colors duration-200 bg-dash-surface3 hover:bg-dash-surface1 px-4 py-1.5 rounded-md border border-dash-border"
+                  >
+                    View all {project.milestones.length} milestones
+                  </Link>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
@@ -196,7 +283,10 @@ export default function ClientActiveProjects({
         <h3 className="text-md lg:text-lg font-serif text-ink flex items-center">
           Active Projects
         </h3>
-        <h4 className="text-ink text-[11px] lg:text-[13px] flex items-center cursor-pointer hover:text-dash-ink2 transition-colors">
+        <h4
+          onClick={() => redirect("/client/all-projects")}
+          className="text-ink text-[11px] lg:text-[13px] flex items-center cursor-pointer hover:text-dash-ink2 transition-colors"
+        >
           View all →
         </h4>
       </div>
