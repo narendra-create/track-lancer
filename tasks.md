@@ -100,9 +100,9 @@
 - [ ] make setnew password controller for settings page
 - [ ] make a function to archive projects from freelancer or from client side
 - [ ] make project cancelled button
-- [ ] make getdeadlinecontroller for client dashboard
-- [ ] continue on client dashboard real data
-- [ ] make controller for get client money stats, upcoming deadlines, client dashboard stats
+- [x] make getdeadlinecontroller for client dashboard
+- [x] continue on client dashboard real data
+- [x] make controller for get client money stats, upcoming deadlines, client dashboard stats
 - [ ] Add real data to client dashboard stage 2
 - [ ] API/REALDATA: Fetch paginated list of projects for Client dashboard
 - [ ] create model for activity feature
