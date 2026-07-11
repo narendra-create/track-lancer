@@ -1,6 +1,6 @@
-export type AllProjectStatus = "ACTIVE" | "STOPPED" | "CANCELLED";
+export type AllProjectStatus = "ACTIVE" | "STOPPED" | "CANCELLED" | "COMPLETED";
 
-export const SECTION_ORDER: AllProjectStatus[] = ["ACTIVE", "STOPPED", "CANCELLED"];
+export const SECTION_ORDER: AllProjectStatus[] = ["ACTIVE", "COMPLETED", "STOPPED", "CANCELLED"];
 
 export type AllProjectClient = {
   user: {
