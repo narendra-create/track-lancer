@@ -95,3 +95,7 @@ export const getGreeting = (): string => {
 
     return "Good Night";
 };
+
+export const formatMoneydash = (amount: number): string => {
+    return new Intl.NumberFormat("en-IN").format(amount);
+};
