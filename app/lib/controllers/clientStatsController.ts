@@ -1,4 +1,5 @@
 import { prisma } from "@/app/lib/prisma";
+import { getInitials } from "../utilitys";
 
 // getClientMoneyStats(clientProfileId: string)
 //getClientUpcomingDeadlines(clientProfileId: string)
@@ -94,4 +95,97 @@ export const getClientMoneyStats = async (clientId: string): Promise<MoneyStatsT
             completedCount: completedprojectscount
         }
     }
+};
+
+export const getClientCurrentProjects = async (clientId: string, cursor?: string) => {
+    if (!clientId) {
+        return { success: false, error: "Invalid Client id", status: 400 }
+    }
+    const result = await prisma.project.findMany({
+        take: 4,
+        ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+        where: {
+            clientId: clientId, status: {
+                in: ["ACTIVE", "STOPPED"]
+            }
+        },
+        select: {
+            id: true,
+            title: true,
+            freelancer: {
+                select: {
+                    user: {
+                        select: {
+                            name: true,
+                            image: true,
+                        }
+                    },
+                    category: true
+                }
+            },
+            payments: {
+                select: {
+                    due_date: true,
+                    paid_amount: true,
+                    total_cost: true,
+                    payment_status: true
+                }
+            },
+            status: true,
+            milestones: {
+                select: {
+                    status: true,
+                    deadline: true
+                },
+                orderBy: {
+                    deadline: "desc"
+                }
+            },
+            createdAt: true
+        }
+    });
+
+    const projects = result.map((project) => {
+        const totalMilestones = project.milestones.length;
+        const completedMilestones =
+            project.milestones.filter(
+                milestone => milestone.status === "COMPLETED"
+            ).length;
+
+        const progress =
+            totalMilestones === 0
+                ? 0
+                : Math.round(
+                    (completedMilestones / totalMilestones) * 100
+                );
+
+        const lastMilestone = project.milestones[0];
+        const projectDeadline = lastMilestone?.deadline;
+
+        //Payments
+        const totalAmount = project.payments.reduce((sum, p) => sum + p.total_cost, 0);
+        const received = project.payments.reduce((sum, p) => sum + p.paid_amount, 0);
+        return {
+            id: project.id,
+            title: project.title,
+            freelancerName: project.freelancer?.user.name ?? "unknown",
+            freelancerInitials: getInitials(project.freelancer?.user.name ?? "unknown"),
+            freelancerCategory: project.freelancer?.category,
+            money: {
+                totalAmount,
+                received,
+                remaining: totalAmount - received
+            },
+            status: project.status,
+            stats: {
+                totalMilestones,
+                completedMilestones,
+                progress
+            },
+            deadline: projectDeadline
+        }
+    })
+    const nextCursor = projects.length === 4 ? projects[projects.length - 1].id : null;
+
+    return { success: true, projects: projects, nextCursor }
 }
