@@ -99,15 +99,22 @@
 # for 11/07/2026
 - [x] make setnew password controller for settings page
 - [ ] make a function to archive projects from freelancer or from client side
-- [ ] make project cancelled button
+- [x] make project cancelled button
 - [x] make getdeadlinecontroller for client dashboard
 - [x] continue on client dashboard real data
 - [x] make controller for get client money stats, upcoming deadlines, client dashboard stats
-- [ ] Add real data to client dashboard stage 2
+- [x] Add real data to client dashboard stage 2
+- [x] make cancel request model
+- [x] make cancel request generation
+- [x] make cancel request approval and reject
+# for 12/07/2026
 - [ ] API/REALDATA: Fetch paginated list of projects for Client dashboard
 - [ ] create model for activity feature
 - [ ] continue activity feature
 - [ ] make notification off system for settings page
+- [ ] replace earned with paid in client milestones page
+- [ ] make sure only one request of cancellation generates for each project
+- [ ] fix a bug - when rejecting the cancel request and then generating new request - instently cancells the project
 
 ## additionals
 - [ ] ADDITIONAL: Set up email notifications or in-app alerts for milestone status changes
