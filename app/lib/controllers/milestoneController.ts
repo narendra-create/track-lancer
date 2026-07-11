@@ -103,6 +103,16 @@ export const getAllMilestones = async (projectId: string, profileId: string, rol
                 createdAt: true,
                 deadline: true,
                 status: true,
+                hasCancelRequest: true,
+                cancellRequests: {
+                    where: { isRejected: false },
+                    take: 1,
+                    orderBy: { createdAt: "desc" },
+                    select: {
+                        clientApproved: true,
+                        freelancerApproved: true,
+                    }
+                },
                 milestones: {
                     select: {
                         createdAt: true,
