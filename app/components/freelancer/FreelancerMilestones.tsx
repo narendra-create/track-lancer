@@ -253,6 +253,67 @@ function StopProjectModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+function CancelProjectModal({ onClose, onConfirm }: { onClose: () => void; onConfirm: () => Promise<void> }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleCancel = async () => {
+    setLoading(true);
+    await onConfirm();
+    setLoading(false);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 8 }}
+        transition={{ duration: 0.18 }}
+        className="bg-[var(--color-dash-surface1)] border border-[var(--color-dash-border)] rounded-xl p-7 max-w-sm w-full shadow-2xl relative"
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-[var(--color-dash-ink3)] hover:text-white transition-colors"
+        >
+          <X size={18} />
+        </button>
+
+        <div className="mb-6">
+          <div className="w-10 h-10 rounded-full bg-[var(--color-dash-red-bg)] border border-[rgba(192,96,96,0.25)] flex items-center justify-center mb-4">
+            <OctagonX size={16} className="text-[var(--color-dash-red)]" />
+          </div>
+          <h2 className="font-serif text-xl text-white mb-1">Cancel Project</h2>
+          <p className="font-mono text-[10px] tracking-[2px] uppercase text-[var(--color-dash-ink3)]">
+            This action cannot be undone
+          </p>
+        </div>
+
+        <p className="font-sans text-[13px] text-[var(--color-dash-ink3)] leading-relaxed mb-6">
+          Canceling the project will permanently close it. You will not be able to add new milestones or request payments.
+        </p>
+
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-3 bg-transparent border border-[var(--color-dash-border)] rounded-md text-[var(--color-dash-ink3)] font-mono text-[11px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-surface2)] transition-all duration-200"
+          >
+            Go Back
+          </button>
+          <button
+            onClick={handleCancel}
+            disabled={loading}
+            className="flex-1 px-4 py-3 bg-[var(--color-dash-red-bg)] border border-[rgba(192,96,96,0.3)] rounded-md text-[var(--color-dash-red)] font-mono text-[11px] uppercase tracking-[1.5px] hover:bg-[rgba(192,96,96,0.15)] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <OctagonX size={12} />
+            {loading ? "Canceling..." : "Cancel Project"}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 function StatCard({
   label,
   value,
@@ -300,6 +361,9 @@ interface FreelancerMilestonesProps {
   hasUpi?: boolean;
   updateUPI?: (data: { upiId: string, AccountHolderName: string }) => Promise<{ success: boolean; error?: string }>;
   onComplete?: (projectId: string) => Promise<any>;
+  onCancelProject?: (projectId: string) => Promise<any>;
+  onApprove?: (projectId: string) => Promise<any>;
+  onReject?: (projectId: string) => Promise<any>;
 }
 
 export function FreelancerMilestones({
@@ -315,10 +379,14 @@ export function FreelancerMilestones({
   hasUpi,
   updateUPI,
   onComplete,
+  onCancelProject,
+  onApprove,
+  onReject,
 }: FreelancerMilestonesProps) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showFlagModal, setShowFlagModal] = useState<string | null>(null);
   const [showStopModal, setShowStopModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [showBudgetrequestModal, setshowBudgetrequestModal] = useState(false);
   const [showUpiBlockModal, setShowUpiBlockModal] = useState(false);
   const [pendingMilestoneId, setPendingMilestoneId] = useState<string | null>(null);
@@ -426,6 +494,23 @@ export function FreelancerMilestones({
             onClose={() => setshowBudgetrequestModal(false)}
             onSubmit={onBudgetRaiseRequest}
             projectId={project.id}
+          />
+        )}
+        {showCancelModal && (
+          <CancelProjectModal
+            key="cancel"
+            onClose={() => setShowCancelModal(false)}
+            onConfirm={async () => {
+              if (onCancelProject) {
+                const result = await onCancelProject(project.id);
+                if (result?.error) {
+                  addToast({ title: "Error", message: String(result.error), type: "error" });
+                } else {
+                  addToast({ title: "Success", message: "Project cancelled", type: "success" });
+                  setShowCancelModal(false);
+                }
+              }
+            }}
           />
         )}
         {showUpiBlockModal && (
@@ -801,84 +886,129 @@ export function FreelancerMilestones({
             >
               Your project is - {project.status.toLowerCase()}
             </motion.div>
-          ) : role === "FREELANCER" ? (
+          ) : (
             <div className="flex flex-col gap-3">
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.22, delay: 0.14 }}
-                onClick={() => {
-                  const inProgress = project.milestones.find(
-                    (m) => m.status === "IN_PROGRESS",
-                  );
-                  if (inProgress) {
-                    setShowFlagModal(inProgress.id);
-                  } else {
-                    addToast({
-                      title: "Error",
-                      message: "No active milestone in progress to flag",
-                      type: "error",
-                    });
-                  }
-                }}
-                className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-amber-bg)] hover:border-[rgba(200,120,64,0.35)] hover:text-[var(--color-dash-amber)] transition-all duration-200 flex items-center justify-center gap-2"
-              >
-                <Flag size={12} />
-                Flag a Delay
-              </motion.button>
-              
-              {onComplete && (
+              {project.hasCancelRequest && (
+                ((role === "CLIENT" && project.cancellRequests?.[0]?.clientApproved) ||
+                 (role === "FREELANCER" && project.cancellRequests?.[0]?.freelancerApproved)) ? (
+                  <motion.button
+                    disabled
+                    className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border)] rounded-xl text-[var(--color-dash-ink4)] font-mono text-[10px] uppercase tracking-[1.5px] flex items-center justify-center gap-2 cursor-not-allowed opacity-70"
+                  >
+                    <OctagonX size={12} />
+                    Waiting for Approval
+                  </motion.button>
+                ) : (
+                  <>
+                    {onApprove && (
+                      <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.22, delay: 0.13 }}
+                        onClick={async () => {
+                          const result = await onApprove(project.id);
+                          if (result?.error) {
+                            addToast({ title: "Error", message: String(result.error), type: "error" });
+                          } else {
+                            addToast({ title: "Success", message: "Cancel request approved", type: "success" });
+                          }
+                        }}
+                        className="w-full h-[42px] px-5 bg-[var(--color-dash-amber-bg)] border border-[rgba(200,120,64,0.35)] rounded-xl text-[var(--color-dash-amber)] font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[rgba(200,120,64,0.15)] transition-all duration-200 flex items-center justify-center gap-2"
+                      >
+                        <Check size={12} />
+                        Approve Cancel Request
+                      </motion.button>
+                    )}
+                    {onReject && (
+                      <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.22, delay: 0.14 }}
+                        onClick={async () => {
+                          const result = await onReject(project.id);
+                          if (result?.error) {
+                            addToast({ title: "Error", message: String(result.error), type: "error" });
+                          } else {
+                            addToast({ title: "Success", message: "Cancel request rejected", type: "success" });
+                          }
+                        }}
+                        className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-red-bg)] hover:border-[rgba(192,96,96,0.35)] hover:text-[var(--color-dash-red)] transition-all duration-200 flex items-center justify-center gap-2"
+                      >
+                        <OctagonX size={12} />
+                        Reject Cancel Request
+                      </motion.button>
+                    )}
+                  </>
+                )
+              )}
+
+              {role === "FREELANCER" ? (
+                <>
+                  <motion.button
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.22, delay: 0.14 }}
+                    onClick={() => {
+                      const inProgress = project.milestones.find((m) => m.status === "IN_PROGRESS");
+                      if (inProgress) setShowFlagModal(inProgress.id);
+                      else addToast({ title: "Error", message: "No active milestone in progress to flag", type: "error" });
+                    }}
+                    className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-amber-bg)] hover:border-[rgba(200,120,64,0.35)] hover:text-[var(--color-dash-amber)] transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    <Flag size={12} />
+                    Flag a Delay
+                  </motion.button>
+                  
+                  {onComplete && (
+                    <motion.button
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.22, delay: 0.15 }}
+                      onClick={async () => {
+                        const allMilestonesDone = project.milestones.every(
+                          (m) => m.status === "COMPLETED" || m.status === "STOPPED"
+                        );
+                        if (!allMilestonesDone) {
+                          addToast({ title: "Action Not Allowed", message: "All milestones must be either completed or stopped before marking the project as completed.", type: "error" });
+                          return;
+                        }
+                        const result = await onComplete(project.id);
+                        if (result?.error) addToast({ title: "Error", message: String(result.error), type: "error" });
+                        else addToast({ title: "Success", message: "Project marked as completed", type: "success" });
+                      }}
+                      className="w-full h-[42px] px-5 bg-[var(--color-dash-green)]/10 border border-[var(--color-dash-green)]/30 rounded-xl text-[var(--color-dash-green)] font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-green)]/20 transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      <Check size={12} />
+                      Project Completed
+                    </motion.button>
+                  )}
+                </>
+              ) : (
                 <motion.button
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.22, delay: 0.15 }}
-                  onClick={async () => {
-                    const allMilestonesDone = project.milestones.every(
-                      (m) => m.status === "COMPLETED" || m.status === "STOPPED"
-                    );
-                    
-                    if (!allMilestonesDone) {
-                      addToast({
-                        title: "Action Not Allowed",
-                        message: "All milestones must be either completed or stopped before marking the project as completed.",
-                        type: "error",
-                      });
-                      return;
-                    }
-
-                    const result = await onComplete(project.id);
-                    if (result?.error) {
-                      addToast({
-                        title: "Error",
-                        message: String(result.error),
-                        type: "error",
-                      });
-                    } else {
-                      addToast({
-                        title: "Success",
-                        message: "Project marked as completed",
-                        type: "success",
-                      });
-                    }
-                  }}
-                  className="w-full h-[42px] px-5 bg-[var(--color-dash-green)]/10 border border-[var(--color-dash-green)]/30 rounded-xl text-[var(--color-dash-green)] font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-green)]/20 transition-all duration-200 flex items-center justify-center gap-2"
+                  transition={{ duration: 0.22, delay: 0.14 }}
+                  onClick={() => setShowStopModal(true)}
+                  className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-red-bg)] hover:border-[rgba(192,96,96,0.35)] hover:text-[var(--color-dash-red)] transition-all duration-200 flex items-center justify-center gap-2"
                 >
-                  <Check size={12} />
-                  Project Completed
+                  <OctagonX size={12} />
+                  Stop Project
+                </motion.button>
+              )}
+
+              {!project.hasCancelRequest && onCancelProject && (
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22, delay: 0.16 }}
+                  onClick={() => setShowCancelModal(true)}
+                  className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-red-bg)] hover:border-[rgba(192,96,96,0.35)] hover:text-[var(--color-dash-red)] transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  <OctagonX size={12} />
+                  Cancel Project
                 </motion.button>
               )}
             </div>
-          ) : (
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.22, delay: 0.14 }}
-              onClick={() => setShowStopModal(true)}
-              className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-red-bg)] hover:border-[rgba(192,96,96,0.35)] hover:text-[var(--color-dash-red)] transition-all duration-200 flex items-center justify-center gap-2"
-            >
-              <OctagonX size={12} />
-              Stop Project
-            </motion.button>
           )}
         </div>
 
