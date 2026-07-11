@@ -98,7 +98,6 @@
 - [x] link payment details component with history cards
 # for 11/07/2026
 - [x] make setnew password controller for settings page
-- [ ] make a function to archive projects from freelancer or from client side
 - [x] make project cancelled button
 - [x] make getdeadlinecontroller for client dashboard
 - [x] continue on client dashboard real data
@@ -108,6 +107,7 @@
 - [x] make cancel request generation
 - [x] make cancel request approval and reject
 # for 12/07/2026
+- [ ] make a function to archive projects from freelancer or from client side
 - [ ] API/REALDATA: Fetch paginated list of projects for Client dashboard
 - [ ] create model for activity feature
 - [ ] continue activity feature
