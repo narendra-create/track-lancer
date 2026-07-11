@@ -75,6 +75,7 @@ const PaymentPage = async ({ params }: Props) => {
         detailresult.details.freelancer.AccountHolderName ??
         detailresult.details.freelancer.user.name
       }
+      dueamount={detailresult.details.totalDue}
       upiId={detailresult.details.freelancer.upiId}
       amount={"custom"}
       dueDate={formatDate(detailresult.details.due_date)}
