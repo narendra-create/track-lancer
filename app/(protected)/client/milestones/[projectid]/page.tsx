@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { FreelancerMilestones } from "@/app/components/freelancer/FreelancerMilestones";
 import { getAllMilestones } from "@/app/lib/controllers/milestoneController";
+import { raiseCancellRequest, processCancellRequest } from "@/app/lib/controllers/ProjectController";
 
 type Props = {
   params: Promise<{
@@ -39,12 +40,45 @@ const Milestones = async ({ params }: Props) => {
     return redirect("/client/dashboard");
   }
 
+  const handleCancelProject = async (projectId: string) => {
+    "use server";
+    const result = await raiseCancellRequest(projectId);
+    if (!result.success) {
+      return { error: result.error ?? "Failed to cancel project" };
+    }
+    revalidatePath(`/client/milestones/${projectId}`);
+    return { updated: true };
+  };
+
+  const handleApprove = async (projectId: string) => {
+    "use server";
+    const result = await processCancellRequest(projectId, "APPROVE");
+    if (!result.success) {
+      return { error: result.error ?? "Failed to approve request" };
+    }
+    revalidatePath(`/client/milestones/${projectId}`);
+    return { updated: true };
+  };
+
+  const handleReject = async (projectId: string) => {
+    "use server";
+    const result = await processCancellRequest(projectId, "REJECT");
+    if (!result.success) {
+      return { error: result.error ?? "Failed to reject request" };
+    }
+    revalidatePath(`/client/milestones/${projectId}`);
+    return { updated: true };
+  };
+
   return (
     <main>
       <FreelancerMilestones
         project={result.project}
         projectTitle={result.project.title}
         projectStatus={result.project.status}
+        onCancelProject={handleCancelProject}
+        onApprove={handleApprove}
+        onReject={handleReject}
         role="CLIENT"
       />
     </main>

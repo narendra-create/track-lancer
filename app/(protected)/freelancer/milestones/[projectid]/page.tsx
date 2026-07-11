@@ -20,7 +20,7 @@ import {
 import { createBudgetRequestSchema, createBudgetInput } from "@/app/lib/validations/Budgetrequest";
 import { raiseBudgetRequest } from "@/app/lib/controllers/BudgetController";
 import { getProfileAction, updateUPIDetailsAction } from "@/app/lib/actions/ProfileActions";
-import { markProjectCompleted } from "@/app/lib/controllers/ProjectController";
+import { markProjectCompleted, raiseCancellRequest, processCancellRequest } from "@/app/lib/controllers/ProjectController";
 
 type Props = {
   params: Promise<{
@@ -128,6 +128,36 @@ const Milestones = async ({ params }: Props) => {
     return { updated: result.Project };
   };
 
+  const handleCancelProject = async (projectId: string) => {
+    "use server";
+    const result = await raiseCancellRequest(projectId);
+    if (!result.success) {
+      return { error: result.error ?? "Failed to cancel project" };
+    }
+    revalidatePath(`/freelancer/milestones/${projectId}`);
+    return { updated: true };
+  };
+
+  const handleApprove = async (projectId: string) => {
+    "use server";
+    const result = await processCancellRequest(projectId, "APPROVE");
+    if (!result.success) {
+      return { error: result.error ?? "Failed to approve request" };
+    }
+    revalidatePath(`/freelancer/milestones/${projectId}`);
+    return { updated: true };
+  };
+
+  const handleReject = async (projectId: string) => {
+    "use server";
+    const result = await processCancellRequest(projectId, "REJECT");
+    if (!result.success) {
+      return { error: result.error ?? "Failed to reject request" };
+    }
+    revalidatePath(`/freelancer/milestones/${projectId}`);
+    return { updated: true };
+  };
+
   return (
     <main>
       <FreelancerMilestones
@@ -140,6 +170,9 @@ const Milestones = async ({ params }: Props) => {
         projectStatus={result.project.status}
         onCompleteMilestone={handleComplete}
         onComplete={handleProjectComplete}
+        onCancelProject={handleCancelProject}
+        onApprove={handleApprove}
+        onReject={handleReject}
         role="FREELANCER"
         hasUpi={hasUpi}
         updateUPI={updateUPIDetailsAction}
