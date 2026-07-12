@@ -15,6 +15,7 @@ export interface PastProjectsProps {
     projects: ClientPastProject[] | FreelancerPastProject[];
     nextCursor: string | null;
   }>;
+  onArchive?: (id: string) => void;
 }
 
 // MAIN COMPONENT
@@ -23,6 +24,7 @@ export function PastProjects({
   role,
   nextCursor: initialCursor,
   loadmore,
+  onArchive,
 }: PastProjectsProps) {
   const [projects, setProjects] = useState(initialProjects);
   const [cursor, setCursor] = useState(initialCursor ?? null);
@@ -103,7 +105,7 @@ export function PastProjects({
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-3 lg:px-4 px-2 gap-4 w-full">
         {sortedProjects && sortedProjects.length > 0 ? (
           sortedProjects.map((project) => (
-            <PastProjectCard key={project.id} {...project} role={role} />
+            <PastProjectCard key={project.id} {...project} role={role} onArchive={onArchive} />
           ))
         ) : (
           <p className="text-[var(--color-dash-ink3)] font-mono text-sm">
