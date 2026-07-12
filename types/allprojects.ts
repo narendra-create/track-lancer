@@ -31,6 +31,8 @@ export type AllProject = {
   status: AllProjectStatus;
   stats: AllProjectStats;
   hasCancelRequest: boolean;
+  archivedByFreelancer: boolean;
+  archivedByClient: boolean;
 };
 
 type GetAllProjectsSuccess = {
@@ -57,4 +59,6 @@ export type AcceptProjectDetails = {
     name: string | undefined,
     email: string | undefined
   }
+  archivedByClient: boolean;
+  archivedByFreelancer: boolean;
 };
