@@ -216,8 +216,13 @@ export const delayMilestone = async (input: delayMilestoneInput) => {
     if (!findFreelancer) return { success: false, error: "Profile Not found", status: 404 };
 
     const findMilestone = await prisma.milestone.findFirst({
-        where: { id: input.milestoneId, project: { freelancerId: findFreelancer.id, archivedByFreelancer: false } }
+        where: { id: input.milestoneId, project: { freelancerId: findFreelancer.id, archivedByFreelancer: false } },
+        include: { project: true }
     });
+
+    if (findMilestone && findMilestone.project.status !== "ACTIVE") {
+        return { success: false, error: "You cannot delay a milestone for a stopped or completed project", status: 400 };
+    }
 
     if (!findMilestone) {
         return { success: false, error: "Your account is not linked with this milestone", status: 403 }
@@ -312,8 +317,8 @@ export const deleteMilestone = async (milestoneId: string, projectId: string) =>
     if (!findproject) {
         return { success: false, error: "Project Doesn't exist", status: 404 }
     };
-    if (findproject.status !== "ACTIVE" && findproject.status !== "STOPPED") {
-        return { success: false, error: "You can only delete Active and Stopped project's Milestone", status: 400 }
+    if (findproject.status !== "ACTIVE") {
+        return { success: false, error: "You can only delete milestones from Active projects", status: 400 }
     }
 
     try {

@@ -191,12 +191,12 @@ function FlagDelayModal({
   );
 }
 
-function StopProjectModal({ onClose }: { onClose: () => void }) {
+function StopProjectModal({ onClose, onConfirm }: { onClose: () => void; onConfirm: () => Promise<any> }) {
   const [loading, setLoading] = useState(false);
 
   const handleStop = async () => {
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 700));
+    await onConfirm();
     setLoading(false);
     onClose();
   };
@@ -374,6 +374,7 @@ interface FreelancerMilestonesProps {
     AccountHolderName: string;
   }) => Promise<{ success: boolean; error?: string }>;
   onComplete?: (projectId: string) => Promise<any>;
+  onStopProject?: (projectId: string) => Promise<any>;
   onCancelProject?: (projectId: string) => Promise<any>;
   onApprove?: (projectId: string) => Promise<any>;
   onReject?: (projectId: string) => Promise<any>;
@@ -392,6 +393,7 @@ export function FreelancerMilestones({
   hasUpi,
   updateUPI,
   onComplete,
+  onStopProject,
   onCancelProject,
   onApprove,
   onReject,
@@ -513,6 +515,17 @@ export function FreelancerMilestones({
           <StopProjectModal
             key="stop"
             onClose={() => setShowStopModal(false)}
+            onConfirm={async () => {
+              if (onStopProject) {
+                const result = await onStopProject(project.id);
+                if (result?.error) {
+                  addToast({ title: "Error", message: String(result.error), type: "error" });
+                } else {
+                  addToast({ title: "Success", message: "Project stopped", type: "success" });
+                  setShowStopModal(false);
+                }
+              }
+            }}
           />
         )}
         {showBudgetrequestModal && (
@@ -778,12 +791,13 @@ export function FreelancerMilestones({
               onClick={() => {
                 if (
                   project.status === "COMPLETED" ||
-                  project.status === "CANCELLED"
+                  project.status === "CANCELLED" ||
+                  project.status === "STOPPED"
                 ) {
                   addToast({
                     title: "Project Closed",
                     message:
-                      "You cannot create milestones for a closed project.",
+                      "You cannot create milestones for a closed or stopped project.",
                     type: "error",
                   });
                   return;
@@ -802,6 +816,7 @@ export function FreelancerMilestones({
               className={`px-4 py-2 lg:text-[16px] bg-transparent border border-[var(--color-dash-border-hover)] rounded-md text-white font-mono text-[10px] uppercase tracking-[1.5px] transition-all duration-200 flex items-center gap-2 ${
                 project.status === "COMPLETED" ||
                 project.status === "CANCELLED" ||
+                project.status === "STOPPED" ||
                 costUsed >= totalCost
                   ? "opacity-50 cursor-not-allowed text-[var(--color-dash-ink3)]"
                   : "hover:bg-[var(--color-dash-surface2)]"
@@ -813,6 +828,28 @@ export function FreelancerMilestones({
           )}
         </div>
       </motion.div>
+
+      {project.status === "STOPPED" && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 p-4 lg:p-5 rounded-xl border border-[rgba(192,96,96,0.35)] bg-[var(--color-dash-red-bg)] flex items-start gap-4"
+        >
+          <div className="p-2.5 rounded-full bg-[rgba(192,96,96,0.15)] shrink-0 mt-0.5">
+            <Ban size={22} className="text-[var(--color-dash-red)]" />
+          </div>
+          <div>
+            <h3 className="font-serif text-[18px] lg:text-[22px] text-[var(--color-dash-red)] mb-1.5 leading-none">
+              PROJECT IS STOPPED
+            </h3>
+            <p className="font-sans text-[13px] lg:text-[14px] text-[var(--color-dash-red)]/80 leading-relaxed">
+              {role === "FREELANCER" 
+                ? "The client has stopped this project. You may complete your currently active milestone, but no new milestones can be added, and active ones cannot be delayed."
+                : "You have stopped this project. Work is officially paused. The freelancer can complete their current milestone but cannot proceed further."}
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       <div className="flex flex-col xl:flex-row gap-6">
         {/* side-analytics */}
@@ -855,12 +892,13 @@ export function FreelancerMilestones({
                     onClick={() => {
                       if (
                         project.status === "COMPLETED" ||
-                        project.status === "CANCELLED"
+                        project.status === "CANCELLED" ||
+                        project.status === "STOPPED"
                       ) {
                         addToast({
                           title: "Project Closed",
                           message:
-                            "You cannot raise budget for a closed project.",
+                            "You cannot raise budget for a closed or stopped project.",
                           type: "error",
                         });
                         return;
@@ -869,7 +907,8 @@ export function FreelancerMilestones({
                     }}
                     className={`w-full py-2 border rounded-md font-mono text-[10px] uppercase tracking-[1px] transition-all duration-200 ${
                       project.status === "COMPLETED" ||
-                      project.status === "CANCELLED"
+                      project.status === "CANCELLED" ||
+                      project.status === "STOPPED"
                         ? "bg-[var(--color-dash-surface2)] border-[var(--color-dash-border)] text-[var(--color-dash-ink3)] opacity-50 cursor-not-allowed"
                         : "bg-[var(--color-dash-amber-bg)] border-[rgba(200,120,64,0.3)] text-[var(--color-dash-amber)] hover:bg-[rgba(200,120,64,0.15)]"
                     }`}
@@ -1072,6 +1111,14 @@ export function FreelancerMilestones({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.22, delay: 0.14 }}
                     onClick={() => {
+                      if (project.status === "STOPPED") {
+                        addToast({
+                          title: "Project Stopped",
+                          message: "You cannot flag a delay for a stopped project.",
+                          type: "error",
+                        });
+                        return;
+                      }
                       const inProgress = project.milestones.find(
                         (m) => m.status === "IN_PROGRESS",
                       );
@@ -1083,18 +1130,37 @@ export function FreelancerMilestones({
                           type: "error",
                         });
                     }}
-                    className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-amber-bg)] hover:border-[rgba(200,120,64,0.35)] hover:text-[var(--color-dash-amber)] transition-all duration-200 flex items-center justify-center gap-2"
+                    className={`w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] transition-all duration-200 flex items-center justify-center gap-2 ${
+                      project.status === "STOPPED"
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-[var(--color-dash-amber-bg)] hover:border-[rgba(200,120,64,0.35)] hover:text-[var(--color-dash-amber)]"
+                    }`}
                   >
                     <Flag size={12} />
                     Flag a Delay
                   </motion.button>
 
+                  {project.status === "STOPPED" && (
+                    <div className="w-full text-center mt-1 mb-1">
+                      <span className="font-bold text-[var(--color-dash-red)] font-mono text-[10px] uppercase tracking-[1.5px]">
+                        Project Stopped
+                      </span>
+                    </div>
+                  )}
                   {onComplete && (
                     <motion.button
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.22, delay: 0.15 }}
                       onClick={async () => {
+                        if (project.status === "STOPPED") {
+                          addToast({
+                            title: "Project Stopped",
+                            message: "You cannot mark a stopped project as completed.",
+                            type: "error",
+                          });
+                          return;
+                        }
                         const allMilestonesDone = project.milestones.every(
                           (m) =>
                             m.status === "COMPLETED" || m.status === "STOPPED",
@@ -1122,7 +1188,11 @@ export function FreelancerMilestones({
                             type: "success",
                           });
                       }}
-                      className="w-full h-[42px] px-5 bg-[var(--color-dash-green)]/10 border border-[var(--color-dash-green)]/30 rounded-xl text-[var(--color-dash-green)] font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-green)]/20 transition-all duration-200 flex items-center justify-center gap-2"
+                      className={`w-full h-[42px] px-5 border rounded-xl font-mono text-[10px] uppercase tracking-[1.5px] transition-all duration-200 flex items-center justify-center gap-2 ${
+                        project.status === "STOPPED"
+                          ? "bg-[var(--color-dash-green)]/10 border-[var(--color-dash-green)]/30 text-[var(--color-dash-green)]/50 opacity-50 cursor-not-allowed"
+                          : "bg-[var(--color-dash-green)]/10 border-[var(--color-dash-green)]/30 text-[var(--color-dash-green)] hover:bg-[var(--color-dash-green)]/20"
+                      }`}
                     >
                       <Check size={12} />
                       Project Completed
@@ -1134,11 +1204,16 @@ export function FreelancerMilestones({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.22, delay: 0.14 }}
+                  disabled={project.status === "STOPPED"}
                   onClick={() => setShowStopModal(true)}
-                  className="w-full h-[42px] px-5 bg-transparent border border-[var(--color-dash-border-hover)] rounded-xl text-white font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-red-bg)] hover:border-[rgba(192,96,96,0.35)] hover:text-[var(--color-dash-red)] transition-all duration-200 flex items-center justify-center gap-2"
+                  className={`w-full h-[42px] px-5 border rounded-xl font-mono text-[10px] uppercase tracking-[1.5px] transition-all duration-200 flex items-center justify-center gap-2 ${
+                    project.status === "STOPPED"
+                      ? "bg-[var(--color-dash-red-bg)] border-[rgba(192,96,96,0.3)] text-[var(--color-dash-red)] opacity-70 cursor-not-allowed"
+                      : "bg-transparent border-[var(--color-dash-border-hover)] text-white hover:bg-[var(--color-dash-red-bg)] hover:border-[rgba(192,96,96,0.35)] hover:text-[var(--color-dash-red)]"
+                  }`}
                 >
                   <OctagonX size={12} />
-                  Stop Project
+                  {project.status === "STOPPED" ? "Project Stopped" : "Stop Project"}
                 </motion.button>
               )}
 
@@ -1193,7 +1268,7 @@ export function FreelancerMilestones({
                   isLast={idx === project.milestones.length - 1}
                   role={role}
                   onDelete={
-                    onDelete
+                    onDelete && project.status !== "STOPPED"
                       ? async (milestoneId) => {
                           const result = await onDelete(
                             milestoneId,

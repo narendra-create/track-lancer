@@ -4,7 +4,7 @@ import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { FreelancerMilestones } from "@/app/components/freelancer/FreelancerMilestones";
-import { getAllMilestones } from "@/app/lib/controllers/milestoneController";
+import { getAllMilestones, stopProject } from "@/app/lib/controllers/milestoneController";
 import { raiseCancellRequest, processCancellRequest } from "@/app/lib/controllers/ProjectController";
 
 type Props = {
@@ -70,6 +70,16 @@ const Milestones = async ({ params }: Props) => {
     return { updated: true };
   };
 
+  const handleStopProject = async (projectId: string) => {
+    "use server";
+    const result = await stopProject(projectId);
+    if (!result.success) {
+      return { error: result.error ?? "Failed to stop project" };
+    }
+    revalidatePath(`/client/milestones/${projectId}`);
+    return { updated: true };
+  };
+
   return (
     <main>
       <FreelancerMilestones
@@ -77,6 +87,7 @@ const Milestones = async ({ params }: Props) => {
         projectTitle={result.project.title}
         projectStatus={result.project.status}
         onCancelProject={handleCancelProject}
+        onStopProject={handleStopProject}
         onApprove={handleApprove}
         onReject={handleReject}
         role="CLIENT"

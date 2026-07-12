@@ -116,9 +116,13 @@
 - [x] replace earned with paid in client milestones page
 - [x] make sure only one request of cancellation generates for each project
 - [x] fix a bug - when rejecting the cancel request and then generating new request - instently cancells the project
-- [ ] fix a bug - when client stops the project - the project is still active and freelancer can create any new data
+- [x] fix a bug - when client stops the project - the project is still active and freelancer can create any new data
 
 # for 13/07/2026
+- [ ] make resume project button
+- [ ] make resume project controller for client
+- [ ] show payment for cancelled projects too - give freelancer the money back
+- [ ] cancelled projects on past project page
 - [ ] continue activity feature
 - [ ] implement sms making in controllers
 - [ ] integrate websocket for real time notifications
