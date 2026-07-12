@@ -15,7 +15,7 @@ export const getPastProjects = async (role: userrole, profileid: string, cursor?
             const result = await prisma.project.findMany({
                 take: 10,
                 ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-                where: { freelancerId: profileid, status: "COMPLETED" },
+                where: { freelancerId: profileid, status: "COMPLETED", archivedByFreelancer: false },
                 select: {
                     id: true,
                     client: {
@@ -60,7 +60,7 @@ export const getPastProjects = async (role: userrole, profileid: string, cursor?
             const result = await prisma.project.findMany({
                 take: 10,
                 ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-                where: { clientId: profileid, status: { in: ["COMPLETED", "CANCELLED"] } },
+                where: { clientId: profileid, status: { in: ["COMPLETED", "CANCELLED"] }, archivedByClient: false },
                 select: {
                     id: true,
                     freelancer: { select: { user: { select: { name: true, email: true } } } },
@@ -311,7 +311,8 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
             where: {
                 freelancerId: profileid, status: {
                     not: "PENDING"
-                }
+                },
+                archivedByFreelancer: false
             },
             select: {
                 id: true,
@@ -347,7 +348,9 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                     }
                 },
                 createdAt: true,
-                hasCancelRequest: true
+                hasCancelRequest: true,
+                archivedByClient: true,
+                archivedByFreelancer: true
             }
         });
 
@@ -399,7 +402,9 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                     progress,
                     projectDeadline
                 },
-                hasCancelRequest: project.hasCancelRequest
+                hasCancelRequest: project.hasCancelRequest,
+                archivedByFreelancer: project.archivedByFreelancer,
+                archivedByClient: project.archivedByClient
             }
 
         });
@@ -414,7 +419,8 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
             where: {
                 clientId: profileid, status: {
                     not: "PENDING"
-                }
+                },
+                archivedByClient: false
             },
             select: {
                 id: true,
@@ -451,6 +457,8 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                 },
                 createdAt: true,
                 hasCancelRequest: true,
+                archivedByClient: true,
+                archivedByFreelancer: true
             }
         });
 
@@ -502,7 +510,9 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
                     progress,
                     projectDeadline
                 },
-                hasCancelRequest: project.hasCancelRequest
+                hasCancelRequest: project.hasCancelRequest,
+                archivedByFreelancer: project.archivedByFreelancer,
+                archivedByClient: project.archivedByClient
             }
 
         });
@@ -913,3 +923,344 @@ export const processCancellRequest = async (projectId: string, type: "APPROVE" |
         }
     }
 };
+
+export const processarchiveProject = async (projectId: string, action: "ARCHIVE" | "UNARCHIVE") => {
+    if (!projectId) {
+        return { success: false, error: "Invalid Profile id", status: 400 }
+    };
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    const sessionrole = session.user.role.toLowerCase()
+    if (sessionrole !== "freelancer" && sessionrole !== "client") return { success: false, error: "Forbidden", status: 403 };
+
+    if (sessionrole === "freelancer") {
+        const findfreelancer = await prisma.freelancer.findUnique({
+            where: { userId: session.user.id }
+        });
+        if (!findfreelancer) {
+            return { success: false, error: "no Freelancer Account found that is associated with this project", status: 404 }
+        };
+        const findProject = await prisma.project.findUnique({
+            where: { id: projectId }
+        });
+        if (!findProject) {
+            return { success: false, error: "Project Not Found", status: 404 }
+        }
+        if (findProject.freelancerId !== findfreelancer.id) {
+            return { success: false, error: "this project is not associated with you", status: 404 }
+        }
+        if (findProject.archivedByFreelancer && action === "ARCHIVE") {
+            return {
+                success: false,
+                error: "Project is already archived.",
+                status: 409
+            };
+        }
+        if (!findProject.archivedByClient && action === "UNACHIVE") {
+            return {
+                success: false,
+                error: "This Project is Not archived.",
+                status: 409
+            };
+        }
+        if (findProject.status === "ACTIVE" || findProject.status === "STOPPED") {
+            return { success: false, error: "You can't archive active/stopped projects", status: 422 }
+        };
+        try {
+            const updated = await prisma.project.update({
+                where: { id: findProject.id },
+                data: {
+                    archivedByFreelancer: action === "ARCHIVE" ? true : false
+                }
+            });
+
+            return { success: true, updatedProject: updated, status: 200 }
+        }
+        catch (err) {
+            return {
+                success: false,
+                error: err instanceof Error ? err.message : "Server Error",
+                status: 500
+            };
+        }
+    }
+    else if (sessionrole === "client") {
+        const findClient = await prisma.userprofile.findUnique({
+            where: { userId: session.user.id }
+        });
+        if (!findClient) {
+            return { success: false, error: "no Client Account found that is associated with this project", status: 404 }
+        };
+        const findProject = await prisma.project.findUnique({
+            where: { id: projectId }
+        });
+        if (!findProject) {
+            return { success: false, error: "Project Not Found", status: 404 }
+        }
+        if (findProject.clientId !== findClient.id) {
+            return { success: false, error: "this project is not associated with you", status: 409 }
+        }
+        if (findProject.archivedByClient && action === "ARCHIVE") {
+            return {
+                success: false,
+                error: "Project is already archived.",
+                status: 409
+            };
+        }
+        if (!findProject.archivedByClient && action === "UNACHIVE") {
+            return {
+                success: false,
+                error: "This Project is Not archived.",
+                status: 409
+            };
+        }
+        if (findProject.status === "ACTIVE" || findProject.status === "STOPPED") {
+            return { success: false, error: "You can't archive active/stopped projects", status: 422 }
+        };
+        try {
+            const updated = await prisma.project.update({
+                where: { id: findProject.id },
+                data: {
+                    archivedByClient: action === "ARCHIVE" ? true : false
+                }
+            });
+
+            return { success: true, updatedProject: updated, status: 200 }
+        }
+        catch (err) {
+            return {
+                success: false,
+                error: err instanceof Error ? err.message : "Server Error",
+                status: 500
+            };
+        }
+    }
+    return { success: false, error: "Invalid role", status: 403 }
+};
+
+export const getArchivedProjects = async (cursor?: string) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    const sessionrole = session.user.role.toLowerCase()
+    if (sessionrole !== "freelancer" && sessionrole !== "client") return { success: false, error: "Forbidden", status: 403 };
+
+    if (sessionrole === "freelancer") {
+        const findfreelancer = await prisma.freelancer.findUnique({
+            where: { userId: session.user.id }
+        })
+        const result = await prisma.project.findMany({
+            take: 6,
+            ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+            where: {
+                freelancerId: findfreelancer?.id,
+                archivedByFreelancer: true
+            },
+            select: {
+                id: true,
+                title: true,
+                deadline: true,
+                client: {
+                    select: {
+                        user: {
+                            select: {
+                                name: true,
+                                image: true,
+                            }
+                        }
+                    }
+                },
+                clientEmail: true,
+                payments: {
+                    select: {
+                        due_date: true,
+                        paid_amount: true,
+                        total_cost: true,
+                        payment_status: true
+                    }
+                },
+                status: true,
+                milestones: {
+                    select: {
+                        status: true,
+                        deadline: true
+                    },
+                    orderBy: {
+                        deadline: "desc"
+                    }
+                },
+                createdAt: true,
+                hasCancelRequest: true,
+                archivedByFreelancer: true,
+                archivedByClient: true
+            }
+        });
+
+        const projects = result.map((project) => {
+            const totalMilestones = project.milestones.length;
+            const completedMilestones =
+                project.milestones.filter(
+                    milestone => milestone.status === "COMPLETED"
+                ).length;
+
+            const progress =
+                totalMilestones === 0
+                    ? 0
+                    : Math.round(
+                        (completedMilestones / totalMilestones) * 100
+                    );
+
+            const projectDeadline = project.deadline;
+
+            //Payments
+            const totalAmount = project.payments.reduce((sum, p) => sum + p.total_cost, 0);
+            const received = project.payments.reduce((sum, p) => sum + p.paid_amount, 0);
+
+            return {
+                id: project.id,
+                title: project.title,
+                client: project.client ? {
+                    user: {
+                        name: project.client.user.name,
+                        image: project.client.user.image
+                    },
+                    email: project.clientEmail
+                } : {
+                    user: {
+                        name: "Unknown",
+                        image: null
+                    },
+                    email: null
+                },
+                money: {
+                    totalAmount,
+                    received,
+                    remaining: totalAmount - received
+                },
+                status: project.status as AllProjectStatus,
+                stats: {
+                    totalMilestones,
+                    completedMilestones,
+                    progress,
+                    projectDeadline
+                },
+                hasCancelRequest: project.hasCancelRequest,
+                archivedByClient: project.archivedByClient,
+                archivedByFreelancer: project.archivedByFreelancer
+            }
+
+        });
+        const nextCursor = projects.length === 6 ? projects[projects.length - 1].id : null;
+
+        return { success: true, projects: projects, nextCursor }
+    }
+    else if (sessionrole === "client") {
+        const findclient = await prisma.userprofile.findUnique({
+            where: { userId: session.user.id }
+        })
+        const result = await prisma.project.findMany({
+            take: 6,
+            ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+            where: {
+                clientId: findclient?.id,
+                archivedByClient: true
+            },
+            select: {
+                id: true,
+                title: true,
+                deadline: true,
+                freelancer: {
+                    select: {
+                        user: {
+                            select: {
+                                name: true,
+                                image: true,
+                                email: true
+                            }
+                        }
+                    }
+                },
+                payments: {
+                    select: {
+                        due_date: true,
+                        paid_amount: true,
+                        total_cost: true,
+                        payment_status: true
+                    }
+                },
+                status: true,
+                milestones: {
+                    select: {
+                        status: true,
+                        deadline: true
+                    },
+                    orderBy: {
+                        deadline: "desc"
+                    }
+                },
+                createdAt: true,
+                hasCancelRequest: true,
+                archivedByClient: true,
+                archivedByFreelancer: true
+            }
+        });
+
+        const projects = result.map((project) => {
+            const totalMilestones = project.milestones.length;
+            const completedMilestones =
+                project.milestones.filter(
+                    milestone => milestone.status === "COMPLETED"
+                ).length;
+
+            const progress =
+                totalMilestones === 0
+                    ? 0
+                    : Math.round(
+                        (completedMilestones / totalMilestones) * 100
+                    );
+
+            const projectDeadline = project.deadline;
+
+            //Payments
+            const totalAmount = project.payments.reduce((sum, p) => sum + p.total_cost, 0);
+            const paid = project.payments.reduce((sum, p) => sum + p.paid_amount, 0);
+
+            return {
+                id: project.id,
+                title: project.title,
+                client: project.freelancer ? {
+                    user: {
+                        name: project.freelancer.user.name,
+                        image: project.freelancer.user.image
+                    },
+                    email: project.freelancer.user.email
+                } : {
+                    user: {
+                        name: "Unknown",
+                        image: null
+                    },
+                    email: null
+                },
+                money: {
+                    totalAmount,
+                    received: paid,
+                    remaining: totalAmount - paid
+                },
+                status: project.status as AllProjectStatus,
+                stats: {
+                    totalMilestones,
+                    completedMilestones,
+                    progress,
+                    projectDeadline
+                },
+                hasCancelRequest: project.hasCancelRequest,
+                archivedByClient: project.archivedByClient,
+                archivedByFreelancer: project.archivedByFreelancer
+            }
+
+        });
+        const nextCursor = projects.length === 6 ? projects[projects.length - 1].id : null;
+
+        return { success: true, projects: projects, nextCursor }
+    }
+    return { success: false, error: "Invalid role", status: 403 }
+}
