@@ -247,6 +247,7 @@ model CancellRequest {
   raiesdByuserId     String
   raisedBy           User        @relation(fields: [raiesdByuserId], references: [id])
   acceptedById       String?
+  rejectedById       String?
   createdAt          DateTime    @default(now())
   approvedAt         DateTime?
   isRejected         Boolean     @default(false)
