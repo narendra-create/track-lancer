@@ -111,7 +111,7 @@
 - [x] make a archived projects page
 - [x] make function to unarchive projects
 - [x] update project findings by is archived or not on all pages
-- [ ] API/REALDATA: Fetch paginated list of projects for Client dashboard
+- [x] API/REALDATA: Fetch paginated list of projects for Client dashboard
 - [ ] create model for activity feature
 - [ ] continue activity feature
 - [ ] make notification off system for settings page
