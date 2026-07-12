@@ -1,4 +1,5 @@
 import React from "react";
+import { Archive } from "lucide-react";
 import type { userrole } from "@/app/generated/prisma/enums";
 
 // PROPS
@@ -13,6 +14,7 @@ export interface PastProjectCardProps {
   paymentStatus: "PAID" | "DUE" | "UNPAID";
   completionDate: string | Date;
   paidAmount: number | string;
+  onArchive?: (id: string) => void;
 }
 
 // UI COMPONENT
@@ -27,6 +29,7 @@ export function PastProjectCard({
   paidAmount,
   clientEmail,
   freelancerEmail,
+  onArchive,
 }: PastProjectCardProps) {
   // DATE FORMATTING
   const formattedDate =
@@ -97,9 +100,25 @@ export function PastProjectCard({
         <span className="text-[var(--color-dash-ink3)] font-mono text-[10px] tracking-[1px] uppercase">
           COMPLETED {formattedDate}
         </span>
-        <span className="text-[var(--color-dash-gold)] font-mono text-[16px] tracking-wide">
-          {formattedCost}
-        </span>
+        <div className="flex items-center gap-3">
+          {/* ARCHIVE BUTTON */}
+          {onArchive && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onArchive(id);
+              }}
+              className="flex items-center gap-1.5 px-2 py-1 rounded-md border border-[#2a3441] bg-[#1c232d] text-[#8b9ebb] hover:text-[#d1dff5] hover:bg-[#252f3e] hover:border-[#3a4759] transition-all duration-150"
+              title="Archive Project"
+            >
+              <Archive size={12} />
+              <span className="font-mono text-[9px] tracking-wide uppercase">Archive</span>
+            </button>
+          )}
+          <span className="text-[var(--color-dash-gold)] font-mono text-[16px] tracking-wide">
+            {formattedCost}
+          </span>
+        </div>
       </div>
     </div>
   );
