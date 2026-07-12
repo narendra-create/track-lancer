@@ -14,7 +14,7 @@ export const raiseBudgetRequest = async (input: createBudgetInput) => {
     if (!freelancer) return { success: false, error: "Profile Not found", status: 404 };
 
     const project = await prisma.project.findFirst({
-        where: { id: input.projectId, freelancerId: freelancer.id },
+        where: { id: input.projectId, freelancerId: freelancer.id, archivedByFreelancer: false },
         include: {
             milestones: {
                 select: {

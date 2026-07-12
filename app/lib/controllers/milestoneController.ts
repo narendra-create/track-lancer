@@ -15,7 +15,7 @@ export const createMilestone = async (input: createMilestoneInput) => {
     if (!freelancer) return { success: false, error: "Profile Not found", status: 404 };
 
     const project = await prisma.project.findFirst({
-        where: { id: input.projectId, freelancerId: freelancer.id },
+        where: { id: input.projectId, freelancerId: freelancer.id, archivedByFreelancer: false },
         include: {
             milestones: true
         }
@@ -216,7 +216,7 @@ export const delayMilestone = async (input: delayMilestoneInput) => {
     if (!findFreelancer) return { success: false, error: "Profile Not found", status: 404 };
 
     const findMilestone = await prisma.milestone.findFirst({
-        where: { id: input.milestoneId, project: { freelancerId: findFreelancer.id } }
+        where: { id: input.milestoneId, project: { freelancerId: findFreelancer.id, archivedByFreelancer: false } }
     });
 
     if (!findMilestone) {
@@ -406,7 +406,8 @@ export const markMilestoneCompleted = async (milestoneId: string, projectId: str
     const findproject = await prisma.project.findFirst({
         where: {
             id: projectId,
-            freelancerId: findFreelancer.id
+            freelancerId: findFreelancer.id,
+            archivedByFreelancer: false
         }
     });
     if (!findproject) {
