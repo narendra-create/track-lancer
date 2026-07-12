@@ -622,42 +622,48 @@ export const raiseCancellRequest = async (projectId: string) => {
         try {
             if (findcancellRequest && findcancellRequest.freelancerApproved) {
                 const updated = await prisma.$transaction(async (tx) => {
-                    let updatedRequest;
-                    let updatedProject;
-                    if (findcancellRequest.isRejected) {
-                        updatedProject = await tx.project.update({
-                            where: { id: findproject.id },
-                            data: {
-                                hasCancelRequest: false
-                            }
-                        });
-                        updatedRequest = await tx.cancellRequest.update({
-                            where: { id: findcancellRequest.id },
-                            data: {
-                                clientApproved: true,
-                                freelancerApproved: false,
-                                isRejected: false
-                            }
-                        });
-                    }
                     if (!findcancellRequest.isRejected) {
-                        updatedProject = await tx.project.update({
+                        const updatedProject = await tx.project.update({
                             where: { id: findproject.id },
                             data: {
+                                status: "CANCELLED",
                                 hasCancelRequest: false
                             }
                         });
-                        updatedRequest = await tx.cancellRequest.update({
+                        const updatedRequest = await tx.cancellRequest.update({
                             where: { id: findcancellRequest.id },
                             data: {
+                                acceptedById: session.user.id,
                                 clientApproved: true,
-                                freelancerApproved: false,
-                                isRejected: false
+                                approvedAt: new Date()
                             }
                         });
-                    }
 
-                    return { updatedProject, updatedRequest }
+                        return { updatedProject, updatedRequest }
+                    }
+                    else {
+                        const updatedProject = await tx.project.update({
+                            where: { id: findproject.id },
+                            data: {
+                                hasCancelRequest: true
+                            }
+                        });
+                        const updatedRequest = await tx.cancellRequest.update({
+                            where: { id: findcancellRequest.id },
+                            data: {
+                                raiesdByuserId: session.user.id,
+                                clientId: findclient.id,
+                                clientApproved: true,
+                                freelancerId: findproject.freelancerId!,
+                                freelancerApproved: false,
+                                isRejected: false,
+                                acceptedById: undefined,
+                                rejectedById: undefined
+                            }
+                        });
+
+                        return { updatedProject, updatedRequest }
+                    }
                 })
 
                 return { success: true, updatedProject: updated.updatedProject, updatedRequest: updated.updatedRequest, status: 200 }
@@ -670,16 +676,33 @@ export const raiseCancellRequest = async (projectId: string) => {
                             hasCancelRequest: true,
                         }
                     });
-                    return await tx.cancellRequest.create({
-                        data: {
-                            projectId: findproject.id,
-                            raiesdByuserId: session.user.id,
-                            clientId: findclient.id,
-                            clientApproved: true,
-                            freelancerId: findproject.freelancerId!,
-                            freelancerApproved: false
-                        }
-                    })
+
+                    if (findcancellRequest) {
+                        return await tx.cancellRequest.update({
+                            where: { id: findcancellRequest.id },
+                            data: {
+                                raiesdByuserId: session.user.id,
+                                clientId: findclient.id,
+                                clientApproved: true,
+                                freelancerId: findproject.freelancerId!,
+                                freelancerApproved: false,
+                                isRejected: false,
+                                acceptedById: null,
+                                rejectedById: null
+                            }
+                        });
+                    } else {
+                        return await tx.cancellRequest.create({
+                            data: {
+                                projectId: findproject.id,
+                                raiesdByuserId: session.user.id,
+                                clientId: findclient.id,
+                                clientApproved: true,
+                                freelancerId: findproject.freelancerId!,
+                                freelancerApproved: false
+                            }
+                        });
+                    }
                 })
 
                 return { success: true, request: raisedRequest, status: 200 }
@@ -721,23 +744,48 @@ export const raiseCancellRequest = async (projectId: string) => {
         try {
             if (findcancellRequest && findcancellRequest.clientApproved) {
                 const updated = await prisma.$transaction(async (tx) => {
-                    const updatedProject = await tx.project.update({
-                        where: { id: findproject.id },
-                        data: {
-                            status: "CANCELLED",
-                            hasCancelRequest: false
-                        }
-                    });
-                    const updatedRequest = await tx.cancellRequest.update({
-                        where: { id: findcancellRequest.id },
-                        data: {
-                            acceptedById: session.user.id,
-                            freelancerApproved: true,
-                            approvedAt: new Date()
-                        }
-                    });
+                    if (!findcancellRequest.isRejected ) {
+                        const updatedProject = await tx.project.update({
+                            where: { id: findproject.id },
+                            data: {
+                                status: "CANCELLED",
+                                hasCancelRequest: false
+                            }
+                        });
+                        const updatedRequest = await tx.cancellRequest.update({
+                            where: { id: findcancellRequest.id },
+                            data: {
+                                acceptedById: session.user.id,
+                                freelancerApproved: true,
+                                approvedAt: new Date()
+                            }
+                        });
 
-                    return { updatedProject, updatedRequest }
+                        return { updatedProject, updatedRequest }
+                    }
+                    else {
+                        const updatedProject = await tx.project.update({
+                            where: { id: findproject.id },
+                            data: {
+                                hasCancelRequest: true
+                            }
+                        });
+                        const updatedRequest = await tx.cancellRequest.update({
+                            where: { id: findcancellRequest.id },
+                            data: {
+                                raiesdByuserId: session.user.id,
+                                clientId: findproject.clientId!,
+                                clientApproved: false,
+                                freelancerId: findfreelancer.id,
+                                freelancerApproved: true,
+                                isRejected: false,
+                                acceptedById: undefined,
+                                rejectedById: undefined
+                            }
+                        });
+
+                        return { updatedProject, updatedRequest }
+                    }
                 })
 
                 return { success: true, updatedProject: updated.updatedProject, updatedRequest: updated.updatedRequest, status: 200 }
@@ -750,16 +798,33 @@ export const raiseCancellRequest = async (projectId: string) => {
                             hasCancelRequest: true,
                         }
                     });
-                    return await tx.cancellRequest.create({
-                        data: {
-                            projectId: findproject.id,
-                            raiesdByuserId: session.user.id,
-                            clientId: findproject.clientId!,
-                            clientApproved: false,
-                            freelancerId: findproject.freelancerId!,
-                            freelancerApproved: true
-                        }
-                    })
+
+                    if (findcancellRequest) {
+                        return await tx.cancellRequest.update({
+                            where: { id: findcancellRequest.id },
+                            data: {
+                                raiesdByuserId: session.user.id,
+                                clientId: findproject.clientId!,
+                                clientApproved: false,
+                                freelancerId: findproject.freelancerId!,
+                                freelancerApproved: true,
+                                isRejected: false,
+                                acceptedById: null,
+                                rejectedById: null
+                            }
+                        });
+                    } else {
+                        return await tx.cancellRequest.create({
+                            data: {
+                                projectId: findproject.id,
+                                raiesdByuserId: session.user.id,
+                                clientId: findproject.clientId!,
+                                clientApproved: false,
+                                freelancerId: findproject.freelancerId!,
+                                freelancerApproved: true
+                            }
+                        });
+                    }
                 })
 
                 return { success: true, request: raisedRequest, status: 200 }
@@ -845,9 +910,10 @@ export const processCancellRequest = async (projectId: string, type: "APPROVE" |
                     updatedRequest = await tx.cancellRequest.update({
                         where: { id: findcancellRequest.id },
                         data: {
-                            acceptedById: session.user.id,
                             clientApproved: false,
-                            isRejected: true
+                            freelancerApproved: false,
+                            isRejected: true,
+                            rejectedById: session.user.id
                         }
                     });
                 }
@@ -921,9 +987,10 @@ export const processCancellRequest = async (projectId: string, type: "APPROVE" |
                     updatedRequest = await tx.cancellRequest.update({
                         where: { id: findcancellRequest.id },
                         data: {
-                            acceptedById: session.user.id,
                             freelancerApproved: false,
-                            isRejected: true
+                            clientApproved: false,
+                            isRejected: true,
+                            rejectedById: session.user.id
                         }
                     });
                 }

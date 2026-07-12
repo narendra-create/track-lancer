@@ -115,7 +115,8 @@
 - [x] create model for activity feature
 - [x] replace earned with paid in client milestones page
 - [x] make sure only one request of cancellation generates for each project
-- [ ] fix a bug - when rejecting the cancel request and then generating new request - instently cancells the project
+- [x] fix a bug - when rejecting the cancel request and then generating new request - instently cancells the project
+- [ ] fix a bug - when client stops the project - the project is still active and freelancer can create any new data
 
 # for 13/07/2026
 - [ ] continue activity feature
