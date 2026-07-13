@@ -139,7 +139,7 @@
 # for 13/07/2026
 
 - [x] make resume project button
-- [ ] make resume project controller for client
+- [x] make resume project controller for client
 
 # for 14/07/2026
 - [ ] show payment for cancelled projects too - give freelancer the money back

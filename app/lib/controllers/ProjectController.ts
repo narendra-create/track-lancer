@@ -744,7 +744,7 @@ export const raiseCancellRequest = async (projectId: string) => {
         try {
             if (findcancellRequest && findcancellRequest.clientApproved) {
                 const updated = await prisma.$transaction(async (tx) => {
-                    if (!findcancellRequest.isRejected ) {
+                    if (!findcancellRequest.isRejected) {
                         const updatedProject = await tx.project.update({
                             where: { id: findproject.id },
                             data: {
@@ -1349,4 +1349,80 @@ export const getArchivedProjects = async (cursor?: string) => {
         return { success: true, projects: projects, nextCursor }
     }
     return { success: false, error: "Invalid role", status: 403 }
+};
+
+export const resumeProject = async (projectId: string) => {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized", status: 401 };
+    if (session.user.role.toLowerCase() !== "client") return { success: false, error: "Forbidden", status: 403 };
+
+    const client = await prisma.userprofile.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true }
+    });
+    if (!client) return { success: false, error: "Profile Not found", status: 404 };
+
+    const findproject = await prisma.project.findFirst({
+        where: { id: projectId, clientId: client.id }
+    });
+    if (!findproject) {
+        return { success: false, error: "You can only edit your projects", status: 403 }
+    };
+    if (findproject.status !== "STOPPED") {
+        return { success: false, error: `Your project is - ${findproject.status}, not stopped`, status: 400 }
+    }
+    try {
+        await prisma.$transaction(async (tx) => {
+            await tx.project.update({
+                where: { id: projectId },
+                data: {
+                    status: "ACTIVE",
+                    updatedAt: new Date()
+                }
+            })
+            await tx.milestone.updateMany({
+                where: { projectId: projectId, project: { clientId: client.id }, status: "STOPPED" },
+                data: {
+                    status: "NOT_STARTED"
+                }
+            });
+
+            const existingActive = await tx.milestone.findFirst({
+                where: {
+                    projectId,
+                    status: "IN_PROGRESS"
+                }
+            });
+
+            if (!existingActive) {
+                const nextMilestone = await tx.milestone.findFirst({
+                    where: {
+                        projectId,
+                        status: "NOT_STARTED",
+                    },
+                    orderBy: {
+                        position: "asc",
+                    },
+                });
+
+                if (nextMilestone) {
+                    await tx.milestone.update({
+                        where: { id: nextMilestone.id },
+                        data: { status: "IN_PROGRESS" },
+                    });
+                }
+            }
+
+            return;
+        });
+
+        return { success: true, status: 200 };
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
+        };
+        console.error("From resumeProject", error);
+        return { success: false, error: "Server Error", status: 500 }
+    }
 };
