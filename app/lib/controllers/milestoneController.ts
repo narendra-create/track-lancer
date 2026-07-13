@@ -220,7 +220,7 @@ export const delayMilestone = async (input: delayMilestoneInput) => {
         include: { project: true }
     });
 
-    if (findMilestone && findMilestone.project.status !== "ACTIVE") {
+    if (findMilestone && findMilestone.project?.status !== "ACTIVE") {
         return { success: false, error: "You cannot delay a milestone for a stopped or completed project", status: 400 };
     }
 
@@ -293,7 +293,7 @@ export const delayMilestone = async (input: delayMilestoneInput) => {
         console.error("From delayProject", error);
         return { success: false, error: "Server Error", status: 500 }
     }
-}
+};
 
 export const deleteMilestone = async (milestoneId: string, projectId: string) => {
     const session = await getSession();
@@ -393,7 +393,7 @@ export const deleteMilestone = async (milestoneId: string, projectId: string) =>
             status: 500
         };
     }
-}
+};
 
 export const markMilestoneCompleted = async (milestoneId: string, projectId: string) => {
     const session = await getSession();
@@ -497,4 +497,4 @@ export const markMilestoneCompleted = async (milestoneId: string, projectId: str
             status: 500
         };
     }
-}
+};
