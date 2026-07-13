@@ -21,6 +21,7 @@ model User {
   Freelancer      Freelancer?
   userprofiles    Userprofile?
   cancellRequests CancellRequest[]
+  activities      Activity[]
 
   @@unique([email])
   @@map("user")
@@ -209,9 +210,13 @@ model Activity {
   message           String
   highlightmessage  String
   projectId         String
+  userId            String
+  user              User         @relation(fields: [userId], references: [id])
   project           Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+
+  @@index([userId, createdAt, projectId, type])
 }
 
 model BudgetRaiseRequest {
