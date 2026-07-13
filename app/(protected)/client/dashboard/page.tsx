@@ -2,10 +2,14 @@ import ClientDashboard from "@/app/Features/Client/Client-dashboard";
 import { DUMMY_CLIENT_DASHBOARD } from "@/app/components/seeds/ClientDashboardSeed";
 import type { ClientDashboardData } from "@/app/Features/Client/Client-dashboard";
 import { getClientStats } from "@/app/lib/Batch-Fetch/ClientDashboardStats";
-import { getClientCurrentProjects, getDeadlines } from "@/app/lib/controllers/clientStatsController";
+import {
+  getClientCurrentProjects,
+  getDeadlines,
+} from "@/app/lib/controllers/clientStatsController";
 import { getSession } from "@/app/lib/session";
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
+import { resumeProject } from "@/app/lib/controllers/ProjectController";
 
 const Dashboard = async () => {
   const result = await getClientStats();
@@ -37,16 +41,17 @@ const Dashboard = async () => {
   const loadMoreProjects = async (cursor: string) => {
     "use server";
     const session = await getSession();
-    if (!session || session.user.role.toLowerCase() !== "client") return { projects: [], nextCursor: null };
+    if (!session || session.user.role.toLowerCase() !== "client")
+      return { projects: [], nextCursor: null };
     const clientProfile = await prisma.userprofile.findUnique({
-        where: { userId: session.user.id },
-        select: { id: true }
+      where: { userId: session.user.id },
+      select: { id: true },
     });
     if (!clientProfile) return { projects: [], nextCursor: null };
-    
+
     const res = await getClientCurrentProjects(clientProfile.id, cursor);
     if (!res.success) return { projects: [], nextCursor: null };
-    
+
     return {
       projects: (res as any).projects.map((p: any) => ({
         id: p.id,
@@ -54,40 +59,47 @@ const Dashboard = async () => {
         projectcode: p.id.substring(0, 8),
         status: p.status,
         agreedCost: p.money?.totalAmount || 0,
-        deadline: p.deadline ? new Date(p.deadline).toISOString() : new Date().toISOString(),
+        deadline: p.deadline
+          ? new Date(p.deadline).toISOString()
+          : new Date().toISOString(),
         freelancerName: p.freelancerName,
         freelancerInitials: p.freelancerInitials,
         freelancerCategory: p.freelancerCategory,
         paid: p.money?.received || 0,
         remaining: p.money?.remaining || 0,
-        milestones: p.milestones || []
+        milestones: p.milestones || [],
       })),
-      nextCursor: res.nextCursor as string | null
+      nextCursor: res.nextCursor as string | null,
     };
   };
 
   const loadMoreDeadlines = async (cursor: string) => {
     "use server";
     const session = await getSession();
-    if (!session || session.user.role.toLowerCase() !== "client") return { deadlines: [], nextCursor: null };
+    if (!session || session.user.role.toLowerCase() !== "client")
+      return { deadlines: [], nextCursor: null };
     const clientProfile = await prisma.userprofile.findUnique({
-        where: { userId: session.user.id },
-        select: { id: true }
+      where: { userId: session.user.id },
+      select: { id: true },
     });
     if (!clientProfile) return { deadlines: [], nextCursor: null };
 
     const res = await getDeadlines(clientProfile.id, cursor);
     if (!res.success) return { deadlines: [], nextCursor: null };
-    
+
     return {
       deadlines: (res as any).milestones,
-      nextCursor: (res as any).nextCursor as string | null
+      nextCursor: (res as any).nextCursor as string | null,
     };
   };
 
   return (
     <main>
-      <ClientDashboard data={data} loadMoreProjects={loadMoreProjects} loadMoreDeadlines={loadMoreDeadlines} />
+      <ClientDashboard
+        data={data}
+        loadMoreProjects={loadMoreProjects}
+        loadMoreDeadlines={loadMoreDeadlines}
+      />
     </main>
   );
 };

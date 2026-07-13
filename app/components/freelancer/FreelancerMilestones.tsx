@@ -15,6 +15,7 @@ import {
   Calendar,
   DollarSign,
   OctagonX,
+  Play,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import type { MilestoneItem, ProjectWithMilestones } from "@/types/milestones";
@@ -378,6 +379,7 @@ interface FreelancerMilestonesProps {
   onCancelProject?: (projectId: string) => Promise<any>;
   onApprove?: (projectId: string) => Promise<any>;
   onReject?: (projectId: string) => Promise<any>;
+  onResumeProject?: (projectId: string) => Promise<any>;
 }
 
 export function FreelancerMilestones({
@@ -397,6 +399,7 @@ export function FreelancerMilestones({
   onCancelProject,
   onApprove,
   onReject,
+  onResumeProject,
 }: FreelancerMilestonesProps) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showFlagModal, setShowFlagModal] = useState<string | null>(null);
@@ -411,6 +414,7 @@ export function FreelancerMilestones({
   const [upiLoading, setUpiLoading] = useState(false);
   const [checkSuccess, setCheckSuccess] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isResuming, setIsResuming] = useState(false);
 
   const isValidUpi = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(
     upiData.upiId,
@@ -1199,21 +1203,47 @@ export function FreelancerMilestones({
                     </motion.button>
                   )}
                 </>
+              ) : project.status === "STOPPED" ? (
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22, delay: 0.14 }}
+                  disabled={isResuming || !onResumeProject}
+                  onClick={async () => {
+                    if (!onResumeProject) return;
+                    setIsResuming(true);
+                    try {
+                      const result = await onResumeProject(project.id);
+                      if (result?.error) {
+                        addToast({ title: "Error", message: result.error, type: "error" });
+                      } else {
+                        addToast({ title: "Success", message: "Project resumed successfully", type: "success" });
+                      }
+                    } catch (err: any) {
+                      addToast({ title: "Error", message: err.message || "An unexpected error occurred", type: "error" });
+                    } finally {
+                      setIsResuming(false);
+                    }
+                  }}
+                  className="w-full h-[42px] px-5 border border-[var(--color-dash-amber)]/30 bg-[var(--color-dash-amber)]/10 text-[var(--color-dash-amber)] rounded-xl font-mono text-[10px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-amber)]/20 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isResuming ? (
+                    <span className="w-3.5 h-3.5 border-2 border-[var(--color-dash-amber)] border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Play size={12} fill="currentColor" />
+                  )}
+                  {isResuming ? "Resuming..." : "Resume Project"}
+                </motion.button>
               ) : (
                 <motion.button
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.22, delay: 0.14 }}
-                  disabled={project.status === "STOPPED"}
                   onClick={() => setShowStopModal(true)}
-                  className={`w-full h-[42px] px-5 border rounded-xl font-mono text-[10px] uppercase tracking-[1.5px] transition-all duration-200 flex items-center justify-center gap-2 ${
-                    project.status === "STOPPED"
-                      ? "bg-[var(--color-dash-red-bg)] border-[rgba(192,96,96,0.3)] text-[var(--color-dash-red)] opacity-70 cursor-not-allowed"
-                      : "bg-transparent border-[var(--color-dash-border-hover)] text-white hover:bg-[var(--color-dash-red-bg)] hover:border-[rgba(192,96,96,0.35)] hover:text-[var(--color-dash-red)]"
-                  }`}
+                  className="w-full h-[42px] px-5 border rounded-xl font-mono text-[10px] uppercase tracking-[1.5px] transition-all duration-200 flex items-center justify-center gap-2 bg-transparent border-[var(--color-dash-border-hover)] text-white hover:bg-[var(--color-dash-red-bg)] hover:border-[rgba(192,96,96,0.35)] hover:text-[var(--color-dash-red)]"
                 >
                   <OctagonX size={12} />
-                  {project.status === "STOPPED" ? "Project Stopped" : "Stop Project"}
+                  Stop Project
                 </motion.button>
               )}
 

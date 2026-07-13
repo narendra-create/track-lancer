@@ -145,9 +145,9 @@ function ProjectCard({
         className="p-5 lg:p-4 cursor-pointer"
         onClick={() => setExpanded((v) => !v)}
       >
-        <div className="flex justify-between mb-3">
-          <div className="flex gap-3 items-start">
-            <div className="mt-1">
+        <div className="flex justify-between mb-3 gap-2">
+          <div className="flex gap-3 items-start min-w-0">
+            <div className="mt-1 shrink-0">
               <AvatarInitials
                 initials={project.freelancerInitials}
                 variant="gold"

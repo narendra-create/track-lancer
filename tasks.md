@@ -36,19 +36,25 @@
 - [x] add extra buttons in settings page
 - [x] make controllers for projectid based milestones
 - [x] make one controller to return all projects
+
 # for 02/07/2026
+
 - [x] wire up: make a function to add milestones
 - [x] make a function to delay the milestone
 - [x] work on budget raise request
 - [x] payment history ui
+
 # for 05/07/2006
-- [x] add checks on milestone creation like user cant create milestone if budget reached, and only not started status milestones after one in progress  milestone
+
+- [x] add checks on milestone creation like user cant create milestone if budget reached, and only not started status milestones after one in progress milestone
 - [x] budget raise request ui
 - [x] see budget requests page
 - [x] create budget request controller
 - [x] add handleDelay and milestone delete in milestones page of freelancer
 - [x] connect budget request creation
+
 # for 06/07/2026
+
 - [x] make controller for budget approve
 - [x] function to markReviewd in budgetcontroller
 - [x] controller for rejecting the request
@@ -63,7 +69,9 @@
 - [x] make client all projects page
 - [x] make approve project system for client
 - [x] make searchProject controller
+
 # for 07/07/2026
+
 - [x] update font size and element sizes in client/all-projects and freelancer/see-projects
 - [x] refresh page or animate when approve or reject clicked
 - [x] budget requests page for client
@@ -73,9 +81,13 @@
 - [x] payment history cards and page
 - [x] Milestone status complete controller
 - [x] add limit on milestone cost for freelancer
+
 # for 08/07/2026
+
 - [x] assign navigation buttons to all newly created pages
+
 # for 09/07/2026
+
 - [x] verify payments controller
 - [x] make client dashboard
 - [x] payment history controllers
@@ -86,7 +98,9 @@
 - [x] add real data in payment history page
 - [x] add real data in verification requests page
 - [x] add real data to client dashboard from existing controllers stage 1
+
 # for 10/07/2026
+
 - [x] Make Payment initiate for client with qr code
 - [x] make i have paid page where they can submit txn number and screenshot
 - [x] Make controller for marking project completed
@@ -96,7 +110,9 @@
 - [x] make upi code submit system for freelancer
 - [x] update terms page
 - [x] link payment details component with history cards
+
 # for 11/07/2026
+
 - [x] make setnew password controller for settings page
 - [x] make project cancelled button
 - [x] make getdeadlinecontroller for client dashboard
@@ -106,7 +122,9 @@
 - [x] make cancel request model
 - [x] make cancel request generation
 - [x] make cancel request approval and reject
+
 # for 12/07/2026
+
 - [x] make a function to archive projects from freelancer or from client side
 - [x] make a archived projects page
 - [x] make function to unarchive projects
@@ -119,8 +137,11 @@
 - [x] fix a bug - when client stops the project - the project is still active and freelancer can create any new data
 
 # for 13/07/2026
-- [ ] make resume project button
+
+- [x] make resume project button
 - [ ] make resume project controller for client
+
+# for 14/07/2026
 - [ ] show payment for cancelled projects too - give freelancer the money back
 - [ ] cancelled projects on past project page
 - [ ] continue activity feature
@@ -128,7 +149,10 @@
 - [ ] integrate websocket for real time notifications
 - [ ] cron job for deleting messages more then 7 days
 - [ ] make notification off system for settings page
-
+- [ ] see all date selectors to only select future dates and within the project deadline limit
+- [ ] make enter key submit all things
+- [ ] bug - freelancer revenue showing 0
 ## additionals
+
 - [ ] ADDITIONAL: Set up email notifications or in-app alerts for milestone status changes
 - [ ] ADDITIONAL: Implement automated reminders for pending payments

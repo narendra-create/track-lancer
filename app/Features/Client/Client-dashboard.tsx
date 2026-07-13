@@ -8,7 +8,12 @@ import {
   Primarydashboardbutton,
   Seconddashboardbutton,
 } from "@/app/components/Buttons/Dashboardbuttons";
-import { staggerContainer, scaleIn, fadeUp, fadeLeft } from "@/app/lib/animations";
+import {
+  staggerContainer,
+  scaleIn,
+  fadeUp,
+  fadeLeft,
+} from "@/app/lib/animations";
 import ClientActiveProjects from "@/app/components/client/ClientActiveProjects";
 import type { ClientDashboardProject } from "@/app/components/client/ClientActiveProjects";
 import ClientActivity from "@/app/components/client/ClientActivity";
@@ -34,8 +39,15 @@ export type ClientDashboardData = {
 
 export type ClientDashboardProps = {
   data: ClientDashboardData;
-  loadMoreProjects?: (cursor: string) => Promise<{ projects: ClientDashboardProject[], nextCursor: string | null }>;
-  loadMoreDeadlines?: (cursor: string) => Promise<{ deadlines: ClientDeadlineItem[], nextCursor: string | null }>;
+  loadMoreProjects?: (
+    cursor: string,
+  ) => Promise<{
+    projects: ClientDashboardProject[];
+    nextCursor: string | null;
+  }>;
+  loadMoreDeadlines?: (
+    cursor: string,
+  ) => Promise<{ deadlines: ClientDeadlineItem[]; nextCursor: string | null }>;
 };
 
 type BudgetProject = {
@@ -58,9 +70,10 @@ function BudgetSnapshot({ projects }: { projects: ClientDashboardProject[] }) {
     title: p.title,
     paid: p.paid,
     total: p.agreedCost,
-    status: (p.status === "ACTIVE" || p.status === "PENDING" || p.status === "STOPPED")
-      ? p.status
-      : "ACTIVE",
+    status:
+      p.status === "ACTIVE" || p.status === "PENDING" || p.status === "STOPPED"
+        ? p.status
+        : "ACTIVE",
   }));
 
   const totalCommitted = budgetProjects.reduce((s, p) => s + p.total, 0);
@@ -119,7 +132,8 @@ function BudgetSnapshot({ projects }: { projects: ClientDashboardProject[] }) {
                 </span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-[9px] lg:text-[11px] text-dash-ink3">
-                    ₹{p.paid.toLocaleString("en-IN")} / ₹{p.total.toLocaleString("en-IN")}
+                    ₹{p.paid.toLocaleString("en-IN")} / ₹
+                    {p.total.toLocaleString("en-IN")}
                   </span>
                   <span className="font-mono text-[9px] lg:text-[11px] text-dash-ink4">
                     {pct}%
@@ -131,7 +145,11 @@ function BudgetSnapshot({ projects }: { projects: ClientDashboardProject[] }) {
                   className={`h-full rounded-full ${STATUS_BAR[p.status]}`}
                   initial={{ width: 0 }}
                   animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.6, delay: i * 0.1 + 0.2, ease: "easeOut" }}
+                  transition={{
+                    duration: 0.6,
+                    delay: i * 0.1 + 0.2,
+                    ease: "easeOut",
+                  }}
                 />
               </div>
             </motion.div>
@@ -149,7 +167,11 @@ const getGreeting = () => {
   return "Good evening,";
 };
 
-const ClientDashboard = ({ data, loadMoreProjects, loadMoreDeadlines }: ClientDashboardProps) => {
+const ClientDashboard = ({
+  data,
+  loadMoreProjects,
+  loadMoreDeadlines,
+}: ClientDashboardProps) => {
   const viewPort = { once: true, amount: 0.2 };
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -211,7 +233,7 @@ const ClientDashboard = ({ data, loadMoreProjects, loadMoreDeadlines }: ClientDa
             All Projects
           </Seconddashboardbutton>
           <Primarydashboardbutton href="/client/accept-project">
-           <b>+</b> New Project
+            <b>+</b> New Project
           </Primarydashboardbutton>
         </div>
       </section>
@@ -260,7 +282,11 @@ const ClientDashboard = ({ data, loadMoreProjects, loadMoreDeadlines }: ClientDa
           viewport={viewPort}
           className="lg:w-[75%]"
         >
-          <ClientActiveProjects projects={data.activeProjects} nextCursor={data.nextProjectCursor} loadMore={loadMoreProjects} />
+          <ClientActiveProjects
+            projects={data.activeProjects}
+            nextCursor={data.nextProjectCursor}
+            loadMore={loadMoreProjects}
+          />
         </motion.div>
 
         <motion.div
@@ -270,7 +296,11 @@ const ClientDashboard = ({ data, loadMoreProjects, loadMoreDeadlines }: ClientDa
           viewport={viewPort}
           className="lg:w-[25%] flex flex-col gap-4"
         >
-          <ClientUpcomingDeadlines items={data.deadlines} nextCursor={data.nextDeadlineCursor} loadMore={loadMoreDeadlines} />
+          <ClientUpcomingDeadlines
+            items={data.deadlines}
+            nextCursor={data.nextDeadlineCursor}
+            loadMore={loadMoreDeadlines}
+          />
           <ClientActivity items={data.activity} />
         </motion.div>
       </motion.section>
