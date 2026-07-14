@@ -168,6 +168,8 @@ model Milestonedelay {
 
   milestone Milestone? @relation(fields: [milestoneId], references: [id])
   createdAt DateTime   @default(now())
+
+  @@index([createdAt, milestoneId])
 }
 
 model Project {
