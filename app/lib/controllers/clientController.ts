@@ -127,41 +127,46 @@ export const getMoneyStats = async (freelancerId: string) => {
 
     if (!freelancerFound) return { success: false, error: "Freelancer Not found", status: 404 };
 
-    const paymentsfound = await prisma.payment.aggregate({
+    const paymentsverificationfound = await prisma.paymentverification.aggregate({
+        where: { freelancerId: freelancerFound.id, status: "VERIFIED" },
+        _sum: {
+            paid_amount: true,
+        },
+    });
+    const paymentstotalcost = await prisma.payment.aggregate({
         where: { project: { freelancerId: freelancerFound.id } },
         _sum: {
-            total_cost: true,
-            paid_amount: true
+            total_cost: true
         }
-    });
+    })
 
     const lifetimeDue = Math.max(0,
-        (paymentsfound._sum.total_cost ?? 0) - (paymentsfound._sum.paid_amount ?? 0)
+        (paymentstotalcost._sum.total_cost ?? 0) - (paymentsverificationfound._sum.paid_amount ?? 0)
     );
 
-    const payments = await prisma.payment.findMany({
+    const paymentverification = await prisma.paymentverification.findMany({
         where: {
-            project: { freelancerId: freelancerFound.id },
-            payment_status: "PAID"
+            freelancerId: freelancerFound.id,
+            status: "VERIFIED"
         },
         select: {
             paid_amount: true,
-            createdAt: true
+            updatedAt: true
         }
     });
 
-    const lifetimeEarned = payments.reduce((sum, p) => sum + p.paid_amount, 0);
+    const lifetimeEarned = paymentverification.reduce((sum, p) => sum + p.paid_amount, 0);
     const now = new Date();
-    const thisMonthEarned = payments.filter(p =>
-        p.createdAt.getMonth() === now.getMonth() &&
-        p.createdAt.getFullYear() === now.getFullYear()
+    const thisMonthEarned = paymentverification.filter(p =>
+        p.updatedAt && p.updatedAt.getMonth() === now.getMonth() &&
+        p.updatedAt.getFullYear() === now.getFullYear()
     ).reduce((sum, p) => sum + p.paid_amount, 0);
 
     //Last month earnings for trend comparison
     const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastMonthEarned = payments.filter(p =>
-        p.createdAt.getMonth() === lastMonthDate.getMonth() &&
-        p.createdAt.getFullYear() === lastMonthDate.getFullYear()
+    const lastMonthEarned = paymentverification.filter(p =>
+        p.updatedAt && p.updatedAt.getMonth() === lastMonthDate.getMonth() &&
+        p.updatedAt.getFullYear() === lastMonthDate.getFullYear()
     ).reduce((sum, p) => sum + p.paid_amount, 0);
 
     //Trend percentage: ((current - last) / last) * 100
@@ -205,15 +210,27 @@ export const getRavnuechartStats = async (freelancerId: string) => {
     //for getting start of previous month
     const startofRange = new Date(currentYear, currentMonth - 11, 1);
 
-    const payments = await prisma.payment.findMany({
+    const paymentverifications = await prisma.paymentverification.findMany({
         where: {
-            project: { freelancerId },
-            payment_status: "PAID",
-            createdAt: {
+            freelancerId,
+            status: "VERIFIED",
+            updatedAt: {
                 gte: startofRange
             }
         }
     });
+    const payments = await prisma.payment.findMany({
+        where: {
+            project: { freelancerId: freelancerId },
+            createdAt: {
+                gte: startofRange
+            }
+        },
+        select: {
+            createdAt: true,
+            total_cost: true
+        }
+    })
 
     //Getting monthly report
     const Months: ChartDataPoint[] = Array.from({ length: 12 }, (_, i) => {
@@ -227,19 +244,32 @@ export const getRavnuechartStats = async (freelancerId: string) => {
         }
     });
 
-    //for loop to add money
+    //for loop to add earned money
+    for (const p of paymentverifications) {
+        if (!p.updatedAt) continue;
+        const key = `${p.updatedAt.getMonth()}-${p.updatedAt.getFullYear()}`;
+        const month = Months.find(m => m.key === key);
+        if (month) {
+            month.paidOut += p.paid_amount;
+        }
+    };
+    //for loop to add total cost
     for (const p of payments) {
+        if (!p.createdAt) continue;
         const key = `${p.createdAt.getMonth()}-${p.createdAt.getFullYear()}`;
         const month = Months.find(m => m.key === key);
         if (month) {
             month.earned += p.total_cost;
-            month.paidOut += p.paid_amount;
         }
     };
 
     //Weekly report: 4Weeks of current month
-    const thismonthpayments = payments.filter(p =>
-        p.createdAt.getMonth() === currentMonth &&
+    const thismonthpayments = paymentverifications.filter(p =>
+        p.updatedAt && p.updatedAt.getMonth() === currentMonth &&
+        p.updatedAt.getFullYear() === currentYear
+    );
+    const thismonthpaymenttotalcost = payments.filter(p =>
+        p.createdAt && p.createdAt.getMonth() === currentMonth &&
         p.createdAt.getFullYear() === currentYear
     );
 
@@ -251,12 +281,19 @@ export const getRavnuechartStats = async (freelancerId: string) => {
         isCurrent: false
     }));
 
-    //Filling values of payments
-    for (const p of payments) {
+    //Filling values of paid out
+    for (const p of thismonthpayments) {
+        if (!p.updatedAt) continue;
+        const day = p.updatedAt.getDate();
+        const weekindex = Math.min(Math.floor((day - 1) / 7), 3);
+        WeekDays[weekindex].paidOut += p.paid_amount;
+    }
+    //Filling values of total cost
+    for (const p of thismonthpaymenttotalcost) {
+        if (!p.createdAt) continue;
         const day = p.createdAt.getDate();
         const weekindex = Math.min(Math.floor((day - 1) / 7), 3);
         WeekDays[weekindex].earned += p.total_cost;
-        WeekDays[weekindex].paidOut += p.paid_amount;
     }
 
     // Mark current week

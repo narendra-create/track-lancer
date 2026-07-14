@@ -146,12 +146,12 @@
 - [ ] cancelled projects on past project page
 - [ ] continue activity feature
 - [ ] implement sms making in controllers
-- [ ] integrate websocket for real time notifications
+- [ ] integrate polling for real time notifications
 - [ ] cron job for deleting messages more then 7 days
 - [ ] make notification off system for settings page
 - [ ] see all date selectors to only select future dates and within the project deadline limit
 - [ ] make enter key submit all things
-- [ ] bug - freelancer revenue showing 0
+- [x] bug - freelancer revenue showing 0
 ## additionals
 
 - [ ] ADDITIONAL: Set up email notifications or in-app alerts for milestone status changes

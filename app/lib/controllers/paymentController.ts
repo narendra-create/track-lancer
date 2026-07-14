@@ -275,7 +275,7 @@ export const markVerifiedPayment = async (verificationPaymentId: string) => {
                 }
             });
 
-            if (remaining === 0) {
+            if (remaining === findverification.paid_amount) {
                 await tx.payment.update({
                     where: { id: findverification.paymentid },
                     data: {
