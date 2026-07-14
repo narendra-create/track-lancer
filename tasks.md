@@ -142,6 +142,7 @@
 - [x] make resume project controller for client
 
 # for 14/07/2026
+
 - [x] show payment for cancelled projects too - give freelancer the money back
 - [x] cancelled projects on past project page
 - [x] continue activity feature
@@ -150,13 +151,19 @@
   - whole Milestone controller
   - Payment controller
   - reminder
-- [ ] Add activity creation logic in project controller and budget controller too
-- [ ] integrate polling for real time notifications
-- [ ] cron job for deleting messages more then 7 days
-- [ ] make notification off system for settings page
+- [x] Add activity creation logic in project controller and budget controller too
 - [x] see all date selectors to only select future dates and within the project deadline limit
 - [x] bug - freelancer revenue showing 0
 - [x] make delay controller update project deadline and next milestone deadline too
+
+# for 15/07/2026
+
+- [ ] Make controller for getting activitys
+- [ ] add activitys in frontend of both client and freelancer
+- [ ] integrate polling for real time notifications
+- [ ] cron job for deleting messages more then 7 days
+- [ ] make notification off system for settings page
+
 ## additionals
 
 - [ ] ADDITIONAL: Set up email notifications or in-app alerts for milestone status changes
