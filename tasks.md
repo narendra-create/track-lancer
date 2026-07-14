@@ -142,7 +142,7 @@
 - [x] make resume project controller for client
 
 # for 14/07/2026
-- [ ] show payment for cancelled projects too - give freelancer the money back
+- [x] show payment for cancelled projects too - give freelancer the money back
 - [ ] cancelled projects on past project page
 - [ ] continue activity feature
 - [ ] implement sms making in controllers
