@@ -86,10 +86,12 @@ function FlagDelayModal({
   milestoneId,
   onClose,
   handleDelay,
+  currentDeadline,
 }: {
   milestoneId: string;
   onClose: () => void;
   handleDelay: (data: delayMilestoneInput) => Promise<any>;
+  currentDeadline: Date | string;
 }) {
   const [reason, setReason] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -126,6 +128,10 @@ function FlagDelayModal({
       onClose();
     }
   };
+  const baseDate = new Date(currentDeadline);
+  baseDate.setDate(baseDate.getDate() + 1);
+  baseDate.setMinutes(baseDate.getMinutes() - baseDate.getTimezoneOffset());
+  const minDate = baseDate.toISOString().slice(0, 10);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -174,6 +180,7 @@ function FlagDelayModal({
             <input
               type="date"
               value={deadline}
+              min={minDate}
               onChange={(e) => setDeadline(e.target.value)}
               required
               className="w-full bg-[var(--color-dash-surface2)] border border-[var(--color-dash-border)] rounded-md px-4 py-3 font-sans text-[13px] text-white focus:outline-none focus:border-[var(--color-dash-amber)] duration-200"
@@ -192,7 +199,13 @@ function FlagDelayModal({
   );
 }
 
-function StopProjectModal({ onClose, onConfirm }: { onClose: () => void; onConfirm: () => Promise<any> }) {
+function StopProjectModal({
+  onClose,
+  onConfirm,
+}: {
+  onClose: () => void;
+  onConfirm: () => Promise<any>;
+}) {
   const [loading, setLoading] = useState(false);
 
   const handleStop = async () => {
@@ -476,12 +489,17 @@ export function FreelancerMilestones({
   ).length;
 
   const isOverdue = new Date(project.deadline).getTime() < Date.now();
+  const today = new Date();
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+
+  const minDate = today.toISOString().slice(0, 10);
 
   return (
     <div className="w-full min-h-screen bg-[var(--color-dash-bg)] px-4 py-6 lg:px-8 lg:py-8">
       <AnimatePresence>
         {showAddModal && (
           <AddMilestoneModal
+            projectDeadline={project.deadline}
             key="add"
             productId={project.id}
             remainingLimit={totalCost - costUsed}
@@ -507,14 +525,22 @@ export function FreelancerMilestones({
             }}
           />
         )}
-        {showFlagModal && onDelayMilestone && (
-          <FlagDelayModal
-            key="flag"
-            milestoneId={showFlagModal}
-            handleDelay={(data) => onDelayMilestone(data, project.id)}
-            onClose={() => setShowFlagModal(null)}
-          />
-        )}
+        {showFlagModal &&
+          onDelayMilestone &&
+          (() => {
+            const currentMilestone = project.milestones.find(
+              (m) => m.id === showFlagModal,
+            );
+            return (
+              <FlagDelayModal
+                currentDeadline={currentMilestone?.deadline ?? minDate}
+                key="flag"
+                milestoneId={showFlagModal}
+                handleDelay={(data) => onDelayMilestone(data, project.id)}
+                onClose={() => setShowFlagModal(null)}
+              />
+            );
+          })()}
         {showStopModal && (
           <StopProjectModal
             key="stop"
@@ -523,9 +549,17 @@ export function FreelancerMilestones({
               if (onStopProject) {
                 const result = await onStopProject(project.id);
                 if (result?.error) {
-                  addToast({ title: "Error", message: String(result.error), type: "error" });
+                  addToast({
+                    title: "Error",
+                    message: String(result.error),
+                    type: "error",
+                  });
                 } else {
-                  addToast({ title: "Success", message: "Project stopped", type: "success" });
+                  addToast({
+                    title: "Success",
+                    message: "Project stopped",
+                    type: "success",
+                  });
                   setShowStopModal(false);
                 }
               }
@@ -847,7 +881,7 @@ export function FreelancerMilestones({
               PROJECT IS STOPPED
             </h3>
             <p className="font-sans text-[13px] lg:text-[14px] text-[var(--color-dash-red)]/80 leading-relaxed">
-              {role === "FREELANCER" 
+              {role === "FREELANCER"
                 ? "The client has stopped this project. You may complete your currently active milestone, but no new milestones can be added, and active ones cannot be delayed."
                 : "You have stopped this project. Work is officially paused. The freelancer can complete their current milestone but cannot proceed further."}
             </p>
@@ -1118,7 +1152,8 @@ export function FreelancerMilestones({
                       if (project.status === "STOPPED") {
                         addToast({
                           title: "Project Stopped",
-                          message: "You cannot flag a delay for a stopped project.",
+                          message:
+                            "You cannot flag a delay for a stopped project.",
                           type: "error",
                         });
                         return;
@@ -1160,7 +1195,8 @@ export function FreelancerMilestones({
                         if (project.status === "STOPPED") {
                           addToast({
                             title: "Project Stopped",
-                            message: "You cannot mark a stopped project as completed.",
+                            message:
+                              "You cannot mark a stopped project as completed.",
                             type: "error",
                           });
                           return;
@@ -1215,12 +1251,24 @@ export function FreelancerMilestones({
                     try {
                       const result = await onResumeProject(project.id);
                       if (result?.error) {
-                        addToast({ title: "Error", message: result.error, type: "error" });
+                        addToast({
+                          title: "Error",
+                          message: result.error,
+                          type: "error",
+                        });
                       } else {
-                        addToast({ title: "Success", message: "Project resumed successfully", type: "success" });
+                        addToast({
+                          title: "Success",
+                          message: "Project resumed successfully",
+                          type: "success",
+                        });
                       }
                     } catch (err: any) {
-                      addToast({ title: "Error", message: err.message || "An unexpected error occurred", type: "error" });
+                      addToast({
+                        title: "Error",
+                        message: err.message || "An unexpected error occurred",
+                        type: "error",
+                      });
                     } finally {
                       setIsResuming(false);
                     }
