@@ -20,6 +20,11 @@ export const raiseBudgetRequest = async (input: createBudgetInput) => {
                 select: {
                     milestonecost: true
                 }
+            },
+            client: {
+                select: {
+                    userId: true
+                }
             }
         }
     });
@@ -51,6 +56,22 @@ export const raiseBudgetRequest = async (input: createBudgetInput) => {
             }
         });
 
+        try {
+            await prisma.activity.create({
+                data: {
+                    type: "REMINDER",
+                    projectId: project.id,
+                    dateTimeofMessage: new Date(),
+                    highlightmessage: "New Budget Request",
+                    message: `Please Review the budget request raised for ${project.title}, in project milestones page`,
+                    userId: project.client?.userId!,
+                }
+            })
+        }
+        catch (err) {
+            console.log("Error in raisebudget request's activity creation", err);
+        }
+
         return { success: true, request: createdRequest, extra: `+${input.requestedAmount}`, status: 201 }
     }
     catch (err) {
@@ -78,7 +99,9 @@ export const processRequest = async (budgetId: string, status: "APPROVED" | "REJ
             project: { clientId: clientprofile.id }
         },
         include: {
-            project: true
+            project: {
+                include: { freelancer: { select: { userId: true } } }
+            }
         }
     })
     if (!request) {
@@ -121,9 +144,26 @@ export const processRequest = async (budgetId: string, status: "APPROVED" | "REJ
                         agreedCost: updatedRequest.requestedBudget
                     }
                 });
+
             };
             return updatedRequest;
         });
+
+        try {
+            await prisma.activity.create({
+                data: {
+                    type: "REMINDER",
+                    projectId: request.projectId,
+                    dateTimeofMessage: new Date(),
+                    highlightmessage: status === "APPROVED" ? "Budget raise approved" : "Budget request rejected",
+                    message: `Client ${status === "APPROVED" ? "Approved" : "Rejected"} Budget Raise for ${request.project.title} ${status === "APPROVED" ? ", You can continue creating milestones" : "."}`,
+                    userId: request.project.freelancer?.userId!,
+                }
+            })
+        }
+        catch (err) {
+            console.log("Error in process request's activity creation", err);
+        }
 
         return { success: true, updatedrequest: updatedrequest, status: 200 };
     }
