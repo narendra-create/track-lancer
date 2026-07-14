@@ -8,20 +8,21 @@ datasource db {
 }
 
 model User {
-  id              String           @id
-  name            String
-  email           String
-  emailVerified   Boolean          @default(false)
-  image           String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  sessions        Session[]
-  accounts        Account[]
-  role            userrole
-  Freelancer      Freelancer?
-  userprofiles    Userprofile?
-  cancellRequests CancellRequest[]
-  activities      Activity[]
+  id                       String           @id
+  name                     String
+  email                    String
+  emailVerified            Boolean          @default(false)
+  image                    String?
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
+  sessions                 Session[]
+  accounts                 Account[]
+  blockedNotificationTypes ActivityType[]   @default([])
+  role                     userrole
+  Freelancer               Freelancer?
+  userprofiles             Userprofile?
+  cancellRequests          CancellRequest[]
+  activities               Activity[]
 
   @@unique([email])
   @@map("user")
