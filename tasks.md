@@ -144,12 +144,13 @@
 # for 14/07/2026
 - [x] show payment for cancelled projects too - give freelancer the money back
 - [ ] cancelled projects on past project page
-- [ ] continue activity feature
+- [x] continue activity feature
 - [x] implement sms making in controllers
   - milestone Delay controller function
   - whole Milestone controller
   - Payment controller
   - reminder
+- [ ] Add activity creation logic in project controller and budget controller too
 - [ ] integrate polling for real time notifications
 - [ ] cron job for deleting messages more then 7 days
 - [ ] make notification off system for settings page
