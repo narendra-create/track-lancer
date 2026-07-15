@@ -105,59 +105,78 @@ export default function ClientUpcomingDeadlines({
       </div>
 
       <div className="max-h-[340px] lg:max-h-[420px] overflow-y-auto custom-scrollbar">
-        {sorted.map((item, i) => {
-          const daysLeft = getDaysLeft(item.deadline);
-          const status = getStatus(daysLeft);
-          const cfg = STATUS_CONFIG[status];
-          const formatted = new Intl.DateTimeFormat("en-IN", {
-            day: "2-digit",
-            month: "short",
-          }).format(item.deadline);
+        {sorted.length === 0 ? (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex h-[200px] lg:h-[250px] flex-col items-center justify-center p-6 text-center"
+          >
+            <div className="relative mb-4 flex h-14 w-14 lg:h-16 lg:w-16 items-center justify-center rounded-2xl bg-gradient-to-b from-[#2a2a2a] to-[#1a1a1a] border border-[#333] shadow-lg">
+              <div className="absolute inset-0 rounded-2xl bg-white/5 opacity-0 transition-opacity hover:opacity-100" />
+              <Clock size={24} className="text-[#666]" />
+            </div>
+            <h3 className="mb-1.5 font-serif text-[15px] lg:text-[17px] text-[#e8e3d8] tracking-wide">
+              No Upcoming Deadlines
+            </h3>
+            <p className="max-w-[220px] font-sans text-[11px] lg:text-[12px] leading-relaxed text-[#888]">
+              You're all caught up! There are no milestones due soon.
+            </p>
+          </motion.div>
+        ) : (
+          sorted.map((item, i) => {
+            const daysLeft = getDaysLeft(item.deadline);
+            const status = getStatus(daysLeft);
+            const cfg = STATUS_CONFIG[status];
+            const formatted = new Intl.DateTimeFormat("en-IN", {
+              day: "2-digit",
+              month: "short",
+            }).format(item.deadline);
 
-          return (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, x: -6 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.18, delay: i * 0.05 }}
-              className="flex items-start gap-2 px-5 py-[11px] border-b border-[#2c2c2c] last:border-b-0"
-            >
-              <div className="flex flex-col items-center gap-1.25 pt-0.75">
-                <div className={`w-[6px] h-[6px] rounded-full shrink-0 ${cfg.dot}`} />
-                {i < sorted.length - 1 && (
-                  <div className="w-px h-full min-h-[26px] bg-[#7c7c7c]" />
-                )}
-              </div>
-              <div className="min-w-0 flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-3 lg:gap-20">
-                  <div className="min-w-0">
-                    <p className="text-[.78rem] pb-1.5 lg:text-[17px] font-medium text-[#c4bcb1] leading-snug truncate">
-                      {item.milestoneTitle}
-                    </p>
-                    <p className="text-[.7rem] lg:text-[11px] text-[#89827a] font-semibold truncate">
-                      {item.projectTitle}
-                    </p>
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.18, delay: i * 0.05 }}
+                className="flex items-start gap-2 px-5 py-[11px] border-b border-[#2c2c2c] last:border-b-0"
+              >
+                <div className="flex flex-col items-center gap-1.25 pt-0.75">
+                  <div className={`w-[6px] h-[6px] rounded-full shrink-0 ${cfg.dot}`} />
+                  {i < sorted.length - 1 && (
+                    <div className="w-px h-full min-h-[26px] bg-[#7c7c7c]" />
+                  )}
+                </div>
+                <div className="min-w-0 flex flex-col gap-3">
+                  <div className="flex items-start justify-between gap-3 lg:gap-20">
+                    <div className="min-w-0">
+                      <p className="text-[.78rem] pb-1.5 lg:text-[17px] font-medium text-[#c4bcb1] leading-snug truncate">
+                        {item.milestoneTitle}
+                      </p>
+                      <p className="text-[.7rem] lg:text-[11px] text-[#89827a] font-semibold truncate">
+                        {item.projectTitle}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 font-mono font-bold text-[8px] lg:text-[12px] tracking-[1px] px-2 py-0.5 rounded-[3px] ${cfg.badge}`}
+                    >
+                      {cfg.label(daysLeft)}
+                    </span>
                   </div>
-                  <span
-                    className={`shrink-0 font-mono font-bold text-[8px] lg:text-[12px] tracking-[1px] px-2 py-0.5 rounded-[3px] ${cfg.badge}`}
-                  >
-                    {cfg.label(daysLeft)}
-                  </span>
+                  <div className="mt-[5px] flex items-center gap-1.5">
+                    <Clock size={9} className="text-dash-red" />
+                    <span className="font-mono text-[7px] lg:text-[12px] font-semibold tracking-[1px] text-dash-red">
+                      {formatted}
+                    </span>
+                    <span className="font-mono text-[7px] lg:text-[9px] text-[#8d837a] font-bold">•</span>
+                    <span className="font-mono text-[7px] font-semibold lg:text-[11px] tracking-[0.3px] text-[#c8a96e]/70">
+                      ₹{item.cost.toLocaleString("en-IN")}
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-[5px] flex items-center gap-1.5">
-                  <Clock size={9} className="text-dash-red" />
-                  <span className="font-mono text-[7px] lg:text-[12px] font-semibold tracking-[1px] text-dash-red">
-                    {formatted}
-                  </span>
-                  <span className="font-mono text-[7px] lg:text-[9px] text-[#8d837a] font-bold">•</span>
-                  <span className="font-mono text-[7px] font-semibold lg:text-[11px] tracking-[0.3px] text-[#c8a96e]/70">
-                    ₹{item.cost.toLocaleString("en-IN")}
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
+              </motion.div>
+            );
+          })
+        )}
         {nextCursor && loadMore && (
           <div className="flex justify-center p-3">
             <button
