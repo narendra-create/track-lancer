@@ -1,4 +1,4 @@
-import type { ActivityType } from "@/app/generated/prisma";
+import type { ActivityType } from "@/app/generated/prisma/enums";
 
 export type ActivityItem = {
   id: string;
