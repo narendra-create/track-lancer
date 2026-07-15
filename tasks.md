@@ -163,7 +163,7 @@
 - [x] add activitys in frontend of both client and freelancer
 - [x] integrate polling for real time notifications
 - [ ] cron job for deleting messages more then 7 days
-- [ ] make notification off system for settings page
+- [ ] make notification off controller for settings page
 
 # for 17/07/2026
 
