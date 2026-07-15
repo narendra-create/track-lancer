@@ -159,6 +159,7 @@
 # for 15/07/2026
 
 - [x] Make controller for getting activitys
+- [ ] api route for activities
 - [ ] add activitys in frontend of both client and freelancer
 - [ ] integrate polling for real time notifications
 - [ ] cron job for deleting messages more then 7 days
