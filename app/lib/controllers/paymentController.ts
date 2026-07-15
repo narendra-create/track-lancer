@@ -210,7 +210,7 @@ export const initiatePayment = async (input: intiiatePaymentInput) => {
             await prisma.activity.create({
                 data: {
                     type: "PAYMENT",
-                    dateTimeofMessage: `On ${formatDate(created.createdAt)}`,
+                    dateTimeofMessage: new Date(),
                     highlightmessage: "Payment Verification Request",
                     message: `New payment verification Request generated for - ${findpayment.project?.title}, Please Review it.`,
                     projectId: findpayment.project?.id!,
@@ -333,7 +333,7 @@ export const markVerifiedPayment = async (verificationPaymentId: string) => {
                 await prisma.activity.create({
                     data: {
                         type: "PAYMENT",
-                        dateTimeofMessage: `On ${formatDate(findverification.updatedAt)}`,
+                        dateTimeofMessage: new Date(),
                         highlightmessage: "Payment Verified",
                         message: `Payment of ${findverification.paid_amount} is verified by Freelancer`,
                         projectId: findverification.Payment.projectId!,
@@ -415,7 +415,7 @@ export const markRejectPayment = async (verificationPaymentId: string) => {
             await prisma.activity.create({
                 data: {
                     type: "WARNING",
-                    dateTimeofMessage: `On ${formatDate(findverification.updatedAt)}`,
+                    dateTimeofMessage: new Date(),
                     highlightmessage: "Payment Unverified",
                     message: `Your Payment Request ${findverification.txn_number} is marked as Unverified by freelancer`,
                     projectId: findverification.Payment.projectId!,

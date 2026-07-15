@@ -99,3 +99,33 @@ export const getGreeting = (): string => {
 export const formatMoneydash = (amount: number): string => {
     return new Intl.NumberFormat("en-IN").format(amount);
 };
+
+export function formatRelativeTime(date: Date | string | number): string {
+    const target = new Date(date).getTime();
+    const now = Date.now();
+
+    const diff = target - now; // positive = future
+    const absDiff = Math.abs(diff);
+
+    const rtf = new Intl.RelativeTimeFormat("en", {
+        numeric: "auto",
+    });
+
+    const units = [
+        { unit: "year", ms: 1000 * 60 * 60 * 24 * 365 },
+        { unit: "month", ms: 1000 * 60 * 60 * 24 * 30 },
+        { unit: "week", ms: 1000 * 60 * 60 * 24 * 7 },
+        { unit: "day", ms: 1000 * 60 * 60 * 24 },
+        { unit: "hour", ms: 1000 * 60 * 60 },
+        { unit: "minute", ms: 1000 * 60 },
+        { unit: "second", ms: 1000 },
+    ] as const;
+
+    for (const { unit, ms } of units) {
+        if (absDiff >= ms || unit === "second") {
+            return rtf.format(Math.round(diff / ms), unit);
+        }
+    }
+
+    return "just now";
+}

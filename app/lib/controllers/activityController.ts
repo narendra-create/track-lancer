@@ -37,7 +37,13 @@ export const getActivitys = async (since?: string) => {
                 message: true,
                 type: true,
                 projectId: true,
-                userId: true
+                userId: true,
+                createdAt: true,
+                project: {
+                    select: {
+                        title: true
+                    }
+                }
             },
             orderBy: {
                 createdAt: "desc"

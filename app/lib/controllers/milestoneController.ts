@@ -202,7 +202,7 @@ export const stopProject = async (projectId: string) => {
             await prisma.activity.create({
                 data: {
                     type: "WARNING",
-                    dateTimeofMessage: `Stopped At ${formatDate(new Date())}`,
+                    dateTimeofMessage: new Date(),
                     highlightmessage: "Project Stopped",
                     message: `${findproject.title} is Stopped By Client`,
                     projectId: projectId,
@@ -345,7 +345,7 @@ export const delayMilestone = async (input: delayMilestoneInput) => {
             await prisma.activity.create({
                 data: {
                     type: "DELAY",
-                    dateTimeofMessage: `From ${formatDate(findMilestone.deadline)} to ${formatDate(input.newDeadline)}`,
+                    dateTimeofMessage: new Date(),
                     highlightmessage: "Milestone Dalayed",
                     message: `Milestone Delayed of ${findMilestone.project?.title}`,
                     projectId: findMilestone.projectId!,
@@ -584,7 +584,7 @@ export const markMilestoneCompleted = async (milestoneId: string, projectId: str
             await prisma.activity.create({
                 data: {
                     type: "MILESTONEDONE",
-                    dateTimeofMessage: `On ${formatDate(completed.date)}`,
+                    dateTimeofMessage: new Date(),
                     highlightmessage: "Milestone Completed",
                     message: `${foundmilestone.title} - Completed`,
                     projectId: foundmilestone.projectId!,
