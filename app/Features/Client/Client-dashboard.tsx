@@ -17,7 +17,7 @@ import {
 import ClientActiveProjects from "@/app/components/client/ClientActiveProjects";
 import type { ClientDashboardProject } from "@/app/components/client/ClientActiveProjects";
 import ClientActivity from "@/app/components/client/ClientActivity";
-import type { ClientActivityItem } from "@/app/components/client/ClientActivity";
+import type { ActivityItem } from "@/types/activitys";
 import ClientUpcomingDeadlines from "@/app/components/client/ClientUpcomingDeadlines";
 import type { ClientDeadlineItem } from "@/app/components/client/ClientUpcomingDeadlines";
 
@@ -25,7 +25,7 @@ export type ClientDashboardData = {
   name: string;
   activeProjects: ClientDashboardProject[];
   deadlines: ClientDeadlineItem[];
-  activity: ClientActivityItem[];
+  activity: ActivityItem[];
   stats: {
     activeCount: number;
     totalPaid: number;
@@ -39,15 +39,14 @@ export type ClientDashboardData = {
 
 export type ClientDashboardProps = {
   data: ClientDashboardData;
-  loadMoreProjects?: (
-    cursor: string,
-  ) => Promise<{
+  loadMoreProjects?: (cursor: string) => Promise<{
     projects: ClientDashboardProject[];
     nextCursor: string | null;
   }>;
   loadMoreDeadlines?: (
     cursor: string,
   ) => Promise<{ deadlines: ClientDeadlineItem[]; nextCursor: string | null }>;
+  notifications: ActivityItem[];
 };
 
 type BudgetProject = {
@@ -171,6 +170,7 @@ const ClientDashboard = ({
   data,
   loadMoreProjects,
   loadMoreDeadlines,
+  notifications,
 }: ClientDashboardProps) => {
   const viewPort = { once: true, amount: 0.2 };
 
@@ -301,7 +301,7 @@ const ClientDashboard = ({
             nextCursor={data.nextDeadlineCursor}
             loadMore={loadMoreDeadlines}
           />
-          <ClientActivity items={data.activity} />
+          <ClientActivity items={notifications} />
         </motion.div>
       </motion.section>
     </motion.main>

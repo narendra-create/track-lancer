@@ -31,12 +31,14 @@ const FreelancerDashboard = ({
   data,
   loadmore,
   hasUpi,
+  notifications,
 }: {
   data: FreelancerDashboardData;
   loadmore: (
     nextcursor: string,
   ) => Promise<{ projects: LoadMoreResult; nextCursor: string | null }>;
   hasUpi: boolean;
+  notifications: any[];
 }) => {
   const [Projects, setProjects] = useState<LoadMoreResult>(data.projects ?? []);
   const [cursor, setcursor] = useState(data.nextCursor);
@@ -263,7 +265,7 @@ const FreelancerDashboard = ({
           )}
         </div>
         <motion.div variants={fadeLeft} className="lg:w-[25%] mt-1">
-          <FreelancerActivity />
+          <FreelancerActivity items={notifications} />
         </motion.div>
       </motion.section>
     </motion.main>
