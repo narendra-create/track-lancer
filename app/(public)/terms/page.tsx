@@ -29,6 +29,10 @@ const sections = [
   { id: "governedby", label: "Governing Law & Jurisdiction" },
   { id: "changes", label: "Changes to Terms" },
   { id: "contact", label: "Contact" },
+  {
+    id: "data-lifecycle",
+    label: "Data Retention, System Operation, and Project Lifecycle",
+  },
 ];
 
 const viewPort = { once: true, amount: 0.15 };
@@ -437,8 +441,59 @@ export default function TermsPage() {
             </p>
           </TermsSection>
 
-          {/* 14 — Contact */}
-          <TermsSection id="contact" number="14" title="Contact">
+          {/* 14 — Data Retention, System Operation, and Project Lifecycle */}
+          <TermsSection
+            id="data-lifecycle"
+            number="14"
+            title="Data Retention, System Operation, and Project Lifecycle"
+          >
+            <p>
+              <b>System Latency and Data Synchronization: </b>
+              The User explicitly acknowledges and agrees that the activity data
+              and status updates displayed on the Platform are not strictly
+              real-time. The Platform employs a periodic synchronization
+              protocol whereby activity data is fetched and updated at intervals
+              of approximately thirty (30) seconds. The Company makes no
+              representations or warranties regarding instantaneous data
+              reflection and shall not be held liable for any direct, indirect,
+              or consequential losses, claims, or damages arising out of or in
+              connection with this inherent system latency or brief delays in
+              data synchronization.
+            </p>
+            <p>
+              <b>Data Retention Policy: User Activities: </b>
+              In accordance with our data minimization principles and to
+              maintain optimal server performance, the Company institutes a
+              strict data retention limit on temporary user activity logs. The
+              Company reserves the absolute right, at its sole discretion and
+              without prior notice, to permanently delete any User activities,
+              activity logs, or associated tracking data that are older than
+              seven (7) days from the exact date and time of their creation. The
+              User acknowledges that upon such deletion, the data shall be
+              permanently irrecoverable, and the Company bears no legal or
+              contractual obligation to retain, retrieve, or furnish such
+              historical activity data beyond this stipulated period.
+            </p>
+            <p>
+              <b>Project Lifecycle and Abandonment: </b>
+              To ensure the efficient operation of the Platform and the
+              judicious use of computational resources, any projects initiated
+              or listed by the User that remain in an "unclaimed," "pending," or
+              otherwise inactive status for a continuous period exceeding thirty
+              (30) days shall be legally deemed abandoned by the User. Upon the
+              expiration of this thirty (30) day period, the Company reserves
+              the unilateral right to permanently remove, purge, and destroy
+              such abandoned projects from its databases and servers without any
+              prior intimation to the User. The Company shall bear no liability
+              whatsoever for any loss of data, loss of anticipated profits,
+              intellectual property claims, or business disruptions resulting
+              directly or indirectly from the automated deletion of such
+              abandoned projects.
+            </p>
+          </TermsSection>
+
+          {/* 15 — Contact */}
+          <TermsSection id="contact" number="15" title="Contact">
             <p>
               Questions about these Terms? Reach out directly — there is a real
               person on the other end.
