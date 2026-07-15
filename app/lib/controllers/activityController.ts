@@ -3,7 +3,7 @@ import { getSession } from "@/app/lib/session";
 
 const ACTIVITY_LIMIT = 25;
 
-export const getActicitys = async (since?: string) => {
+export const getActivitys = async (since?: string) => {
     const session = await getSession();
     if (!session?.user) return { success: false, error: "Unauthorized", status: 401 };
     const role = session.user.role.toLowerCase();
