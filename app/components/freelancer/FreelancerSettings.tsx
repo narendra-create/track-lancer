@@ -540,7 +540,7 @@ function SecuritySection() {
         </div>
       </form>
 
-      <div className="border-t border-[var(--color-dash-border)] pt-8">
+      {/* <div className="border-t border-[var(--color-dash-border)] pt-8">
         <p className="font-serif text-[16px] text-white mb-1">
           Active Sessions
         </p>
@@ -587,7 +587,7 @@ function SecuritySection() {
             )}
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }
