@@ -1,5 +1,6 @@
 import { prisma } from "@/app/lib/prisma";
 import { getSession } from "@/app/lib/session";
+import { ActivityType } from "@/app/generated/prisma/enums";
 
 const ACTIVITY_LIMIT = 25;
 
@@ -60,3 +61,41 @@ export const getActivitys = async (since?: string) => {
         return { success: false, error: "Server Error", status: 500 }
     }
 };
+
+export const blockNotification = async (input: ActivityType[]) => {
+    if (input.length === 0) return;
+    const session = await getSession();
+    if (!session) {
+        return { success: false, error: "Logged Out", status: 401 }
+    }
+    const role = session.user.role.toLowerCase();
+    if (role !== "freelancer" && role !== "client") {
+        return { success: false, error: "Invalid Role", status: 403 }
+    };
+
+    const finduser = await prisma.user.findUnique({
+        where: { id: session.user.id }
+    });
+
+    if (!finduser) {
+        return { success: false, error: "Unexpected Error", status: 400 }
+    };
+
+    try {
+        await prisma.user.update({
+            where: { id: finduser.id },
+            data: {
+                blockedNotificationTypes: input
+            }
+        });
+
+        return { success: true, status: 200 }
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            console.error(error);
+        };
+        console.error("From getActivity", error);
+        return { success: false, error: "Server Error", status: 500 }
+    }
+}
