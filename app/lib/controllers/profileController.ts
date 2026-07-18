@@ -181,7 +181,8 @@ export const getSettingsProfile = async () => {
       data: {
         name: user.name,
         email: user.email,
-        phone: user.userprofiles?.phone || ""
+        phone: user.userprofiles?.phone || "",
+        blockedNotificationTypes: user.blockedNotificationTypes || []
       },
     };
   } else {
@@ -193,7 +194,8 @@ export const getSettingsProfile = async () => {
         phone: user.Freelancer?.phone || "",
         category: user.Freelancer?.category || "",
         upiId: user.Freelancer?.upiId || undefined,
-        AccountHolderName: user.Freelancer?.AccountHolderName || undefined
+        AccountHolderName: user.Freelancer?.AccountHolderName || undefined,
+        blockedNotificationTypes: user.blockedNotificationTypes || []
       },
     };
   }
