@@ -18,6 +18,7 @@ import {
 import { formatDate } from "@/app/lib/utilitys";
 import { Paymentstatus } from "@/app/generated/prisma/enums";
 import { PaymentDetailUiType } from "../lib/controllers/PaymentDetailUiController";
+import Link from "next/link";
 
 // Dummy data for demonstration
 const DUMMY_PAYMENT = {
@@ -142,10 +143,12 @@ export function PaymentDetails({ role, paymentdetail }: PaymentDetailsProps) {
           {/* Action Button Section */}
           <div className="shrink-0 mt-2 md:mt-0">
             {role === "CLIENT" && isDue && (
-              <button className="flex items-center gap-2 px-6 py-3 bg-[rgba(200,169,110,0.15)] border border-[rgba(200,169,110,0.4)] rounded-md font-mono text-[12px] tracking-[1.5px] uppercase text-[var(--color-dash-gold)] hover:bg-[rgba(200,169,110,0.25)] transition-colors shadow-[0_0_20px_rgba(200,169,110,0.15)]">
-                <CreditCard size={14} strokeWidth={2} />
-                Pay Now
-              </button>
+              <Link href={`/client/pay-now/${payment.id}`}>
+                <button className="flex items-center gap-2 px-6 py-3 bg-[rgba(200,169,110,0.15)] border border-[rgba(200,169,110,0.4)] rounded-md font-mono text-[12px] tracking-[1.5px] uppercase text-[var(--color-dash-gold)] hover:bg-[rgba(200,169,110,0.25)] transition-colors shadow-[0_0_20px_rgba(200,169,110,0.15)]">
+                  <CreditCard size={14} strokeWidth={2} />
+                  Pay Now
+                </button>
+              </Link>
             )}
           </div>
         </div>
