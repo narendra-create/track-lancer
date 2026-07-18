@@ -169,7 +169,7 @@
 - [x] bug - freelancer can mark project completed without creating a single milestone
 - [x] add actiivity in verification request controller
 - [ ] add notification blocking in settings page
-- [ ] add logged in sessions in settings page 
+- [ ] add logged in sessions in settings page
 
 ## additionals
 
