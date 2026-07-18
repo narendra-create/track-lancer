@@ -162,8 +162,7 @@
 - [x] api route for activities
 - [x] add activitys in frontend of both client and freelancer
 - [x] integrate polling for real time notifications
-- [ ] cron job for deleting messages more then 7 days
-- [ ] make notification off controller for settings page
+- [x] make notification off controller for settings page
 
 # for 17/07/2026
 
@@ -171,9 +170,10 @@
 - [ ] bug - freelancer can mark project completed without creating a single milestone
 - [ ] add actiivity in verification request controller
 - [ ] add notification blocking in settings page
-- [ ] add logged in sessions in settings page
+- [ ] add logged in sessions in settings page 
 
 ## additionals
 
+- [ ] cron job for deleting messages more then 7 days
 - [ ] ADDITIONAL: Set up email notifications or in-app alerts for milestone status changes
 - [ ] ADDITIONAL: Implement automated reminders for pending payments
