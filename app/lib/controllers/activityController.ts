@@ -62,7 +62,7 @@ export const getActivitys = async (since?: string) => {
     }
 };
 
-export const blockNotification = async (input: ActivityType[]) => {
+export const updateblockNotification = async (input: ActivityType[]) => {
     if (input.length === 0) return;
     const session = await getSession();
     if (!session) {
