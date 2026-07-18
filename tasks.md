@@ -170,6 +170,7 @@
 - [x] add actiivity in verification request controller
 - [ ] add notification blocking in settings page
 - [ ] add logged in sessions in settings page
+- [x] make activity page feature
 
 ## additionals
 
