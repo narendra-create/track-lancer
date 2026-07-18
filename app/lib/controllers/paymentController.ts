@@ -153,7 +153,12 @@ export const initiatePayment = async (input: intiiatePaymentInput) => {
                 select: {
                     freelancerId: true,
                     id: true,
-                    title: true
+                    title: true,
+                    freelancer: {
+                        select: {
+                            userId: true
+                        }
+                    }
                 }
             },
             paid_amount: true,
@@ -214,23 +219,23 @@ export const initiatePayment = async (input: intiiatePaymentInput) => {
                     highlightmessage: "Payment Verification Request",
                     message: `New payment verification Request generated for - ${findpayment.project?.title}, Please Review it.`,
                     projectId: findpayment.project?.id!,
-                    userId: findpayment.project?.freelancerId!
-                }
+                    userId: findpayment.project?.freelancer?.userId!
+            }
             });
-        }
-        catch (err) {
-            console.log("Error while creating activity in initiatePayment Controller - ", err)
-        }
-
-        return { success: true, createdVerification: created, status: 201 }
     }
     catch (err) {
-        return {
-            success: false,
-            error: err instanceof Error ? err.message : "Server Error",
-            status: 500
-        };
+        console.log("Error while creating activity in initiatePayment Controller - ", err)
     }
+
+    return { success: true, createdVerification: created, status: 201 }
+}
+    catch (err) {
+    return {
+        success: false,
+        error: err instanceof Error ? err.message : "Server Error",
+        status: 500
+    };
+}
 }
 
 export const markVerifiedPayment = async (verificationPaymentId: string) => {
