@@ -87,7 +87,7 @@ export function PaymentDetails({ role, paymentdetail }: PaymentDetailsProps) {
   const isDue = payment.status === "DUE";
 
   return (
-    <div className="w-full mt-5 lg:mt-20 max-w-4xl mx-auto pb-10">
+    <div className="w-full mt-5 lg:mt-20 max-w-4xl mx-auto pb-10 px-4">
       {/* Navigation Section */}
       <button
         onClick={() => router.back()}
