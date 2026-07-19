@@ -1,5 +1,6 @@
 import { prisma } from "@/app/lib/prisma";
 import { getSession } from "@/app/lib/session";
+import { revalidatePath } from 'next/cache';
 import { UAParser } from 'ua-parser-js';
 import { formatRelativeTime } from "../utilitys";
 
@@ -51,6 +52,8 @@ export const revokeSession = async (sessionId: string) => {
                 id: findSession.id
             }
         });
+
+        revalidatePath('/', 'layout');
 
         return { success: true, status: 200 }
     }

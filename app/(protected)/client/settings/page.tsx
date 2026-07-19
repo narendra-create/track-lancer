@@ -17,6 +17,7 @@ const SettingsPage = async () => {
   const profileResponse = await getProfileAction();
 
   const handleRevoke = async (sessionId: string) => {
+    "use server";
     const result = await revokeSession(sessionId);
     if (!result.success) {
       return { success: false, error: `${result.error} - ${result.status}` };
@@ -26,7 +27,7 @@ const SettingsPage = async () => {
   };
 
   return (
-    <div className="mx-4 lg:pl-7 lg:pt-10">
+    <div className="mx-4 lg:pl-7 lg:py-10">
       <ClientSettings
         onRevoke={handleRevoke}
         sessionsData={sessionsresult}

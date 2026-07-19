@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { User, Bell, Shield, Camera, Check, ExternalLink } from "lucide-react";
+import { User, Bell, Shield, Camera, Check, ExternalLink, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/app/components/ToastProvider";
 import {
@@ -352,7 +352,8 @@ function NotificationsSection({ initialData }: { initialData?: ProfileData }) {
   );
 }
 
-function SecuritySection({ sessions, onRevoke }: { sessions: SessionResultArray; onRevoke: (id: string) => void }) {
+function SecuritySection({ sessions, onRevoke }: { sessions: SessionResultArray; onRevoke: (id: string) => Promise<{ success: boolean; error?: string }> }) {
+  const [revokingId, setRevokingId] = useState<string | null>(null);
   const [form, setForm] = useState({ current: "", next: "", confirm: "" });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -429,13 +430,21 @@ function SecuritySection({ sessions, onRevoke }: { sessions: SessionResultArray;
   return (
     <div className="flex flex-col gap-8">
       <form onSubmit={handleChangepassword} className="flex flex-col gap-5">
-        <div>
-          <p className="font-serif text-[16px] text-white mb-1">
-            Change Password
-          </p>
-          <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
-            Use a strong, unique password
-          </p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <p className="font-serif text-[16px] text-white mb-1">
+              Change Password
+            </p>
+            <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+              Use a strong, unique password
+            </p>
+          </div>
+          <Link
+            href="/forgot-password"
+            className="px-5 py-2.5 bg-[var(--color-dash-surface3)] border border-[var(--color-dash-border-hover)] rounded-md text-[var(--color-dash-ink2)] font-mono text-[11px] uppercase tracking-[1.5px] hover:bg-[var(--color-dash-surface2)] hover:text-white hover:border-[var(--color-dash-ink3)] transition-all duration-200 text-center shrink-0"
+          >
+            Forgot Password?
+          </Link>
         </div>
         <div className="w-full h-px bg-[var(--color-dash-border)]" />
 
@@ -495,7 +504,29 @@ function SecuritySection({ sessions, onRevoke }: { sessions: SessionResultArray;
         <p className="font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)] mb-5">
           Devices logged in to your account
         </p>
-        {sessions &&
+        {!sessions ? (
+          <div className="flex flex-col gap-4 py-2">
+            {[1, 2].map((i) => (
+              <div key={i} className="flex items-center justify-between py-3.5 border-b border-[var(--color-dash-border)] last:border-b-0 animate-pulse">
+                <div>
+                  <div className="w-32 h-4 bg-[var(--color-dash-surface3)] rounded mb-2" />
+                  <div className="w-24 h-3 bg-[var(--color-dash-surface2)] rounded" />
+                </div>
+                <div className="w-16 h-6 bg-[var(--color-dash-surface3)] rounded" />
+              </div>
+            ))}
+          </div>
+        ) : sessions.length === 0 ? (
+          <div className="py-8 flex flex-col items-center justify-center border border-dashed border-[var(--color-dash-border)] rounded-lg bg-[var(--color-dash-surface2)]/50">
+            <Shield className="text-[var(--color-dash-ink4)] mb-3" size={24} />
+            <p className="font-sans text-[13px] text-[var(--color-dash-ink2)]">
+              No active sessions found
+            </p>
+            <p className="font-sans text-[11px] text-[var(--color-dash-ink4)] mt-1">
+              Any devices logged into your account will appear here.
+            </p>
+          </div>
+        ) : (
           sessions.map((session, i) => (
             <div
               key={i}
@@ -515,15 +546,28 @@ function SecuritySection({ sessions, onRevoke }: { sessions: SessionResultArray;
                 </span>
               ) : (
                 <button
-                  onClick={() => onRevoke(session.id)}
+                  onClick={async () => {
+                    setRevokingId(session.id);
+                    try {
+                      await onRevoke(session.id);
+                    } finally {
+                      setRevokingId(null);
+                    }
+                  }}
+                  disabled={revokingId === session.id}
                   type="button"
-                  className="font-mono text-[9px] tracking-[1.5px] uppercase px-2.5 py-1 rounded-sm bg-[var(--color-status-danger-bg)] border border-[var(--color-status-danger-border)] text-[var(--color-status-danger-text)] hover:bg-[rgba(192,96,96,0.15)] transition-colors"
+                  className="w-[72px] h-[26px] flex items-center justify-center font-mono text-[9px] tracking-[1.5px] uppercase rounded-sm bg-[var(--color-status-danger-bg)] border border-[var(--color-status-danger-border)] text-[var(--color-status-danger-text)] hover:bg-[rgba(192,96,96,0.15)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Revoke
+                  {revokingId === session.id ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    "Revoke"
+                  )}
                 </button>
               )}
             </div>
-          ))}
+          ))
+        )}
       </div>
     </div>
   );
@@ -536,7 +580,7 @@ export function ClientSettings({
 }: {
   initialData?: ProfileData;
   sessionsData: SessionResultArray;
-  onRevoke: (id: string) => void;
+  onRevoke: (id: string) => Promise<{ success: boolean; error?: string }>;
 }) {
   const [active, setActive] = useState<SettingsSection>("profile");
 
