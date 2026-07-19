@@ -23,6 +23,7 @@
     "recharts": "^3.8.1",
     "resend": "^6.12.4",
     "swr": "^2.4.2",
+    "ua-parser-js": "^2.0.10",
     "zod": "^4.4.3"
   },
   "devDependencies": {
