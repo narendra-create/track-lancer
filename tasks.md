@@ -177,8 +177,10 @@
 - [ ] make a api route for cron jobs
 
 # for 20/07/2026 -- The Launch Date
+
 - [ ] documentation
 - [ ] check environment variables
+- add environment variables on github actions and vercel
 - [ ] check any hardcoded value
 - [ ] fix build errors
 - [ ] see additional features and mark all completed tasks
