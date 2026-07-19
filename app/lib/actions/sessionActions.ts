@@ -32,6 +32,30 @@ export const getDevices = async () => {
     return { success: true, data: formattedSessions, status: 200 }
 };
 
-// export const revokeSession = async (sessionId: string) => {
+export const revokeSession = async (sessionId: string) => {
+    const session = await getSession();
+    if (!session?.user) {
+        return { success: false, error: "Unauthorized", status: 401 }
+    };
 
-// }
+    const findSession = await prisma.session.findUnique({
+        where: { id: sessionId }
+    });
+    if (!findSession || findSession.userId !== session.user.id) {
+        return { success: false, error: "Session Not Found", status: 404 }
+    };
+
+    try {
+        await prisma.session.delete({
+            where: {
+                id: findSession.id
+            }
+        });
+
+        return { success: true, status: 200 }
+    }
+    catch (err) {
+        console.error("From revokeSession function -", err);
+        return { success: false, error: "Server Error", status: 500 }
+    }
+}
