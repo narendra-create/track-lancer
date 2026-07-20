@@ -27,8 +27,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (!signUpRes.ok) {
-      console.error("Sign up failed in proxy:", await signUpRes.text());
-      return NextResponse.json({ success: true });
+      const errorText = await signUpRes.text();
+      console.error("Sign up failed in proxy:", signUpRes.status, errorText);
+      return NextResponse.json({ success: true }); // temporarily leaving this as true per original code, but logging the error
     }
 
     const otpRes = await fetch(`${origin}/api/auth/email-otp/send-verification-otp`, {
@@ -38,7 +39,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (!otpRes.ok) {
-      console.error("OTP send failed in proxy:", await otpRes.text());
+      const errorText = await otpRes.text();
+      console.error("OTP send failed in proxy:", otpRes.status, errorText);
     }
 
     return NextResponse.json({ success: true });
