@@ -179,20 +179,18 @@
 # for 20/07/2026 -- The Launch Date
 
 - [x] generate Readme
-- [ ] security issues fix
-
-1.  getProject Budget requests - user and project relation check
-2.  mark project completed - same issue
-3.  check email route - public and can be used as enumeration
-4.  CSP config -
-- Content-Security-Policy (CSP)
-- X-Content-Type-Options: nosniff
-- X-Frame-Options: DENY
-- Strict-Transport-Security (HSTS)
-- Referrer-Policy
-- Permissions-Policy
-5. searchProject - Use select instead of include to return only needed fields.
-
+- [x] security issues fix
+  - getProject Budget requests - user and project relation check --done
+  - mark project completed - same issue --done
+  - check email route - public and can be used as enumeration --done
+  - CSP config --done
+  - Content-Security-Policy (CSP)
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: DENY
+  - Strict-Transport-Security (HSTS)
+  - Referrer-Policy
+  - Permissions-Policy
+  - searchProject - Use select instead of include to return only needed fields.
 - [ ] check environment variables
 - add environment variables on github actions and vercel
 - [ ] check any hardcoded value
