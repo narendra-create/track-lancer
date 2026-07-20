@@ -8,10 +8,10 @@ export async function POST(req: NextRequest) {
 
     if (!email || typeof email !== "string") {
       return NextResponse.json({ success: false }, { status: 400 });
-    }
-
+    };
+    const normalizedEmail = email.toLowerCase();
     const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
+      where: { email: normalizedEmail },
     });
 
     if (user) {
@@ -19,16 +19,16 @@ export async function POST(req: NextRequest) {
     }
 
     const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    
+
     const signUpRes = await fetch(`${origin}/api/auth/sign-up/email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, name, role }),
     });
-    
+
     if (!signUpRes.ok) {
-       console.error("Sign up failed in proxy:", await signUpRes.text());
-       return NextResponse.json({ success: true });
+      console.error("Sign up failed in proxy:", await signUpRes.text());
+      return NextResponse.json({ success: true });
     }
 
     const otpRes = await fetch(`${origin}/api/auth/email-otp/send-verification-otp`, {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!otpRes.ok) {
-       console.error("OTP send failed in proxy:", await otpRes.text());
+      console.error("OTP send failed in proxy:", await otpRes.text());
     }
 
     return NextResponse.json({ success: true });

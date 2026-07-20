@@ -2,9 +2,17 @@ import { addprofile } from "@/app/lib/controllers/profileController";
 import type { Categorys } from "@/app/generated/prisma/enums";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/app/lib/session";
+import { actionRateLimit, getClientIp } from "@/app/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req)
+    const actionLimit = await actionRateLimit.limit(ip);
+    if (!actionLimit.success) {
+      return NextResponse.json({ success: false, error: "Too many requests from this Ip" },
+        { status: 429 })
+    };
+    
     const session = await getSession();
 
     if (!session?.user) {
