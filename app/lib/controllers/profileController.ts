@@ -111,7 +111,7 @@ export const updateProfile = async (data: updateProfileInput) => {
     catch (err) {
       return {
         success: false,
-        error: err instanceof Error ? err.message : "Server Error",
+        error: "Server Error",
         status: 500
       };
     }
@@ -152,7 +152,7 @@ export const updateProfile = async (data: updateProfileInput) => {
     catch (err) {
       return {
         success: false,
-        error: err instanceof Error ? err.message : "Server Error",
+        error: "Server Error",
         status: 500
       };
     }
@@ -242,7 +242,7 @@ export const updateUPIDetails = async (data: { upiId: string, AccountHolderName:
   catch (err) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Server Error",
+      error: "Server Error",
       status: 500
     };
   }

@@ -77,7 +77,7 @@ export const raiseBudgetRequest = async (input: createBudgetInput) => {
     catch (err) {
         return {
             success: false,
-            error: err instanceof Error ? err.message : "Server Error",
+            error: "Server Error",
             status: 500
         };
     }
@@ -170,7 +170,7 @@ export const processRequest = async (budgetId: string, status: "APPROVED" | "REJ
     catch (err) {
         return {
             success: false,
-            error: err instanceof Error ? err.message : "Server Error",
+            error: "Server Error",
             status: 500
         };
     }
@@ -280,7 +280,7 @@ export const deleteBudgetRequest = async (budgetId: string) => {
     catch (err) {
         return {
             success: false,
-            error: err instanceof Error ? err.message : "Server Error",
+            error: "Server Error",
             status: 500
         };
     }

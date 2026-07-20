@@ -811,7 +811,7 @@ export const raiseCancellRequest = async (projectId: string) => {
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }
@@ -956,7 +956,7 @@ export const raiseCancellRequest = async (projectId: string) => {
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }
@@ -1087,7 +1087,7 @@ export const processCancellRequest = async (projectId: string, type: "APPROVE" |
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }
@@ -1203,7 +1203,7 @@ export const processCancellRequest = async (projectId: string, type: "APPROVE" |
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }
@@ -1265,7 +1265,7 @@ export const processarchiveProject = async (projectId: string, action: "ARCHIVE"
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }
@@ -1316,7 +1316,7 @@ export const processarchiveProject = async (projectId: string, action: "ARCHIVE"
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }

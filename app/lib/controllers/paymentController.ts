@@ -61,7 +61,7 @@ export const getPaymentHistory = async (cursor?: string): Promise<ActionResponse
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }
@@ -117,7 +117,7 @@ export const getPaymentHistory = async (cursor?: string): Promise<ActionResponse
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }
@@ -232,7 +232,7 @@ export const initiatePayment = async (input: intiiatePaymentInput) => {
     catch (err) {
     return {
         success: false,
-        error: err instanceof Error ? err.message : "Server Error",
+        error: "Server Error",
         status: 500
     };
 }
@@ -358,7 +358,7 @@ export const markVerifiedPayment = async (verificationPaymentId: string) => {
     catch (err) {
         return {
             success: false,
-            error: err instanceof Error ? err.message : "Server Error",
+            error: "Server Error",
             status: 500
         };
     }
@@ -437,7 +437,7 @@ export const markRejectPayment = async (verificationPaymentId: string) => {
     catch (err) {
         return {
             success: false,
-            error: err instanceof Error ? err.message : "Server Error",
+            error: "Server Error",
             status: 500
         };
     }
@@ -506,7 +506,7 @@ export const getPaymentVerificationRequests = async (cursor?: string): Promise<A
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }
@@ -573,7 +573,7 @@ export const getPaymentVerificationRequests = async (cursor?: string): Promise<A
         catch (err) {
             return {
                 success: false,
-                error: err instanceof Error ? err.message : "Server Error",
+                error: "Server Error",
                 status: 500
             };
         }

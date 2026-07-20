@@ -462,7 +462,7 @@ export const deleteMilestone = async (milestoneId: string, projectId: string) =>
     catch (err) {
         return {
             success: false,
-            error: err instanceof Error ? err.message : "Server Error",
+            error: "Server Error",
             status: 500
         };
     }
@@ -601,7 +601,7 @@ export const markMilestoneCompleted = async (milestoneId: string, projectId: str
     catch (err) {
         return {
             success: false,
-            error: err instanceof Error ? err.message : "Server Error",
+            error: "Server Error",
             status: 500
         };
     }
