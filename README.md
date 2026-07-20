@@ -20,7 +20,10 @@ TrackLancer is a full-stack freelancer-client project management platform. Freel
 - **Mutual Cancellation**: Projects can only be cancelled with mutual consent from both parties.
 - **Activity & Notifications**: Comprehensive activity logging (DELAYS, PAYMENTS, MILESTONES, REMINDERS, WARNINGS) with customizable notification preferences.
 - **Rich Dashboards**: Revenue charts (monthly/weekly), earnings stats, and active/pending project metrics.
-- **Automated Data Cleanup**: Cron jobs automatically clear stale activities and pending projects.
+- **Active Session Management**: View active login sessions across devices (via User-Agent parsing) and instantly revoke unauthorized devices.
+- **Automated Data Cleanup**: Cron jobs automatically clear stale activities and pending projects to maintain database health.
+- **Dynamic UX**: Polished UI with smooth `motion/react` entrance animations and transitions.
+- **Legal & Compliance**: Dedicated Privacy Policy and Terms of Service pages outlining data collection and usage practices.
 
 ## Architecture Overview
 

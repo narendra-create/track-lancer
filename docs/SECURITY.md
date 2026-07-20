@@ -12,7 +12,7 @@ TrackLancer incorporates multiple security layers, from Edge middleware guards t
 
 ## Data Validation & Input Sanitization
 
-- **Strict Validation**: All data mutation payloads (whether via REST API or Next.js Server Actions) are aggressively validated against rigorous **Zod** schemas (located in `app/lib/validations/`) before reaching business logic.
+- **Strict Validation**: All data mutation payloads (whether via REST API or Next.js Server Actions) are aggressively validated against rigorous **Zod** schemas (located in `app/lib/validations/`) before reaching business logic. Furthermore, all controller error responses are strictly sanitized to prevent backend system details from leaking to the frontend.
 - **SQL Injection Prevention**: TrackLancer exclusively uses Prisma ORM. Prisma automatically parameterizes all queries, neutralizing SQL injection vectors.
 - **XSS Protection**: React's native string interpolation automatically escapes HTML entities, neutralizing most Cross-Site Scripting (XSS) vectors. (Note: Email templates are generated as raw HTML, but this generation happens entirely server-side using trusted data).
 - **CSRF Protection**: Handled automatically by `better-auth` endpoints. The `BETTER_AUTH_TRUSTED_ORIGINS` environment variable must be strictly configured to prevent Cross-Site Request Forgery.
@@ -23,15 +23,15 @@ TrackLancer incorporates multiple security layers, from Edge middleware guards t
 - **Session Revocation**: User sessions track originating IP addresses and User-Agent strings. Users have full visibility into their active sessions via the Settings page and can instantly revoke compromised sessions.
 - **Cron Protection**: The `POST /api/cron/cleanup` endpoint, which executes destructive data pruning, is protected via a required Bearer token matching the `CRON_SECRET` environment variable.
 
-## Known Security Considerations & Limitations
+## Network & Protocol Security
 
-> [!WARNING]
-> While architecturally sound, the current implementation has several areas requiring attention prior to a large-scale public rollout.
-
-1. **Rate Limiting**: Public endpoints, specifically `/api/user/check-email` and login routes, lack application-level rate limiting, making them potentially susceptible to enumeration attacks.
-2. **Security Headers**: No Content Security Policy (CSP) or strict transport security (HSTS) headers are currently explicitly configured in `next.config.ts`.
-3. **Database Connection Instance**: The `/api/user/check-email` route currently instantiates its own `PrismaClient` rather than utilizing the shared singleton located in `app/lib/prisma.ts`. Under heavy load, this could exhaust database connections and cause a denial of service.
-4. **Hardcoded IP Addresses**: The `next.config.ts` file contains hardcoded internal IP addresses inside `allowedDevOrigins`. While not a security risk in production, it is poor practice and should be migrated to environment variables.
+- **Anti-Enumeration Registration**: The `/api/user/register` endpoint acts as a server-side proxy wrapper around the `better-auth` sign-up logic. It securely checks user existence and halts unnecessary downstream OTP emails if an account already exists, but always returns a generic `200 OK` response to the client. This completely eliminates email enumeration vulnerabilities via network inspection.
+- **Security Headers**: Strict security headers are enforced globally via `next.config.ts`, including:
+  - `Content-Security-Policy-Report-Only` (CSP)
+  - `Strict-Transport-Security` (HSTS) with `preload` and `includeSubDomains`
+  - `X-Frame-Options: DENY`
+  - `Permissions-Policy` to restrict device hardware APIs
+- **Safe Allowed Origins**: CORS and proxy origins are dynamically and securely injected via `BETTER_AUTH_TRUSTED_ORIGINS` and `NEXT_CONFIG_ALLOWEDORIGINS` environment variables, avoiding any hardcoded IP addresses in source control.
 
 ## Best Practices for Deployment
 
