@@ -52,11 +52,13 @@ const nextConfig: NextConfig = {
       headers: securityHeaders
     }]
   },
-  allowedDevOrigins: [
-    ...(process.env.NEXT_CONFIG_ALLOWEDORIGINS
-      ?.split(",")
-      .map(origin => origin.trim()) ?? [])
-  ],
+  serverActions: {
+    allowedOrigins: [
+      ...(process.env.NEXT_CONFIG_ALLOWEDORIGINS
+        ?.split(",")
+        .map(origin => origin.trim()) ?? [])
+    ]
+  },
 };
 
 export default nextConfig;
