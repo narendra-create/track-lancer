@@ -23,6 +23,7 @@ TrackLancer is a full-stack freelancer-client project management platform. Freel
 - **Active Session Management**: View active login sessions across devices (via User-Agent parsing) and instantly revoke unauthorized devices.
 - **Automated Data Cleanup**: Cron jobs automatically clear stale activities and pending projects to maintain database health.
 - **Dynamic UX**: Polished UI with smooth `motion/react` entrance animations and transitions.
+- **Edge Rate Limiting**: Upstash Redis-backed global rate limiters protecting authentication, sensitive server actions, and expensive database queries.
 - **Legal & Compliance**: Dedicated Privacy Policy and Terms of Service pages outlining data collection and usage practices.
 
 ## Architecture Overview
@@ -79,6 +80,8 @@ Create a `.env` file in the root directory and populate it with the following re
 | `RESEND_API_KEY` | API key for the Resend email service | Yes |
 | `RESEND_FROM_EMAIL` | Sender email address (default: onboarding@resend.dev) | No |
 | `CRON_SECRET` | Bearer token for authenticating the cleanup cron endpoint | Yes |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL for global rate limiting | Yes |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST Token for global rate limiting | Yes |
 
 ## Installation & Running Locally
 

@@ -33,6 +33,15 @@ TrackLancer incorporates multiple security layers, from Edge middleware guards t
   - `Permissions-Policy` to restrict device hardware APIs
 - **Safe Allowed Origins**: CORS and proxy origins are dynamically and securely injected via `BETTER_AUTH_TRUSTED_ORIGINS` and `NEXT_CONFIG_ALLOWEDORIGINS` environment variables, avoiding any hardcoded IP addresses in source control.
 
+## Rate Limiting (DDoS & Spam Prevention)
+
+TrackLancer utilizes **Upstash Redis** to enforce strict, scalable edge rate limiting across the platform:
+- **Registration Safeguards**: `RegisterIPLimiter` (10 req/1 hr) blocks botnets from creating bulk accounts, while `RegisterEmailLimiter` (3 req/10 min) prevents targeted email inbox spamming.
+- **Data Protection**: Client and Freelancer dashboard endpoints are protected by `statsRateLimit` (35 req/1 min) to safeguard against intensive database aggregation polling.
+- **Server Action Protection**: A generic `actionRateLimit` protects server mutations like creating projects, submitting budget requests, and posting activities to prevent database flooding.
+- **Financial Security**: An ultra-strict `paymentRateLimit` secures payment intents and external gateway API calls to prevent cascading downstream blocks from external payment providers.
+- **Cost Optimization**: All Redis limiters are explicitly configured to run without analytics payloads, maximizing efficiency on free-tier infrastructure.
+
 ## Best Practices for Deployment
 
 - Always enforce `HTTPS` in production.
