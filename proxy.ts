@@ -1,10 +1,22 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@/auth";
+import { getClientIp, RegisterIPLimiter } from "./app/lib/rate-limit";
 
 export async function proxy(req: NextRequest) {
-  const session = await auth.api.getSession({ headers: req.headers });
-
   const { pathname } = req.nextUrl;
+  if (req.method === "POST" && (pathname.startsWith("/api/auth") || pathname.startsWith("/api/user"))) {
+    const ip = getClientIp(req);
+    const { success } = await RegisterIPLimiter.limit(ip);
+
+    if (!success) {
+      return NextResponse.json(
+        { success: false, error: "Too many requests from this Ip, Please Try Again Later" },
+        { status: 429 }
+      );
+    }
+  }
+
+  const session = await auth.api.getSession({ headers: req.headers });
   const user = session?.user;
 
   // Unauthenticated — redirect to login
@@ -33,5 +45,13 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/freelancer/:path*", "/client/:path*", "/login", "/register"],
+  matcher: [
+    "/dashboard/:path*",
+    "/freelancer/:path*",
+    "/client/:path*",
+    "/login",
+    "/register",
+    "/api/auth/:path*",
+    "/api/user/:path*"
+  ]
 };
