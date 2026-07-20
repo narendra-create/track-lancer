@@ -56,6 +56,8 @@ export function AcceptProject({
             name: p.freelancer?.user?.name || "Unknown",
             email: p.freelancer?.user?.email || "Unknown",
           },
+          archivedByClient: false,
+          archivedByFreelancer: false,
         });
         addToast({
           title: "Project Found",

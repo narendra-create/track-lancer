@@ -559,7 +559,23 @@ export const searchProject = async (projectCode: string) => {
     if (session.user.role.toLowerCase() !== "client") return { success: false, error: "Forbidden", status: 403 };
     const findProject = await prisma.project.findFirst({
         where: { projectcode: projectCode, status: "PENDING" },
-        include: { freelancer: { select: { user: { select: { name: true, email: true } } } } }
+        select: {
+            id: true,
+            title: true,
+            agreedCost: true,
+            deadline: true,
+            description: true,
+            freelancer: {
+                select: {
+                    user: {
+                        select: {
+                            name: true,
+                            email: true
+                        }
+                    }
+                }
+            }
+        }
     });
     if (!findProject) {
         return { success: false, error: "Invalid Project Code", status: 400 }
