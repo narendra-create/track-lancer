@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { OtpInput } from "./OtpInput";
 import { authClient } from "@/app/lib/auth-client";
+import { motion } from "motion/react";
+import { fadeUp, staggerContainer } from "../lib/animations";
 
 const CATEGORY_OPTIONS = [
   { value: "WEB_DEV", label: "Web Developer" },
@@ -74,72 +76,18 @@ export function RegisterForm() {
 
     try {
       if (!accountCreated) {
-        // Check if email is already taken before attempting sign-up
-        const checkRes = await fetch("/api/user/check-email", {
+        await fetch("/api/user/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-        const check = await checkRes.json() as { exists?: boolean; verified?: boolean; error?: string };
-
-        if (check.error) {
-          setErrors((previous) => ({ ...previous, form: "Could not verify email. Please try again." }));
-          return;
-        }
-
-        // Already verified → send them to login
-        if (check.exists && check.verified) {
-          setErrors((previous) => ({
-            ...previous,
-            form: "An account with this email already exists. Please log in instead.",
-          }));
-          return;
-        }
-
-        // Exists but unverified → skip sign-up, just resend OTP
-        if (check.exists && !check.verified) {
-          setAccountCreated(true);
-        } else {
-          const { error } = await authClient.signUp.email({
-            email,
-            password,
-            name,
-            role: role.toUpperCase(),
-          });
-
-          if (error) {
-            setErrors((previous) => ({
-              ...previous,
-              form: error.message || "Registration failed.",
-            }));
-            return;
-          }
-
-          setAccountCreated(true);
-        }
-      }
-
-      const { error: otpError } =
-        await authClient.emailOtp.sendVerificationOtp({
-          email,
-          type: "email-verification",
+          body: JSON.stringify({ email, password, name, role: role.toUpperCase() }),
         });
 
-      if (otpError) {
-        setErrors((previous) => ({
-          ...previous,
-          form:
-            "Your account was created, but the verification code could not be sent. Check that this is your Resend account email, then retry.",
-        }));
-        return;
+        setAccountCreated(true);
       }
 
       setStep("otp");
     } catch {
-      setErrors((previous) => ({
-        ...previous,
-        form: "The verification code could not be sent. Please try again.",
-      }));
+      setStep("otp");
     } finally {
       setLoading(false);
     }
@@ -181,8 +129,8 @@ export function RegisterForm() {
 
   if (step === "otp") {
     return (
-      <div className="w-full max-w-md mx-auto">
-        <div className="mb-8">
+      <motion.div variants={staggerContainer} initial="hidden" animate="show" className="w-full max-w-md mx-auto">
+        <motion.div variants={fadeUp} className="mb-8">
           <p className="font-mono text-[8px] tracking-[2.5px] uppercase text-accent mb-3">
             — Verify your email
           </p>
@@ -192,14 +140,16 @@ export function RegisterForm() {
           <p className="font-sans text-sm text-ink-muted mt-1.5">
             We sent a 6-digit code to <span className="text-ink">{email}</span>.
           </p>
-        </div>
+        </motion.div>
 
-        <OtpInput
-          onVerify={handleOtpVerify}
-          onResend={handleOtpResend}
-        />
+        <motion.div variants={fadeUp}>
+          <OtpInput
+            onVerify={handleOtpVerify}
+            onResend={handleOtpResend}
+          />
+        </motion.div>
 
-        <p className="font-sans text-[11px] text-ink-muted text-center mt-6">
+        <motion.p variants={fadeUp} className="font-sans text-[11px] text-ink-muted text-center mt-6">
           Wrong email?{" "}
           <button
             onClick={() => setStep("form")}
@@ -207,14 +157,14 @@ export function RegisterForm() {
           >
             Go back
           </button>
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     );
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="mb-8">
+    <motion.div variants={staggerContainer} initial="hidden" animate="show" className="w-full max-w-md mx-auto">
+      <motion.div variants={fadeUp} className="mb-8">
         <p className="font-mono text-[8px] tracking-[2.5px] uppercase text-accent mb-3">
           — Create account
         </p>
@@ -224,9 +174,9 @@ export function RegisterForm() {
         <p className="font-sans text-sm text-ink-muted mt-1.5">
           Free forever. No credit card.
         </p>
-      </div>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+      <motion.form variants={fadeUp} onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="name"
@@ -556,17 +506,17 @@ export function RegisterForm() {
               ? "Retry sending code →"
               : "Create account →"}
         </button>
-      </form>
+      </motion.form>
 
-      <div className="flex items-center gap-3 my-6">
+      <motion.div variants={fadeUp} className="flex items-center gap-3 my-6">
         <div className="flex-1 h-px bg-[#2a2a2a]" />
         <span className="font-mono text-[8px] tracking-wider uppercase text-[#3a3733]">
           or
         </span>
         <div className="flex-1 h-px bg-[#2a2a2a]" />
-      </div>
+      </motion.div>
 
-      <p className="font-sans text-[11px] text-ink-muted text-center">
+      <motion.p variants={fadeUp} className="font-sans text-[11px] text-ink-muted text-center">
         Already have an account?{" "}
         <a
           href="/login"
@@ -574,7 +524,7 @@ export function RegisterForm() {
         >
           Log in →
         </a>
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 }

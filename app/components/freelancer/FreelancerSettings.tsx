@@ -4,6 +4,8 @@ import type { SessionResultArray } from "@/types/activeSessions";
 import { updateBlockNotificationAction, updateProfileAction } from "@/app/lib/actions/ProfileActions";
 import { authClient } from "@/app/lib/auth-client";
 import { formatCategory } from "@/app/lib/utilitys";
+import { motion } from "motion/react";
+import { fadeUp, staggerContainer } from "../../lib/animations";
 import {
   Bell,
   Camera,
@@ -828,19 +830,19 @@ export function FreelancerSettings({
   const activeLabel = SECTIONS.find((s) => s.id === active)?.label ?? "";
 
   return (
-    <div className="w-full max-w-4xl">
-      <div className="mb-8">
+    <motion.div variants={staggerContainer} initial="hidden" animate="show" className="w-full max-w-4xl">
+      <motion.div variants={fadeUp} className="mb-8">
         <h1 className="font-serif text-[26px] lg:text-[30px] text-white leading-tight mb-1">
           Settings
         </h1>
         <p className="font-mono text-[10px] tracking-[2px] uppercase text-[var(--color-dash-ink3)]">
           Manage your account
         </p>
-      </div>
+      </motion.div>
 
       <div className="w-full h-px bg-[var(--color-dash-border)] mb-7" />
 
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+      <motion.div variants={fadeUp} className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         <div className="lg:w-[180px] shrink-0">
           <SectionNav active={active} onChange={setActive} />
         </div>
@@ -856,7 +858,7 @@ export function FreelancerSettings({
             {SECTION_CONTENT[active]}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

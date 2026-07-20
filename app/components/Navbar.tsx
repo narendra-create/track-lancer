@@ -12,7 +12,7 @@ const links = [
   { label: "Features", href: "/#features" },
   { label: "Terms", href: "/terms" },
   { label: "About Us", href: "/#about" },
-  { label: "Privacy", href: "/#privacy-policy" },
+  { label: "Privacy", href: "/privacy" },
 ];
 
 const Navbar = () => {
@@ -104,6 +104,7 @@ const Navbar = () => {
           border border-[#3d3d3d]
           hover:bg-[#f14d4d]
           hover:text-black
+          dark:text-white
           duration-150
           no-underline
         "

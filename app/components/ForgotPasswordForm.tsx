@@ -1,6 +1,8 @@
 "use client";
 import { useState, useRef, KeyboardEvent, ClipboardEvent } from "react";
 import { authClient } from "@/app/lib/auth-client";
+import { motion } from "motion/react";
+import { fadeUp, staggerContainer } from "../lib/animations";
 
 const STRENGTH_LABELS = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
 const STRENGTH_COLORS = ["#c06060", "#c87840", "#c8a96e", "#9acd87", "#4a9e75"];
@@ -158,8 +160,8 @@ export function ForgotPasswordForm() {
 
   if (done) {
     return (
-      <div className="w-full max-w-md mx-auto">
-        <div className="mb-8">
+      <motion.div variants={staggerContainer} initial="hidden" animate="show" className="w-full max-w-md mx-auto">
+        <motion.div variants={fadeUp} className="mb-8">
           <p className="font-mono text-[8px] tracking-[2.5px] uppercase text-accent mb-3">
             — All done
           </p>
@@ -169,21 +171,22 @@ export function ForgotPasswordForm() {
           <p className="font-sans text-sm text-ink-muted mt-1.5">
             You can now log in with your new password.
           </p>
-        </div>
-        <a
+        </motion.div>
+        <motion.a
+          variants={fadeUp}
           href="/login"
           className="block w-full py-3 bg-accent text-black font-mono text-[11px] uppercase tracking-wider hover:bg-accent-dim duration-150 text-center"
         >
           Go to login →
-        </a>
-      </div>
+        </motion.a>
+      </motion.div>
     );
   }
 
   if (step === "email") {
     return (
-      <div className="w-full max-w-md mx-auto">
-        <div className="mb-8">
+      <motion.div variants={staggerContainer} initial="hidden" animate="show" className="w-full max-w-md mx-auto">
+        <motion.div variants={fadeUp} className="mb-8">
           <p className="font-mono text-[8px] tracking-[2.5px] uppercase text-accent mb-3">
             — Reset password
           </p>
@@ -193,9 +196,10 @@ export function ForgotPasswordForm() {
           <p className="font-sans text-sm text-ink-muted mt-1.5">
             Enter your email and we&apos;ll send you a reset code.
           </p>
-        </div>
+        </motion.div>
 
-        <form
+        <motion.form
+          variants={fadeUp}
           onSubmit={handleEmailSubmit}
           noValidate
           className="flex flex-col gap-5"
@@ -243,17 +247,17 @@ export function ForgotPasswordForm() {
           >
             {loading ? "Sending…" : "Send reset code →"}
           </button>
-        </form>
+        </motion.form>
 
-        <div className="flex items-center gap-3 my-6">
+        <motion.div variants={fadeUp} className="flex items-center gap-3 my-6">
           <div className="flex-1 h-px bg-[#2a2a2a]" />
           <span className="font-mono text-[8px] tracking-wider uppercase text-[#3a3733]">
             or
           </span>
           <div className="flex-1 h-px bg-[#2a2a2a]" />
-        </div>
+        </motion.div>
 
-        <p className="font-sans text-[11px] text-ink-muted text-center">
+        <motion.p variants={fadeUp} className="font-sans text-[11px] text-ink-muted text-center">
           Remembered it?{" "}
           <a
             href="/login"
@@ -261,14 +265,14 @@ export function ForgotPasswordForm() {
           >
             Log in →
           </a>
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     );
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="mb-8">
+    <motion.div variants={staggerContainer} initial="hidden" animate="show" className="w-full max-w-md mx-auto">
+      <motion.div variants={fadeUp} className="mb-8">
         <p className="font-mono text-[8px] tracking-[2.5px] uppercase text-accent mb-3">
           — Verify & Reset
         </p>
@@ -279,9 +283,10 @@ export function ForgotPasswordForm() {
           If an account exists, a 6-digit code was sent to{" "}
           <span className="text-ink">{email}</span>.
         </p>
-      </div>
+      </motion.div>
 
-      <form
+      <motion.form
+        variants={fadeUp}
         onSubmit={handleResetSubmit}
         noValidate
         className="flex flex-col gap-6"
@@ -459,7 +464,7 @@ export function ForgotPasswordForm() {
             Go back
           </button>
         </p>
-      </form>
-    </div>
+      </motion.form>
+    </motion.div>
   );
 }

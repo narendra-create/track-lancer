@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { authClient } from "../lib/auth-client";
+import { motion } from "motion/react";
+import { fadeUp, staggerContainer } from "../lib/animations";
 
 const fields = [
   {
@@ -72,8 +74,8 @@ export function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="mb-8">
+    <motion.div variants={staggerContainer} initial="hidden" animate="show" className="w-full max-w-md mx-auto">
+      <motion.div variants={fadeUp} className="mb-8">
         <p className="font-mono text-[8px] tracking-[2.5px] uppercase text-accent mb-3">
           — Welcome back
         </p>
@@ -81,9 +83,9 @@ export function LoginForm() {
         <p className="font-sans text-sm text-ink-muted mt-1.5">
           Pick up right where you left off.
         </p>
-      </div>
+      </motion.div>
 
-      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+      <motion.form variants={fadeUp} onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
         {fields.map(({ id, label, type, placeholder, autoComplete }) => (
           <div key={id} className="flex flex-col gap-1.5">
             <div className="flex justify-between items-center">
@@ -142,17 +144,17 @@ export function LoginForm() {
         >
           {loading ? "Logging in…" : "Log in →"}
         </button>
-      </form>
+      </motion.form>
 
-      <div className="flex items-center gap-3 my-6">
+      <motion.div variants={fadeUp} className="flex items-center gap-3 my-6">
         <div className="flex-1 h-px bg-[#2a2a2a]" />
         <span className="font-mono text-[8px] tracking-wider uppercase text-[#3a3733]">
           or
         </span>
         <div className="flex-1 h-px bg-[#2a2a2a]" />
-      </div>
+      </motion.div>
 
-      <p className="font-sans text-[11px] text-ink-muted text-center">
+      <motion.p variants={fadeUp} className="font-sans text-[11px] text-ink-muted text-center">
         Don&apos;t have an account?{" "}
         <a
           href="/register"
@@ -160,7 +162,7 @@ export function LoginForm() {
         >
           Create one →
         </a>
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 }
