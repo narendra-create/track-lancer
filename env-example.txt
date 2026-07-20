@@ -1,0 +1,9 @@
+BETTER_AUTH_SECRET=better auth secret you generated
+BETTER_AUTH_URL=url after deploying the website or http://localhost:3000 in dev env
+DATABASE_URL="data base url default is neon's southeast 1 with postgresql"
+RESEND_API_KEY=your resend key
+BETTER_AUTH_TRUSTED_ORIGINS=full url of local machines in dev env
+CRON_SECRET=cron secret for cron jobs
+NEXT_CONFIG_ALLOWEDORIGINS=ipconfig without full url here if building a feature in local
+UPSTASH_REDIS_REST_URL="your redis url"
+UPSTASH_REDIS_REST_TOKEN="your token"
