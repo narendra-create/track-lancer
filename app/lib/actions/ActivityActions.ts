@@ -3,10 +3,20 @@
 import { prisma } from "@/app/lib/prisma";
 import { getSession } from "@/app/lib/session";
 import type { ActivityItem } from "@/types/activitys";
+import { headers } from "next/headers";
+import { actionRateLimit } from "../rate-limit";
 
 const ACTIVITY_LIMIT = 10; // Load 10 more at a time as requested
 
 export const loadMoreActivityAction = async (cursor: string): Promise<{ items: ActivityItem[]; nextCursor: string | null }> => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        throw new Error("Rate limit exceeded. Try again later.");
+    }
     const session = await getSession();
     if (!session?.user) return { items: [], nextCursor: null };
 
@@ -59,9 +69,9 @@ export const loadMoreActivityAction = async (cursor: string): Promise<{ items: A
             }
         }
 
-        return { 
-            items: activities as unknown as ActivityItem[], 
-            nextCursor 
+        return {
+            items: activities as unknown as ActivityItem[],
+            nextCursor
         };
     }
     catch (error) {

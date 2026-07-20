@@ -3,8 +3,19 @@ import { prisma } from "@/app/lib/prisma";
 import { getCurrentProjects, getClientStat, getMoneyStats, getRavnuechartStats } from "../controllers/clientController";
 import { getSession } from "../session";
 import type { DashboardStatsResponse } from "@/types/dashboard";
-
+import { headers } from "next/headers";
+import { statsRateLimit } from "../rate-limit";
 export const getDashboardStats = async (): Promise<DashboardStatsResponse> => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+               headerStore.get("x-real-ip") || 
+               "unknown";
+    const { success } = await statsRateLimit.limit(ip);
+    
+    if (!success) {
+        return { success: false, error: "Rate limit exceeded. Please try again later.", status: 429 };
+    }
+
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
