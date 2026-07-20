@@ -2,12 +2,26 @@ import { prisma } from "@/app/lib/prisma";
 import type { Categorys } from "@/app/generated/prisma/enums";
 import { getSession } from "@/app/lib/session";
 import { updateProfileInput } from "../validations/ProfileValidation";
+import { headers } from "next/headers";
+import { actionRateLimit } from "../rate-limit";
 
 export const addprofile = async (
   userId: string,
   role: string,
   category?: Categorys,
 ) => {
+  const headerStore = await headers();
+  const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+  const { success } = await actionRateLimit.limit(ip);
+
+  if (!success) {
+    return {
+      success: false,
+      error: "Rate limit exceeded. Try again later.",
+      status: 429
+    }
+  }
   if (role === "client") {
     const profile = await prisma.userprofile.upsert({
       where: { userId },
@@ -71,6 +85,18 @@ export const getFreelancerProfile = async (email: string) => {
 }
 
 export const updateProfile = async (data: updateProfileInput) => {
+  const headerStore = await headers();
+  const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+  const { success } = await actionRateLimit.limit(ip);
+
+  if (!success) {
+    return {
+      success: false,
+      error: "Rate limit exceeded. Try again later.",
+      status: 429
+    }
+  }
   const session = await getSession();
   if (!session) return { success: false, error: "Unauthorized", status: 401 };
   const role = session.user.role.toLowerCase();
@@ -202,6 +228,18 @@ export const getSettingsProfile = async () => {
 };
 
 export const updateUPIDetails = async (data: { upiId: string, AccountHolderName: string }) => {
+      const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
   const isValidSyntax = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(data.upiId);
   if (!isValidSyntax) {
     return { success: false, error: "Enter valid upi id please", status: 400 }

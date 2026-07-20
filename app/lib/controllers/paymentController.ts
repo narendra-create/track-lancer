@@ -4,7 +4,8 @@ import type { intiiatePaymentInput } from "../validations/PaymentValidation";
 import { ActionResponse } from "@/types/api";
 import { PaymentHistory } from "@/types/payment";
 import { VerifyPaymentType } from "@/types/verifypayments";
-import { formatDate } from "../utilitys";
+import { headers } from "next/headers";
+import { paymentRateLimit } from "../rate-limit";
 
 export const getPaymentHistory = async (cursor?: string): Promise<ActionResponse<{ payments: PaymentHistory[], nextCursor: string | null }>> => {
     const session = await getSession();
@@ -127,6 +128,19 @@ export const getPaymentHistory = async (cursor?: string): Promise<ActionResponse
 }
 
 export const initiatePayment = async (input: intiiatePaymentInput) => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await paymentRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
+
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     const role = session.user.role.toLowerCase();
@@ -220,22 +234,22 @@ export const initiatePayment = async (input: intiiatePaymentInput) => {
                     message: `New payment verification Request generated for - ${findpayment.project?.title}, Please Review it.`,
                     projectId: findpayment.project?.id!,
                     userId: findpayment.project?.freelancer?.userId!
-            }
+                }
             });
-    }
-    catch (err) {
-        console.log("Error while creating activity in initiatePayment Controller - ", err)
-    }
+        }
+        catch (err) {
+            console.log("Error while creating activity in initiatePayment Controller - ", err)
+        }
 
-    return { success: true, createdVerification: created, status: 201 }
-}
+        return { success: true, createdVerification: created, status: 201 }
+    }
     catch (err) {
-    return {
-        success: false,
-        error: "Server Error",
-        status: 500
-    };
-}
+        return {
+            success: false,
+            error: "Server Error",
+            status: 500
+        };
+    }
 }
 
 export const markVerifiedPayment = async (verificationPaymentId: string) => {

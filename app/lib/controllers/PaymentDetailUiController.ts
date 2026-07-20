@@ -4,11 +4,6 @@ import { getSession } from "@/app/lib/session";
 export const PaymentDetailUiController = async (paymentId: string) => {
     const session = await getSession();
     if (!session) return { success: false as const, error: "Unauthorized", status: 401 };
-    
-    // Allow both client and freelancer to view? The original controller only allowed client.
-    // The user's page says: role="CLIENT" but if there is a freelancer page we could check both.
-    // For now we will allow if role is client or freelancer, but we should match what the original did if we want to be safe.
-    // Original checked `if (role !== "client")`.
     const role = session.user.role.toLowerCase();
     if (role !== "client" && role !== "freelancer") {
         return { success: false as const, error: "This account cannot view payment details", status: 403 };

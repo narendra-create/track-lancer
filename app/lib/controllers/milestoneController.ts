@@ -2,9 +2,22 @@ import { prisma } from "@/app/lib/prisma";
 import { getSession } from "../session";
 import type { createMilestoneInput, delayMilestoneInput } from "../validations/MilestoneValidation";
 import { userrole } from "@/app/generated/prisma/enums";
-import { formatDate } from "../utilitys";
+import { headers } from "next/headers";
+import { actionRateLimit } from "../rate-limit";
 
 export const createMilestone = async (input: createMilestoneInput) => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
@@ -226,6 +239,18 @@ export const stopProject = async (projectId: string) => {
 };
 
 export const delayMilestone = async (input: delayMilestoneInput) => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };

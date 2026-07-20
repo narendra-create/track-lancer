@@ -5,6 +5,8 @@ import type { FreelancerPastProjectsResponse, ClientPastProjectsResponse, PastPr
 import type { newProjectInput } from "../validations/ProjectValidation";
 import type { GetAllProjectsResponse, AllProjectStatus } from "@/types/allprojects";
 import { getSession } from "../session";
+import { actionRateLimit } from "../rate-limit";
+import { headers } from "next/headers";
 
 export const getPastProjects = async (role: userrole, profileid: string, cursor?: string): Promise<FreelancerPastProjectsResponse | ClientPastProjectsResponse> => {
     if (!profileid) {
@@ -102,6 +104,18 @@ export const getPastProjects = async (role: userrole, profileid: string, cursor?
 }
 
 export const createNewProject = async (input: newProjectInput) => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
@@ -133,6 +147,18 @@ export const createNewProject = async (input: newProjectInput) => {
 };
 
 export const acceptProject = async (projectCode: string) => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     if (session.user.role.toLowerCase() !== "client") return { success: false, error: "Forbidden", status: 403 };
@@ -292,6 +318,18 @@ export const deleteProject = async (freelancerid: string, projectId: string) => 
 }
 
 export const regenerateCode = async (freelancerId: string, projectId: string) => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     try {
         const freelancerfound = await prisma.freelancer.findFirst({
             where: { id: freelancerId },
@@ -554,6 +592,18 @@ export const getAllProjects = async (profileid: string, role: userrole, cursor?:
 }
 
 export const searchProject = async (projectCode: string) => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     if (session.user.role.toLowerCase() !== "client") return { success: false, error: "Forbidden", status: 403 };
@@ -686,6 +736,18 @@ export const markProjectCompleted = async (projectId: string) => {
 }
 
 export const raiseCancellRequest = async (projectId: string) => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     const role = session.user.role.toLowerCase()
@@ -985,6 +1047,18 @@ export const raiseCancellRequest = async (projectId: string) => {
 }
 
 export const processCancellRequest = async (projectId: string, type: "APPROVE" | "REJECT") => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     const role = session.user.role.toLowerCase()

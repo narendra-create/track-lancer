@@ -1,8 +1,22 @@
 import { prisma } from "@/app/lib/prisma";
 import { createBudgetInput } from "../validations/Budgetrequest";
 import { getSession } from "../session";
+import { headers } from "next/headers";
+import { actionRateLimit } from "../rate-limit";
 
 export const raiseBudgetRequest = async (input: createBudgetInput) => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     if (session.user.role.toLowerCase() !== "freelancer") return { success: false, error: "Forbidden", status: 403 };
@@ -84,6 +98,18 @@ export const raiseBudgetRequest = async (input: createBudgetInput) => {
 };
 
 export const processRequest = async (budgetId: string, status: "APPROVED" | "REJECTED") => {
+    const headerStore = await headers();
+    const ip = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+    const { success } = await actionRateLimit.limit(ip);
+
+    if (!success) {
+        return {
+            success: false,
+            error: "Rate limit exceeded. Try again later.",
+            status: 429
+        }
+    }
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized", status: 401 };
     if (session.user.role.toLowerCase() !== "client") return { success: false, error: "Forbidden", status: 403 };
