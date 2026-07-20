@@ -191,15 +191,15 @@
   - Referrer-Policy
   - Permissions-Policy
   - searchProject - Use select instead of include to return only needed fields.
-- [ ] check environment variables
-- add environment variables on github actions and vercel
+- [x] check environment variables
 - [ ] check any hardcoded value
-- [ ] fix build errors
-- [ ] see additional features and mark all completed tasks
-- [ ] cron job for deleting messages more then 7 days
+- [x] fix build errors
+- [x] see additional features and mark all completed tasks
 
 # after launch
 
+- [ ] add environment variables on github actions and vercel
+- [ ] cron job for deleting messages more then 7 days
 - [ ] remove report only CSP after verifying errors
 - [x] Make CSP headers config
 - [x] add rate limiting
