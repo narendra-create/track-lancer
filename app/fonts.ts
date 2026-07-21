@@ -1,4 +1,10 @@
 import { DM_Serif_Display, IBM_Plex_Mono, DM_Sans } from "next/font/google";
+import { Lexend } from "next/font/google";
+
+export const navbarFont = Lexend({
+    subsets: ["latin"],
+    display: "swap", // Ensures text stays visible during loading
+});
 
 export const dmSerif = DM_Serif_Display({
     weight: ["400"],

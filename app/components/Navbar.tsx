@@ -6,6 +6,7 @@ import { authClient } from "@/app/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { navbarFont } from "@/app/fonts";
 
 // ─── Nav links — label maps to the id used in page.tsx ─────────────────────────
 const links = [
@@ -58,16 +59,22 @@ const Navbar = () => {
         {/* Logo */}
         <Link
           href="/#home"
-          className="
-          font-serif
+          className={`
+            ${navbarFont.className}
           text-[#c8a96e]
           text-lg lg:text-3xl
+          font-medium
           no-underline
           flex gap-3 items-center justify-center
-        "
+        `}
         >
-          <Image src={"/Logo-mileglide-cropped.png"} height={40} width={44} alt="icon"></Image>
-          <span className="flex gap-1">
+          <Image
+            src={"/Logo-mileglide-cropped.png"}
+            height={30}
+            width={30}
+            alt="icon"
+          ></Image>
+          <span className="flex gap-1 text-[23px] lg:text-3xl">
             <span>Mile</span>
             <span className="text-white">Glide</span>
           </span>
