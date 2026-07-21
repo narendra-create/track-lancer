@@ -198,9 +198,9 @@
 
 # after launch
 
-- [ ] add environment variables on github actions and vercel
-- [ ] cron job for deleting messages more then 7 days
-- [ ] add loading when they click buttons
+- [x] add environment variables on github actions and vercel
+- [x] cron job for deleting messages more then 7 days
+- [x] add loading when they click buttons
 - [ ] add image in emails
 - [ ] add seo things like opengraph or description in layout file
 - [ ] remove report only CSP after verifying errors
