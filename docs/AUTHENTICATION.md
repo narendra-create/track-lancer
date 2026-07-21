@@ -1,6 +1,6 @@
 # Authentication & Authorization
 
-TrackLancer implements a secure, passwordless-style authentication system using `better-auth` combined with Resend for Email OTP delivery.
+MileGlide implements a secure, passwordless-style authentication system using `better-auth` combined with Resend for Email OTP delivery.
 
 ## Authentication System (better-auth)
 
@@ -39,7 +39,7 @@ sequenceDiagram
 
 ## Email Templates
 
-All OTP emails are sent using visually branded HTML templates defined in `app/lib/email-templates.ts`. The templates utilize TrackLancer's dark theme (#0f0f0f) and gold accents (#c8a96e) to maintain brand consistency throughout the onboarding process.
+All OTP emails are sent using visually branded HTML templates defined in `app/lib/email-templates.ts`. The templates utilize MileGlide's dark theme (#0f0f0f) and gold accents (#c8a96e) to maintain brand consistency throughout the onboarding process.
 
 ## Authorization & Middleware
 

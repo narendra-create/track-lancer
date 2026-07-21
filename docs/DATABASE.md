@@ -1,6 +1,6 @@
-# TrackLancer Database Architecture
+# MileGlide Database Architecture
 
-TrackLancer utilizes PostgreSQL as its primary datastore, interfaced via Prisma ORM. The schema consists of 13 models supporting authentication, project management, financial tracking, and activity logging.
+MileGlide utilizes PostgreSQL as its primary datastore, interfaced via Prisma ORM. The schema consists of 13 models supporting authentication, project management, financial tracking, and activity logging.
 
 ## Entity-Relationship Diagram
 
@@ -72,7 +72,7 @@ erDiagram
 
 ## Indexing Strategy
 
-TrackLancer heavily utilizes composite and foreign-key indexes to optimize read-heavy dashboard aggregations:
+MileGlide heavily utilizes composite and foreign-key indexes to optimize read-heavy dashboard aggregations:
 - `Paymentverification` is indexed on `[txn_number, freelancerId, clientId]` to accelerate verification lookups.
 - `Activity` is indexed on `[userId, createdAt, projectId, type]` to support high-performance cursor-based polling via SWR.
 - Foreign keys (`userId`, `projectId`, `clientId`, `freelancerId`) are uniformly indexed across the schema to optimize relational joins.

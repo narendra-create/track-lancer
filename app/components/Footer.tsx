@@ -41,7 +41,7 @@ const Footer = () => {
         {/* Brand */}
         <div>
           <div className="font-serif text-[#c8a96e] text-[18px] mb-1.5">
-            Track Lancer
+            MileGlide
           </div>
           <p className="font-sans text-[11px] text-[#7a7570] leading-[1.7]">
             A milestone tracker built for Indian freelancers. Simple, honest, on
@@ -109,7 +109,7 @@ const Footer = () => {
       {/* Bottom bar */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2.5 md:gap-0">
         <div className="font-mono text-[8px] tracking-[1px] uppercase text-[#3a3733]">
-          © {year} Track Lancer — Made in India
+          © {year} MileGlide — Made in India
         </div>
         {/* Legal links */}
         <div className="flex gap-4">

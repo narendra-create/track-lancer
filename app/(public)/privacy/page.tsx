@@ -161,7 +161,7 @@ export default function PrivacyPage() {
           <TermsSection id="data-storage" number="03" title="Data Storage">
             <p>
               All data is securely stored in a PostgreSQL database hosted on
-              Neon, located in the Southeast-1 region. By using TrackLancer,
+              Neon, located in the Southeast-1 region. By using MileGlide,
               you consent to this data storage arrangement.
             </p>
           </TermsSection>
@@ -256,7 +256,7 @@ export default function PrivacyPage() {
 
           <TermsSection id="children-privacy" number="09" title="Children's Privacy">
             <p>
-              TrackLancer is not intended for use by children. You must be at
+              MileGlide is not intended for use by children. You must be at
               least 18 years of age to register an account and use our services.
               We do not knowingly collect personal data from anyone under 18.
             </p>

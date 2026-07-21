@@ -1,13 +1,13 @@
 # Development Guide
 
-This document outlines the workflow, conventions, and standards for developing within the TrackLancer codebase.
+This document outlines the workflow, conventions, and standards for developing within the MileGlide codebase.
 
 ## Local Setup
 
 1. **Clone & Install**:
    ```bash
    git clone <repo>
-   cd track-lancer
+   cd mileglide
    npm install
    ```
 2. **Environment Configuration**:
@@ -43,7 +43,7 @@ The `app` directory strictly follows Next.js App Router conventions:
 ## Naming Conventions (Current State)
 
 > [!WARNING]
-> TrackLancer currently contains several legacy naming inconsistencies. When modifying existing code, adhere to the file's current styling. When creating new files, follow the standard conventions.
+> MileGlide currently contains several legacy naming inconsistencies. When modifying existing code, adhere to the file's current styling. When creating new files, follow the standard conventions.
 
 - **Files**: Use `PascalCase` for React components (`DashboardProject.tsx`), and `camelCase` for utilities/controllers (`milestoneController.ts`).
 - **Inconsistencies to note**: 

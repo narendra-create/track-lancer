@@ -32,7 +32,7 @@ export function ClientSidebar({ name, role, initials, image }: SidebarProps) {
             T
           </div>
           <div className="font-serif text-[1.05rem] leading-none tracking-[0.2px] text-dash-gold">
-            Track Lancer
+            MileGlide
             <small className="mt-0.5 block font-mono text-[7px] font-normal uppercase tracking-[2px] text-dash-ink3">
               Client Portal
             </small>

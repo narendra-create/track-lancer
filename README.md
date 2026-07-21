@@ -1,4 +1,4 @@
-# TrackLancer
+# MileGlide
 
 ![Next.js](https://img.shields.io/badge/Next.js-16.2.7-black?style=flat&logo=next.js)
 ![React](https://img.shields.io/badge/React-19.2.4-blue?style=flat&logo=react)
@@ -7,7 +7,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-336791?style=flat&logo=postgresql)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?style=flat&logo=tailwind-css)
 
-TrackLancer is a full-stack freelancer-client project management platform. Freelancers can create projects with milestone-based deliverables, share project codes with clients, and manage the full project lifecycle. Clients can accept projects, track progress, make UPI payments, and verify work.
+MileGlide is a full-stack freelancer-client project management platform. Freelancers can create projects with milestone-based deliverables, share project codes with clients, and manage the full project lifecycle. Clients can accept projects, track progress, make UPI payments, and verify work.
 
 ## Key Features
 
@@ -28,7 +28,7 @@ TrackLancer is a full-stack freelancer-client project management platform. Freel
 
 ## Architecture Overview
 
-TrackLancer is built on a modern Next.js 16 (App Router) architecture, utilizing Server and Client Components to balance SEO, performance, and interactivity. The backend logic is encapsulated within controllers that interact with a PostgreSQL database via Prisma ORM. 
+MileGlide is built on a modern Next.js 16 (App Router) architecture, utilizing Server and Client Components to balance SEO, performance, and interactivity. The backend logic is encapsulated within controllers that interact with a PostgreSQL database via Prisma ORM. 
 
 ```mermaid
 graph TD
@@ -46,7 +46,7 @@ graph TD
 ## Folder Structure
 
 ```
-track-lancer/
+mileglide/
 ├── app/
 │   ├── (auth)/              # Auth pages (login, register, forgot-password)
 │   ├── (protected)/         # Role-guarded pages
@@ -88,7 +88,7 @@ Create a `.env` file in the root directory and populate it with the following re
 1. **Clone the repository:**
    ```bash
    git clone <repository-url>
-   cd track-lancer
+   cd mileglide
    ```
 
 2. **Install dependencies:**
@@ -127,7 +127,7 @@ Create a `.env` file in the root directory and populate it with the following re
    npm start
    ```
 
-3. **Deployment**: TrackLancer is designed to be easily deployed on Vercel. Ensure all environment variables are added to your hosting provider's configuration.
+3. **Deployment**: MileGlide is designed to be easily deployed on Vercel. Ensure all environment variables are added to your hosting provider's configuration.
 
 ## Available Scripts
 

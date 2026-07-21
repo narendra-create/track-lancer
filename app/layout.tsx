@@ -7,9 +7,9 @@ import { ToastProvider } from "./components/ToastProvider";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  title: "TrackLancer — Milestone & Payment Tracker for Freelancers",
+  title: "MileGlide — Milestone & Payment Tracker for Freelancers",
   description:
-    "Tracklancer helps freelancers and clients stay aligned with milestone-based project tracking, transparent progress updates, payment records, and budget control — from start to final delivery.",
+    "MileGlide helps freelancers and clients stay aligned with milestone-based project tracking, transparent progress updates, payment records, and budget control — from start to final delivery.",
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-TrackLancer is a proprietary platform (Copyright 2026 narendra-create). While open-source contributions are not accepted, internal development teams and authorized contractors must adhere to the following guidelines to ensure codebase integrity and maintainability.
+MileGlide is a proprietary platform (Copyright 2026 narendra-create). While open-source contributions are not accepted, internal development teams and authorized contractors must adhere to the following guidelines to ensure codebase integrity and maintainability.
 
 ## 1. Getting Started
 
@@ -20,7 +20,7 @@ All work must be conducted on isolated branches. Never commit directly to `main`
 
 ## 3. Commit Guidelines
 
-TrackLancer utilizes [Conventional Commits](https://www.conventionalcommits.org/). This standardizes our history and makes tracking regressions easier.
+MileGlide utilizes [Conventional Commits](https://www.conventionalcommits.org/). This standardizes our history and makes tracking regressions easier.
 
 **Format**: `<type>(<scope>): <subject>`
 

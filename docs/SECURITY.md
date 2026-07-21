@@ -1,6 +1,6 @@
 # Security Practices
 
-TrackLancer incorporates multiple security layers, from Edge middleware guards to database-level constraints.
+MileGlide incorporates multiple security layers, from Edge middleware guards to database-level constraints.
 
 ## Authentication & Authorization
 
@@ -13,7 +13,7 @@ TrackLancer incorporates multiple security layers, from Edge middleware guards t
 ## Data Validation & Input Sanitization
 
 - **Strict Validation**: All data mutation payloads (whether via REST API or Next.js Server Actions) are aggressively validated against rigorous **Zod** schemas (located in `app/lib/validations/`) before reaching business logic. Furthermore, all controller error responses are strictly sanitized to prevent backend system details from leaking to the frontend.
-- **SQL Injection Prevention**: TrackLancer exclusively uses Prisma ORM. Prisma automatically parameterizes all queries, neutralizing SQL injection vectors.
+- **SQL Injection Prevention**: MileGlide exclusively uses Prisma ORM. Prisma automatically parameterizes all queries, neutralizing SQL injection vectors.
 - **XSS Protection**: React's native string interpolation automatically escapes HTML entities, neutralizing most Cross-Site Scripting (XSS) vectors. (Note: Email templates are generated as raw HTML, but this generation happens entirely server-side using trusted data).
 - **CSRF Protection**: Handled automatically by `better-auth` endpoints. The `BETTER_AUTH_TRUSTED_ORIGINS` environment variable must be strictly configured to prevent Cross-Site Request Forgery.
 
@@ -35,7 +35,7 @@ TrackLancer incorporates multiple security layers, from Edge middleware guards t
 
 ## Rate Limiting (DDoS & Spam Prevention)
 
-TrackLancer utilizes **Upstash Redis** to enforce strict, scalable edge rate limiting across the platform:
+MileGlide utilizes **Upstash Redis** to enforce strict, scalable edge rate limiting across the platform:
 - **Registration Safeguards**: `RegisterIPLimiter` (10 req/1 hr) blocks botnets from creating bulk accounts, while `RegisterEmailLimiter` (3 req/10 min) prevents targeted email inbox spamming.
 - **Data Protection**: Client and Freelancer dashboard endpoints are protected by `statsRateLimit` (35 req/1 min) to safeguard against intensive database aggregation polling.
 - **Server Action Protection**: A generic `actionRateLimit` protects server mutations like creating projects, submitting budget requests, and posting activities to prevent database flooding.

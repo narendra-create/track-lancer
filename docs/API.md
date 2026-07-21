@@ -1,6 +1,6 @@
-# TrackLancer API & Controllers Reference
+# MileGlide API & Controllers Reference
 
-This document outlines the API Routes and the internal Controller methods that drive the business logic of TrackLancer.
+This document outlines the API Routes and the internal Controller methods that drive the business logic of MileGlide.
 
 ## 1. REST API Routes
 

@@ -92,7 +92,7 @@ export default function TermsPage() {
           variants={fadeUp}
           className="text-ink-muted font-sans text-sm lg:text-md mt-4 max-w-xl"
         >
-          By using Track Lancer you agree to these terms. Read them — they are
+          By using MileGlide you agree to these terms. Read them — they are
           written in plain language, not legalese.
         </motion.p>
         <motion.p
@@ -134,7 +134,7 @@ export default function TermsPage() {
           <TermsSection id="acceptance" number="01" title="Acceptance of Terms">
             <p>
               These Terms of Use ("Terms") govern your access to and use of
-              Track Lancer (the "Service"), operated by narednra-create ("we",
+              MileGlide (the "Service"), operated by narednra-create ("we",
               "us", "our"). By creating an account, sharing a project code, or
               otherwise accessing the Service you confirm that you have read,
               understood, and agree to be bound by these Terms.
@@ -145,7 +145,7 @@ export default function TermsPage() {
           {/* 02 — Service */}
           <TermsSection id="service" number="02" title="Description of Service">
             <p>
-              Track Lancer is a milestone-based project tracking tool built for
+              MileGlide is a milestone-based project tracking tool built for
               Indian freelancers and their clients. It allows freelancers to
               create projects, define milestones, record UPI payment IDs, and
               share a unique 8-digit project code with clients — giving both
@@ -218,7 +218,7 @@ export default function TermsPage() {
           {/* 05 — Payments */}
           <TermsSection id="payments" number="05" title="Payments & UPI">
             <p>
-              Track Lancer is free to use. We do not charge a subscription fee,
+              MileGlide is free to use. We do not charge a subscription fee,
               take a commission, or add gateway fees. The Service is provided as
               a transparency and record-keeping tool only.
             </p>
@@ -296,7 +296,7 @@ export default function TermsPage() {
             <p>
               Any milestones that would cause the project to exceed the agreed
               Total Cost are strictly prohibited unless the Total Cost is
-              formally amended. Track Lancer enforces this structure to protect
+              formally amended. MileGlide enforces this structure to protect
               both parties from unexpected scope creep and billing surprises.
             </p>
           </TermsSection>
@@ -338,7 +338,7 @@ export default function TermsPage() {
           {/* 08 — IP */}
           <TermsSection id="ip" number="08" title="Intellectual Property">
             <p>
-              The Track Lancer codebase, design, copy, and brand elements are
+              The MileGlide codebase, design, copy, and brand elements are
               owned by Narendra Dubey(github - narendra-creates) and are
               protected under applicable intellectual property laws.
             </p>
@@ -362,7 +362,7 @@ export default function TermsPage() {
               uninterrupted, error-free availability.
             </p>
             <p>
-              Track Lancer is a record-keeping tool. It does not provide legal,
+              MileGlide is a record-keeping tool. It does not provide legal,
               financial, or contractual advice. It does not constitute a legally
               binding contract between freelancers and clients — it is a
               transparency aid only.

@@ -1,6 +1,6 @@
 # Deployment Guide
 
-TrackLancer is optimized for deployment on Vercel, leaning heavily into Next.js App Router features and Edge middleware.
+MileGlide is optimized for deployment on Vercel, leaning heavily into Next.js App Router features and Edge middleware.
 
 ## Prerequisites
 
@@ -17,15 +17,15 @@ Ensure the following environment variables are securely added to your production
 |---|---|---|
 | `DATABASE_URL` | PostgreSQL connection string with pooling | `postgresql://user:pass@ep-host.region.aws.neon.tech/neondb?sslmode=require` |
 | `BETTER_AUTH_SECRET` | Cryptographically secure random string | `generate-via-openssl-rand-hex-32` |
-| `BETTER_AUTH_URL` | The canonical URL of your deployed app | `https://tracklancer.com` |
-| `BETTER_AUTH_TRUSTED_ORIGINS` | Comma-separated allowed origins (Optional) | `https://tracklancer.com,https://www.tracklancer.com` |
+| `BETTER_AUTH_URL` | The canonical URL of your deployed app | `https://mileglide.com` |
+| `BETTER_AUTH_TRUSTED_ORIGINS` | Comma-separated allowed origins (Optional) | `https://mileglide.com,https://www.mileglide.com` |
 | `RESEND_API_KEY` | Production API key from Resend | `re_123456789...` |
-| `RESEND_FROM_EMAIL` | Sender email domain (Must be verified in Resend) | `TrackLancer <noreply@tracklancer.com>` |
+| `RESEND_FROM_EMAIL` | Sender email domain (Must be verified in Resend) | `MileGlide <noreply@mileglide.com>` |
 | `CRON_SECRET` | Secret token to authorize automated cleanup jobs | `secure_cron_token_xyz` |
 
 ## Build and Deployment Steps
 
-TrackLancer does not currently use Docker or complex CI/CD pipelines. It relies on standard Node.js build processes.
+MileGlide does not currently use Docker or complex CI/CD pipelines. It relies on standard Node.js build processes.
 
 1. **Install Dependencies**:
    ```bash
@@ -53,7 +53,7 @@ TrackLancer does not currently use Docker or complex CI/CD pipelines. It relies 
 
 ## Cron Job Configuration
 
-TrackLancer requires a periodic cron job to prune stale database entries (activities older than 7 days, pending projects older than 30 days).
+MileGlide requires a periodic cron job to prune stale database entries (activities older than 7 days, pending projects older than 30 days).
 
 If deploying on Vercel, setup a `vercel.json` cron configuration. Otherwise, configure an external scheduler (like GitHub Actions or AWS EventBridge) to send a `POST` request to:
 
@@ -68,6 +68,6 @@ If deploying on Vercel, setup a `vercel.json` cron configuration. Otherwise, con
 
 ## Troubleshooting
 
-- **Prisma Client Issues**: TrackLancer uses the `@prisma/adapter-pg` and exports generated files to a custom directory (`app/generated/prisma`). If Vercel builds fail claiming "PrismaClient is not defined", ensure the `postinstall` script or Vercel build command explicitly runs `npx prisma generate`.
+- **Prisma Client Issues**: MileGlide uses the `@prisma/adapter-pg` and exports generated files to a custom directory (`app/generated/prisma`). If Vercel builds fail claiming "PrismaClient is not defined", ensure the `postinstall` script or Vercel build command explicitly runs `npx prisma generate`.
 - **Authentication Failures on Production**: Verify that `BETTER_AUTH_URL` exactly matches your production domain (including `https://`). Ensure `BETTER_AUTH_SECRET` is identical across all environments.
 - **Database Connection Limits**: If using Neon, ensure you are utilizing the pooled connection string (often ending in `?pgbouncer=true` or utilizing connection pooling at the Neon dashboard level) to prevent Vercel Serverless functions from exhausting connection limits.

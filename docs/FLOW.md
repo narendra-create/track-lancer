@@ -1,6 +1,6 @@
 # Application Workflows
 
-This document outlines the core end-to-end flows within TrackLancer using Mermaid sequence diagrams.
+This document outlines the core end-to-end flows within MileGlide using Mermaid sequence diagrams.
 
 ## 1. User Registration Flow
 

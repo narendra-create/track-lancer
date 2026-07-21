@@ -1,6 +1,6 @@
-# TrackLancer Architecture
+# MileGlide Architecture
 
-TrackLancer utilizes a modern, layered architecture built on top of **Next.js 16 (App Router)**. This document provides a high-level overview of the system's design, request lifecycle, data flow, and key architectural decisions.
+MileGlide utilizes a modern, layered architecture built on top of **Next.js 16 (App Router)**. This document provides a high-level overview of the system's design, request lifecycle, data flow, and key architectural decisions.
 
 ## High-Level Architecture
 
@@ -19,7 +19,7 @@ The application is structured into clearly defined layers to separate concerns, 
 
 ## Request Lifecycle
 
-The lifecycle of a typical request through TrackLancer:
+The lifecycle of a typical request through MileGlide:
 
 ```mermaid
 sequenceDiagram

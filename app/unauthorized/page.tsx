@@ -302,7 +302,7 @@ export default function UnauthorizedPage() {
             textTransform: "uppercase",
           }}
         >
-          Track-Lancer · Error 403
+          MileGlide · Error 403
         </p>
       </div>
 

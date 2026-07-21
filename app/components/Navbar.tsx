@@ -5,6 +5,7 @@ import Link from "next/link";
 import { authClient } from "@/app/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 // ─── Nav links — label maps to the id used in page.tsx ─────────────────────────
 const links = [
@@ -46,7 +47,7 @@ const Navbar = () => {
       <nav
         className={` ${isdashboard && "hidden"}
         sticky top-0 z-50
-        h-[66px]
+        h-[66px] lg:h-[88px]
         px-5 md:px-10
         flex items-center justify-between
         bg-[#0f0f0f]/90
@@ -60,11 +61,16 @@ const Navbar = () => {
           className="
           font-serif
           text-[#c8a96e]
-          text-lg lg:text-2xl
+          text-lg lg:text-3xl
           no-underline
+          flex gap-3 items-center justify-center
         "
         >
-          Track Lancer
+          <Image src={"/Logo-mileglide-cropped.png"} height={40} width={44} alt="icon"></Image>
+          <span className="flex gap-1">
+            <span>Mile</span>
+            <span className="text-white">Glide</span>
+          </span>
         </Link>
 
         {/* Desktop Links */}
