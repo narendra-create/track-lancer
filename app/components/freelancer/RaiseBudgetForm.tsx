@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, TrendingUp, IndianRupee, FileText } from "lucide-react";
 import { useToast } from "@/app/components/ToastProvider";
@@ -30,6 +30,13 @@ export function RaiseBudgetForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { addToast } = useToast();
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
   // DERIVED VALUES
   const parsedExtra = Number(extraAmount);

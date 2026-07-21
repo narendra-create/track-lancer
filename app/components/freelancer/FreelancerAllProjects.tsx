@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, AlertTriangle, X, ChevronRight, Archive, ArchiveRestore } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -106,6 +106,13 @@ function DeleteModal({
   onCancel: () => void;
   loading: boolean;
 }) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <motion.div

@@ -29,7 +29,7 @@ export function FreelancerSidebar({
   return (
     <>
       <aside
-        className={`fixed z-100 lg:z-50 flex bg-dash-surface1 transition-transform duration-200 ease-dash-custom
+        className={`fixed z-40 lg:z-40 flex bg-dash-surface1 transition-transform duration-200 ease-dash-custom
         bottom-0 left-0 w-full flex-row border-t border-dash-border
         md:top-0 md:h-screen md:w-[15%] md:flex-col md:border-r md:border-t-0 md:translate-x-0`}
       >

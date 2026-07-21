@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle, XCircle, X, Hash, IndianRupee } from "lucide-react";
 
@@ -21,6 +22,17 @@ export function VerificationPopup({
   onClose,
 }: VerificationPopupProps) {
   const isSubmitted = status === "submitted";
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [open]);
 
   return (
     <AnimatePresence>

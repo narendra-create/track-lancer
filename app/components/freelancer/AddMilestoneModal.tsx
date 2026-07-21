@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { motion } from "motion/react";
 import type { createMilestoneInput } from "@/app/lib/validations/MilestoneValidation";
@@ -43,6 +43,14 @@ export function AddMilestoneModal({
       projectdeadlineCalculate.getTimezoneOffset(),
   );
   const maxDate = projectdeadlineCalculate.toISOString().slice(0, 10);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

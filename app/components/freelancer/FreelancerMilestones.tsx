@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -18,7 +18,7 @@ import {
   Play,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import type { MilestoneItem, ProjectWithMilestones } from "@/types/milestones";
+import type { ProjectWithMilestones } from "@/types/milestones";
 import {
   Projectstatus,
   type Milestonestatus,
@@ -428,6 +428,32 @@ export function FreelancerMilestones({
   const [checkSuccess, setCheckSuccess] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isResuming, setIsResuming] = useState(false);
+
+  useEffect(() => {
+    if (
+      showAddModal ||
+      showFlagModal ||
+      showStopModal ||
+      showCancelModal ||
+      showBudgetrequestModal ||
+      showUpiBlockModal
+    ) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [
+    showAddModal,
+    showFlagModal,
+    showStopModal,
+    showCancelModal,
+    showBudgetrequestModal,
+    showUpiBlockModal,
+  ]);
+
 
   const isValidUpi = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(
     upiData.upiId,

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Clock, Check, X, Trash2, CheckCircle, XCircle, TrendingUp, ArrowUpRight } from "lucide-react";
 import type { BudgetRequestStatus } from "@/app/generated/prisma/enums";
@@ -110,6 +110,13 @@ function BudgetRequestDetailPopup({
       markReviewed?.(request.id);
     }
   };
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
   return (
     <div

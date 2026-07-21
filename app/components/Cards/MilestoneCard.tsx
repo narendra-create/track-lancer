@@ -188,8 +188,8 @@ export function MilestoneCard({
           (onDelete && (milestone.status === "NOT_STARTED" || milestone.status === "IN_PROGRESS")) || 
           (onComplete && milestone.status === "IN_PROGRESS")
         ) && (
-          <div className="mt-4 pt-4 border-t border-[rgba(192,96,96,0.15)] flex items-center justify-between gap-3">
-            <p className="font-mono text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
+          <div className="mt-4 pt-4 flex-col items-start lg:flex-row max-w-63 lg:max-w-88 overflow-hidden border-t border-[rgba(192,96,96,0.15)] flex items-center justify-between gap-3">
+            <p className="font-mono pl-2 lg:pl-0 text-[9px] tracking-[1.5px] uppercase text-[var(--color-dash-ink3)]">
               Manage Milestone
             </p>
             <div className="flex items-center gap-2">
@@ -199,13 +199,13 @@ export function MilestoneCard({
                   className="flex items-center gap-1.5 px-4 py-2 bg-[var(--color-status-paid-bg)] border border-[var(--color-status-paid-border)] rounded-md font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-green)] hover:opacity-80 transition-all duration-200"
                 >
                   <Check size={11} strokeWidth={2} />
-                  Mark Completed
+                  Completed
                 </button>
               )}
               {onDelete && (milestone.status === "NOT_STARTED" || milestone.status === "IN_PROGRESS") && (
                 <button
                   onClick={() => onDelete(milestone.id)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-[rgba(192,96,96,0.1)] border border-[rgba(192,96,96,0.3)] rounded-md font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-red)] hover:bg-[rgba(192,96,96,0.18)] hover:border-[rgba(192,96,96,0.5)] transition-all duration-200"
+                  className="flex items-center gap-1.5 px-4 py-2  bg-[rgba(192,96,96,0.1)] border border-[rgba(192,96,96,0.3)] rounded-md font-mono text-[10px] tracking-[1.5px] uppercase text-[var(--color-dash-red)] hover:bg-[rgba(192,96,96,0.18)] hover:border-[rgba(192,96,96,0.5)] transition-all duration-200"
                 >
                   <Trash2 size={11} strokeWidth={2} />
                   Delete

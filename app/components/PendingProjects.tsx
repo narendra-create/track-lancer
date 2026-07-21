@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Copy, Check, X, RefreshCw, Trash2, AlertTriangle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
@@ -25,6 +25,18 @@ export function PendingProjects({ projects, handleRegenerateCode, handleDelete }
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (projectCode || deleteConfirmId) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [projectCode, deleteConfirmId]);
+
 
   const onRegenerate = async (id: string) => {
     setLoadingId(id);

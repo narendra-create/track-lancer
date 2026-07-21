@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Copy, Check, X } from "lucide-react";
 import type { NewProjectType } from "@/app/(protected)/freelancer/new-project/page";
 import { useToast } from "./ToastProvider";
@@ -39,6 +39,18 @@ export function NewProjectForm({
   const isValidUpi = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(
     upiData.upiId,
   );
+
+  useEffect(() => {
+    if (projectCode) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [projectCode]);
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
