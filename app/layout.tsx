@@ -8,20 +8,20 @@ import NextTopLoader from "nextjs-toploader";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  title: "MileGlide | Freelancer Project Milestones & UPI Payments Tracker",
+  title: "MileGlide | Freelance Milestone & UPI Payment Tracker",
   description:
-    "MileGlide helps freelancers track project milestones, share client dashboards, verify UPI payments, manage delays, and keep every project on record.",
+    "Track freelance project milestones, share client dashboards, verify UPI payments, and manage project delays effortlessly.",
 
   openGraph: {
-    title: "MileGlide | Freelancer Project Milestones & UPI Payments Tracker",
+    title: "MileGlide | Freelance Milestone & UPI Tracker",
     description:
-      "Track freelance projects, milestones, client payments, delays, and budget changes in one clean dashboard built for Indian freelancers.",
+      "Track freelance projects, milestones, and client UPI payments in a clean dashboard built for India.",
     url:
       process.env.NEXT_PUBLIC_SITEURL ?? "https://mileglide.narendra-dubey.in",
     siteName: "MileGlide",
     images: [
       {
-        url: `${process.env.NEXT_PUBLIC_SITEURL ?? "https://mileglide.narendra-dubey.in"}/og-image.png`,
+        url: `${process.env.NEXT_PUBLIC_SITEURL ?? "https://mileglide.narendra-dubey.in"}/og-image.webp`,
         width: 1200,
         height: 630,
         alt: "MileGlide freelancer milestone and UPI payment tracking dashboard",
@@ -33,11 +33,11 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "MileGlide | Freelancer Milestone & UPI Payment Tracker",
+    title: "MileGlide | Freelance Milestone & UPI Tracker",
     description:
-      "A milestone tracker for Indian freelancers to manage client projects, verified UPI payments, delays, budgets, and project history.",
+      "Track freelance projects, milestones, and client UPI payments in a clean dashboard built for India.",
     images: [
-      `${process.env.NEXT_PUBLIC_SITEURL ?? "https://mileglide.narendra-dubey.in"}/og-image.png`,
+      `${process.env.NEXT_PUBLIC_SITEURL ?? "https://mileglide.narendra-dubey.in"}/og-image.webp`,
     ],
   },
 
