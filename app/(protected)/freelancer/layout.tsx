@@ -4,6 +4,7 @@ import { getFreelancerProfile } from "@/app/lib/controllers/profileController";
 import { getInitials, formatCategory } from "@/app/lib/utilitys";
 import { redirect } from "next/navigation";
 import { getSession } from "@/app/lib/session";
+import { prisma } from "@/app/lib/prisma";
 
 export default async function Freelancerlayout({
   children,
@@ -15,14 +16,20 @@ export default async function Freelancerlayout({
     if (!session?.user) {
       redirect("/login");
     }
-    const result = await getFreelancerProfile(session.user.email);
+    // const result = await getFreelancerProfile(session.user.email);
+    const [result, activityCount] = await Promise.all([
+      getFreelancerProfile(session.user.email),
+      await prisma.activity.count({
+        where: { userId: session.user.id },
+      }),
+    ]);
     if (!result.profile) {
       redirect("/unauthorized");
     }
 
-    return result.profile;
+    return { profile: result.profile, activityCount };
   };
-  const data = await loadprofiledetails();
+  const {profile: data, activityCount} = await loadprofiledetails();
 
   return (
     <div className="flex min-h-screen w-full bg-dash-surface flex-col pt-5">
@@ -30,6 +37,7 @@ export default async function Freelancerlayout({
         image={data.image ?? undefined}
         initials={getInitials(data.name)}
         name={data.name}
+        activityCount={activityCount}
         skill={formatCategory(data.Freelancer?.category!)}
       />
 

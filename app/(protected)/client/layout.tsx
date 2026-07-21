@@ -1,9 +1,10 @@
 import { ClientSidebar } from "@/app/components/client/client-sidebar";
 import { ReactNode } from "react";
 import { getClientProfile } from "@/app/lib/controllers/profileController";
-import { getInitials, formatCategory } from "@/app/lib/utilitys";
+import { getInitials } from "@/app/lib/utilitys";
 import { redirect } from "next/navigation";
 import { getSession } from "@/app/lib/session";
+import { prisma } from "@/app/lib/prisma";
 
 export default async function Freelancerlayout({
   children,
@@ -15,15 +16,20 @@ export default async function Freelancerlayout({
     if (!session?.user) {
       redirect("/login");
     }
-    const result = await getClientProfile(session.user.email);
+    const [result, activityCount] = await Promise.all([
+      getClientProfile(session.user.email),
+      await prisma.activity.count({
+        where: { userId: session.user.id },
+      }),
+    ]);
     if (!result.profile) {
       console.log(result);
       redirect("/unauthorized");
     }
 
-    return result.profile;
+    return { profile: result.profile, activityCount };
   };
-  const data = await loadprofiledetails();
+  const { profile: data, activityCount } = await loadprofiledetails();
 
   return (
     <div className="flex min-h-screen w-full bg-dash-surface flex-col pt-5">
@@ -31,6 +37,7 @@ export default async function Freelancerlayout({
         image={data.image ?? undefined}
         initials={getInitials(data.name)}
         name={data.name ?? "Unknown"}
+        acitivityCount={activityCount}
         role="Client"
       />
 

@@ -18,6 +18,7 @@ interface SidebarProps {
   skill?: string;
   image?: string;
   initials?: string;
+  activityCount: number;
 }
 
 export function FreelancerSidebar({
@@ -25,6 +26,7 @@ export function FreelancerSidebar({
   skill,
   initials,
   image,
+  activityCount
 }: SidebarProps) {
   const activePath = usePathname();
   return (
@@ -111,7 +113,7 @@ export function FreelancerSidebar({
             href="/freelancer/activity"
             icon={MessageSquare}
             label="Activitys"
-            badge={2}
+            badge={activityCount}
             isActive={activePath === "/freelancer/activity"}
           />
           <NavLink

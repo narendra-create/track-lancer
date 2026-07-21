@@ -17,9 +17,16 @@ interface SidebarProps {
   role?: string;
   image?: string;
   initials?: string;
+  acitivityCount: number;
 }
 
-export function ClientSidebar({ name, role, initials, image }: SidebarProps) {
+export function ClientSidebar({
+  name,
+  role,
+  initials,
+  image,
+  acitivityCount,
+}: SidebarProps) {
   const activePath = usePathname();
   return (
     <>
@@ -97,7 +104,7 @@ export function ClientSidebar({ name, role, initials, image }: SidebarProps) {
             href="/client/activity"
             icon={MessageSquare}
             label="Activitys"
-            badge={3}
+            badge={acitivityCount}
             isActive={activePath === "/client/activity"}
           />
           <NavLink
