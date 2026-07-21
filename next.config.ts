@@ -61,6 +61,11 @@ const nextConfig: NextConfig = {
       ]
     }
   },
+  allowedDevOrigins: [
+    ...(process.env.NEXT_CONFIG_ALLOWEDDEVORIGINS
+      ?.split(",")
+      .map(origin => origin.trim()) ?? [])
+  ]
 };
 
 export default nextConfig;
