@@ -30,14 +30,6 @@ export const getDeadlines = async (clientId: string, cursor?: string) => {
     if (!clientId) {
         return { success: false, error: "Invalid Client id", status: 400 }
     };
-    const clientProfile = await prisma.userprofile.findUnique({
-        where: { id: clientId },
-        select: {
-            id: true
-        }
-    });
-
-    if (!clientProfile) return { success: false, error: "client Not found", status: 404 };
 
     const now = new Date();
     const dateAfter5Days = new Date(
@@ -48,7 +40,7 @@ export const getDeadlines = async (clientId: string, cursor?: string) => {
         take: 6,
         ...(cursor && { cursor: { id: cursor }, skip: 1 }),
         where: {
-            project: { clientId: clientProfile.id, status: { notIn: ["CANCELLED", "PENDING"] } },
+            project: { clientId: clientId, status: { notIn: ["CANCELLED", "PENDING"] } },
             deadline: {
                 gte: now,
                 lte: dateAfter5Days
@@ -90,17 +82,9 @@ export const getClientMoneyStats = async (clientId: string): Promise<MoneyStatsT
     if (!clientId) {
         return { success: false, error: "Invalid Client id", status: 400 }
     };
-    const clientProfile = await prisma.userprofile.findUnique({
-        where: { id: clientId },
-        select: {
-            id: true
-        }
-    });
-
-    if (!clientProfile) return { success: false, error: "client Not found", status: 404 };
 
     const paymentsfound = await prisma.payment.aggregate({
-        where: { project: { clientId: clientProfile.id } },
+        where: { project: { clientId: clientId } },
         _sum: {
             total_cost: true,
             paid_amount: true
@@ -113,7 +97,7 @@ export const getClientMoneyStats = async (clientId: string): Promise<MoneyStatsT
 
     const payments = await prisma.payment.findMany({
         where: {
-            project: { clientId: clientProfile.id },
+            project: { clientId: clientId },
             payment_status: "PAID"
         },
         select: {
@@ -125,16 +109,16 @@ export const getClientMoneyStats = async (clientId: string): Promise<MoneyStatsT
     const totalPaid = payments.reduce((sum, p) => sum + p.paid_amount, 0);
 
     const projectscount = await prisma.project.count({
-        where: { clientId: clientProfile.id, status: { not: "COMPLETED" } }
+        where: { clientId: clientId, status: { not: "COMPLETED" } }
     });
     const completedprojectscount = await prisma.project.count({
-        where: { clientId: clientProfile.id, status: { equals: "COMPLETED" } }
+        where: { clientId: clientId, status: { equals: "COMPLETED" } }
     });
 
     //Pending payment count
     const pendingpaymentscount = await prisma.payment.count({
         where: {
-            project: { clientId: clientProfile.id },
+            project: { clientId: clientId },
             payment_status: { not: "PAID" }
         }
     });

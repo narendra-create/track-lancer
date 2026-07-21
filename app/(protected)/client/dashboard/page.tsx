@@ -11,7 +11,12 @@ import { ActivityItem } from "@/types/activitys";
 import { getActivitys } from "@/app/lib/controllers/activityController";
 
 const Dashboard = async () => {
-  const result = await getClientStats();
+  let notifications: ActivityItem[];
+  const [result, activityresult] = await Promise.all([
+    getClientStats(),
+    getActivitys(),
+  ]);
+
   if (!result.success) {
     return (
       <main className="min-h-[80vh] flex items-center justify-center p-6">
@@ -35,7 +40,16 @@ const Dashboard = async () => {
       </main>
     );
   }
+  if (!activityresult.success && activityresult.notifications?.length === 0) {
+    console.error(
+      "Error in activity getting",
+      activityresult.error,
+      activityresult.status,
+    );
+  }
+
   const data: ClientDashboardData = result.data!;
+  notifications = activityresult.notifications ?? [];
 
   const loadMoreProjects = async (cursor: string) => {
     "use server";
@@ -91,17 +105,6 @@ const Dashboard = async () => {
       nextCursor: (res as any).nextCursor as string | null,
     };
   };
-
-  let notifications: ActivityItem[];
-  const activityresult = await getActivitys();
-  if (!activityresult.success && activityresult.notifications?.length === 0) {
-    console.error(
-      "Error in activity getting",
-      activityresult.error,
-      activityresult.status,
-    );
-  };
-  notifications = activityresult.notifications ?? [];
 
   return (
     <main>
